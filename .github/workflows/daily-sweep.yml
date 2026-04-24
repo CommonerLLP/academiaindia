@@ -71,65 +71,11 @@ jobs:
 
       - name: Show coverage report
         if: always()
-        run: |
-          if [[ -f data/coverage_report.json ]]; then
-            python -c "import json, sys; d = json.load(open('data/coverage_report.json')); print(f\"attempted={d.get('institutions_attempted')} succeeded={d.get('institutions_succeeded')} with_ads={d.get('institutions_with_ads')} ads={d.get('ads_found_total')}\")"
-            echo ""
-            echo "Parser failures (if any):"
-            python -c "import json; d = json.load(open('data/coverage_report.json')); [print(f\"  {r['institution_id']} [{r['parser']}] {r['fetch_status']} http={r.get('http_status')} ads={r['ads_found']} note={r.get('note','')}\") for r in d.get('rows', []) if r.get('fetch_status') != 'ok']"
-          else
-            echo "no coverage_report.json produced"
-          fi
+        run: python scraper/hss_report.py coverage
 
       - name: Summarise HSS-match records for the run log
         if: always()
-        run: |
-          python - <<'PY'
-          import json, re, os
-          try:
-              current = json.load(open('data/current.json'))
-          except Exception as e:
-              print(f'no current.json ({e})')
-              raise SystemExit(0)
-          HSS_POS = [
-              r"\bsociolog", r"\banthropolog", r"\bdevelopment\s+stud",
-              r"\bscience\s+(and|&)\s+technology\s+stud", r"\bSTS\b",
-              r"\btechnology[-\s]+in[-\s]+society", r"\bdigital\s+societ",
-              r"\bmulti[-\s]?species\s+ethnograph", r"\bcaste\s+stud",
-              r"\bdevelopment,?\s+technology,?\s+and\s+society",
-              r"\bSoPP\b", r"\bADCPS\b", r"\bC[-\s]?TARA\b",
-              r"\bSchool\s+of\s+Public\s+Policy",
-              r"\bAshank\s+Desai\s+Centre\s+for\s+Policy",
-              r"\bCentre\s+for\s+Technology\s+Alternatives\s+for\s+Rural",
-          ]
-          HSS_NEG = [
-              r"\bnon[-\s]?teaching", r"\bregistrar\b", r"\bengineer",
-              r"\bchemistry\b", r"\bmathematics\b", r"\bphysics\b",
-              r"\beconomics?\b", r"\bliterature", r"\bpsycholog",
-              r"\bmanagement\s+stud", r"\bfinance\b",
-          ]
-          def cls(ad):
-              hay = ' | '.join(str(v) for v in [ad.get('title'), ad.get('ad_number'), ad.get('department'), ad.get('discipline'), ad.get('raw_text_excerpt')] if v)
-              if any(re.search(p, hay, re.IGNORECASE) for p in HSS_POS): return 'hss'
-              if any(re.search(p, hay, re.IGNORECASE) for p in HSS_NEG): return 'excluded'
-              if re.search(r'\bfaculty\b|\bassistant\s+professor\b|\bprofessor\b', hay, re.IGNORECASE): return 'ambiguous'
-              return 'excluded'
-          ads = current.get('ads', [])
-          counts = {'hss':0, 'ambiguous':0, 'excluded':0}
-          hss = []
-          for a in ads:
-              c = cls(a)
-              counts[c] += 1
-              if c == 'hss':
-                  hss.append(f"  [{a['institution_id']}] {a['title'][:100]} (closes: {a.get('closing_date') or 'rolling'})")
-          print(f'=== HSS summary for {current.get("generated_at")} ===')
-          print(f'total: {len(ads)} · HSS: {counts["hss"]} · ambiguous: {counts["ambiguous"]} · out-of-scope: {counts["excluded"]}')
-          if hss:
-              print('')
-              print('HSS-match records:')
-              for line in hss:
-                  print(line)
-          PY
+        run: python scraper/hss_report.py hss
 
       - name: Commit updated data
         if: always()
