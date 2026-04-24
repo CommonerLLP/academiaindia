@@ -154,6 +154,7 @@ const HSS_POS = [
   /\bSchool\s+of\s+Public\s+Policy/i,
   /\bAshank\s+Desai\s+Centre\s+for\s+Policy/i,
   /\bCentre\s+for\s+Technology\s+Alternatives\s+for\s+Rural/i,
+  /\bPublic\s+Policy\b/i,
 ];
 const HSS_NEG = [
   /\bnon[-\s]?teaching/i, /\bregistrar\b/i, /\bengineer/i,
@@ -288,7 +289,7 @@ function renderCoverage() {
   const tbody = document.querySelector("#coverage-table tbody");
   tbody.innerHTML = (s.rows || []).map(r => {
     const inst = INSTITUTIONS[r.institution_id] || {name: r.institution_id};
-    const cls = r.fetch_status === "ok" ? "status-ok" : (r.fetch_status === "no-url" ? "status-no" : "status-err");
+    const cls = r.fetch_status === "ok" ? "status-ok" : (r.fetch_status === "manual" || r.fetch_status === "no-url" ? "status-no" : "status-err");
     return `<tr>
       <td>${escapeHTML(inst.name || r.institution_id)}</td>
       <td>${escapeHTML(r.parser)}</td>
