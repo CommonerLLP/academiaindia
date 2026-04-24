@@ -43,8 +43,18 @@ except ImportError:
 # Make scraper/ importable so that `from schema import ...` works regardless of
 # whether this file is run from the project root or from scraper/.
 HERE = Path(__file__).resolve().parent
+REPO_ROOT = HERE.parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
+
+
+def _pdf_url(pdf_path: Path) -> str:
+    """Return a repo-root-relative path so the dashboard can serve it via HTTP.
+    Falls back to an absolute file:// URL if the PDF is outside the repo."""
+    try:
+        return str(pdf_path.resolve().relative_to(REPO_ROOT))
+    except ValueError:
+        return _pdf_url(pdf_path)
 
 from schema import JobAd, PostType, ContractStatus, CategoryBreakdown  # noqa: E402
 
@@ -145,7 +155,7 @@ def _extract_iitd_rolling_ap(pdf_path: Path, text: str, pages: list[str], fetche
                     contract_status=ContractStatus.Regular,
                     closing_date=closing_date,
                     publication_date=ad_date,
-                    original_url=f"file://{pdf_path.resolve()}",
+                    original_url=_pdf_url(pdf_path),
                     fetched_at=fetched_at,
                     confidence=0.92,
                     excerpt=sub_text[:1000] or annex_text[:1000],
@@ -166,7 +176,7 @@ def _extract_iitd_rolling_ap(pdf_path: Path, text: str, pages: list[str], fetche
             contract_status=contract,
             closing_date=closing_date,
             publication_date=ad_date,
-            original_url=f"file://{pdf_path.resolve()}",
+            original_url=_pdf_url(pdf_path),
             fetched_at=fetched_at,
             confidence=0.88,
             excerpt=annex_text[:1000],
@@ -396,7 +406,7 @@ def _extract_generic(pdf_path: Path, text: str, pages: list[str], fetched_at: da
         contract_status=ContractStatus.Unknown,
         closing_date=closing_date,
         publication_date=ad_date,
-        original_url=f"file://{pdf_path.resolve()}",
+        original_url=_pdf_url(pdf_path),
         fetched_at=fetched_at,
         confidence=0.55,
         excerpt=first[:1000],
@@ -490,7 +500,7 @@ def _extract_iitb_l10(pdf_path: Path, text: str, pages: list[str], fetched_at: d
             contract_status=ContractStatus.Regular,
             closing_date=None,  # rolling; annexure doesn't carry a deadline
             publication_date=None,
-            original_url=f"file://{pdf_path.resolve()}",
+            original_url=_pdf_url(pdf_path),
             fetched_at=fetched_at,
             confidence=0.85,
             excerpt=body_text[:1000],

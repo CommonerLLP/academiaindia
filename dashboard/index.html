@@ -69,6 +69,13 @@
     <h2>Search</h2>
     <input id="search" type="search" placeholder="Title, discipline, department…" />
 
+    <h2>Relevance</h2>
+    <div id="filter-hss" class="filter-group">
+      <label><input type="checkbox" value="hss" checked />HSS match</label>
+      <label><input type="checkbox" value="ambiguous" checked />Ambiguous</label>
+      <label><input type="checkbox" value="excluded" />Out of scope</label>
+    </div>
+
     <h2>Institution Type</h2>
     <div id="filter-type" class="filter-group"></div>
 
@@ -136,6 +143,42 @@ const TYPE_ORDER = ["IIT","IIM","IISc","IISER","CentralUniversity","NIT","IIIT",
 const POST_TYPES = ["Faculty","NonFaculty","Scientific","Administrative","Research","Contract","Unknown"];
 const CONTRACT_TYPES = ["Regular","TenureTrack","Contractual","Guest","AdHoc","Visiting","TFPP","TTAP","Unknown"];
 
+// HSS classifier — mirrors scraper/hss_report.py
+const HSS_POS = [
+  /\bsociolog/i, /\banthropolog/i, /\bdevelopment\s+stud/i,
+  /\bscience\s+(and|&)\s+technology\s+stud/i, /\bSTS\b/i,
+  /\btechnology[-\s]+in[-\s]+society/i, /\bdigital\s+societ/i,
+  /\bmulti[-\s]?species\s+ethnograph/i, /\bcaste\s+stud/i,
+  /\bdevelopment,?\s+technology,?\s+and\s+society/i,
+  /\bSoPP\b/i, /\bADCPS\b/i, /\bC[-\s]?TARA\b/i,
+  /\bSchool\s+of\s+Public\s+Policy/i,
+  /\bAshank\s+Desai\s+Centre\s+for\s+Policy/i,
+  /\bCentre\s+for\s+Technology\s+Alternatives\s+for\s+Rural/i,
+];
+const HSS_NEG = [
+  /\bnon[-\s]?teaching/i, /\bregistrar\b/i, /\bengineer/i,
+  /\bchemistry\b/i, /\bmathematics\b/i, /\bphysics\b/i,
+  /\beconomics?\b/i, /\bliterature/i, /\bpsycholog/i,
+  /\bmanagement\s+stud/i, /\bfinance\b/i,
+];
+const FACULTY_HINT = /\bfaculty\b|\bassistant\s+professor\b|\bprofessor\b/i;
+
+function classifyAd(ad) {
+  const hay = [ad.title, ad.ad_number, ad.department, ad.discipline, ad.raw_text_excerpt]
+    .filter(Boolean).join(" | ");
+  if (HSS_POS.some(r => r.test(hay))) return "hss";
+  if (HSS_NEG.some(r => r.test(hay))) return "excluded";
+  if (FACULTY_HINT.test(hay)) return "ambiguous";
+  return "excluded";
+}
+
+function resolveUrl(u) {
+  if (!u) return "#";
+  if (u.startsWith("http") || u.startsWith("file://")) return u;
+  // repo-relative path (e.g. "sources/iit-delhi/...") — dashboard is one level down
+  return "../" + u;
+}
+
 async function loadData() {
   try {
     const [current, coverage, registry] = await Promise.all([
@@ -166,7 +209,7 @@ function populateFilters() {
   renderCheckboxes("filter-post", POST_TYPES.map(t => ({value: t, label: t})));
   renderCheckboxes("filter-contract", CONTRACT_TYPES.map(t => ({value: t, label: t})));
   renderCheckboxes("filter-state", Object.keys(stateCounts).sort().map(s => ({value: s, label: `${s} (${stateCounts[s]})`})));
-  for (const id of ["filter-type","filter-post","filter-contract","filter-state"]) {
+  for (const id of ["filter-hss","filter-type","filter-post","filter-contract","filter-state"]) {
     document.getElementById(id).addEventListener("change", render);
   }
   document.getElementById("search").addEventListener("input", render);
@@ -183,6 +226,7 @@ function getChecked(id) {
 
 function render() {
   const query = document.getElementById("search").value.trim().toLowerCase();
+  const hssClasses = new Set(getChecked("filter-hss"));
   const types = new Set(getChecked("filter-type"));
   const posts = new Set(getChecked("filter-post"));
   const contracts = new Set(getChecked("filter-contract"));
@@ -190,6 +234,7 @@ function render() {
 
   const filtered = ADS.filter(ad => {
     const inst = INSTITUTIONS[ad.institution_id] || {};
+    if (hssClasses.size && !hssClasses.has(classifyAd(ad))) return false;
     if (types.size && !types.has(inst.type)) return false;
     if (states.size && !states.has(inst.state)) return false;
     if (posts.size && !posts.has(ad.post_type)) return false;
@@ -226,7 +271,7 @@ function render() {
           <span>${close}</span>
         </div>
         ${catLine}
-        <div class="ad-actions"><a href="${escapeAttr(ad.original_url)}" target="_blank" rel="noopener noreferrer">Open original →</a></div>
+        <div class="ad-actions"><a href="${escapeAttr(resolveUrl(ad.original_url))}" target="_blank" rel="noopener noreferrer">Open original →</a></div>
       </div>`;
   }).join("");
   document.getElementById("ads").innerHTML = html || `<p style="color:var(--muted)">No advertisements match your filters.</p>`;
