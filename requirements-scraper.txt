@@ -1,0 +1,9 @@
+# Runtime deps for scraper/run.py and scraper/ingest_pdf.py
+# Pinned to the versions validated on 23 Apr 2026 in the Cowork sandbox.
+
+pdfplumber>=0.11.0,<1.0
+pydantic>=2.0,<3.0
+requests>=2.31,<3.0
+requests-cache>=1.2,<2.0
+beautifulsoup4>=4.12,<5.0
+lxml>=5.0,<6.0

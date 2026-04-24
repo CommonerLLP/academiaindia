@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>India HEI Job Tracker · centrally-funded institutions</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #666;
+    --accent: #1F4E79;
+    --warn: #b85c00;
+    --good: #2d6a4f;
+    --border: #d8d5cc;
+    --chip-bg: #f0eee7;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: var(--ink); background: var(--bg); }
+  header { padding: 22px 28px 10px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  header h1 { margin: 0; font-size: 22px; font-weight: 600; color: var(--accent); }
+  header p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  main { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 20px 28px; max-width: 1500px; margin: 0 auto; }
+  aside { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; height: fit-content; position: sticky; top: 20px; }
+  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 14px 0 8px; }
+  aside h2:first-child { margin-top: 0; }
+  .filter-group label { display: flex; align-items: center; gap: 6px; padding: 3px 0; cursor: pointer; font-size: 13px; }
+  .filter-group input[type="checkbox"] { accent-color: var(--accent); }
+  #search { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
+  section#feed { }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .tabs button { background: transparent; border: none; padding: 10px 16px; font-size: 14px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; }
+  .tabs button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .banner { background: #fff4e6; border: 1px solid #e8c999; color: #6b4a10; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
+  .banner strong { color: var(--warn); }
+  .ad { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+  .ad-header { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  .ad-title { font-weight: 600; font-size: 15px; color: var(--ink); }
+  .ad-inst { font-size: 13px; color: var(--accent); font-weight: 600; }
+  .ad-meta { color: var(--muted); font-size: 12px; margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip { display: inline-block; padding: 2px 8px; background: var(--chip-bg); border-radius: 10px; font-size: 11px; color: var(--ink); }
+  .chip.ph-type-Faculty { background: #d9e7f5; color: #1F4E79; }
+  .chip.ph-type-NonFaculty { background: #e4e1d8; }
+  .chip.ph-type-Scientific { background: #dfeeda; color: #2d6a4f; }
+  .chip.confidence-low { background: #f5e1d9; color: #8a3a1a; }
+  .ad-actions { margin-top: 10px; }
+  .ad-actions a { color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500; }
+  .ad-actions a:hover { text-decoration: underline; }
+  .meta-row { color: var(--muted); font-size: 12px; margin: 12px 0 6px; }
+  #coverage-tab table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--panel); border: 1px solid var(--border); }
+  #coverage-tab th, #coverage-tab td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  #coverage-tab th { background: var(--chip-bg); font-weight: 600; }
+  .status-ok { color: var(--good); }
+  .status-err { color: #b85c00; }
+  .status-no { color: var(--muted); }
+  footer { max-width: 1500px; margin: 30px auto; padding: 20px 28px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  footer p { margin: 8px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>India HEI Job Tracker <span style="font-weight: 400; font-size: 15px; color: var(--muted);">· centrally-funded institutions</span></h1>
+  <p>IITs · IIMs · IISERs · IISc · Central Universities · NITs · IIITs · AIIMSs. Daily-refreshed listings aggregated from institution career pages. Not authoritative — always verify deadlines against the original PDF.</p>
+</header>
+
+<main>
+  <aside>
+    <h2>Search</h2>
+    <input id="search" type="search" placeholder="Title, discipline, department…" />
+
+    <h2>Institution Type</h2>
+    <div id="filter-type" class="filter-group"></div>
+
+    <h2>Post Type</h2>
+    <div id="filter-post" class="filter-group"></div>
+
+    <h2>Contract Status</h2>
+    <div id="filter-contract" class="filter-group"></div>
+
+    <h2>State</h2>
+    <div id="filter-state" class="filter-group" style="max-height:180px; overflow-y:auto;"></div>
+  </aside>
+
+  <section id="feed">
+    <div class="tabs">
+      <button class="active" data-tab="listings">Listings</button>
+      <button data-tab="coverage">Coverage</button>
+      <button data-tab="about">About</button>
+    </div>
+
+    <div class="banner" role="note">
+      <strong>Please verify deadlines.</strong> This tracker surfaces advertisements. Deadlines shown are parsed heuristically and may be wrong. Always click through to the original PDF before submitting an application.
+    </div>
+
+    <div id="listings-tab">
+      <div class="meta-row" id="summary-row"></div>
+      <div id="ads"></div>
+    </div>
+
+    <div id="coverage-tab" style="display:none;">
+      <p style="color:var(--muted); font-size:13px;">How many institutions are being successfully scraped and when. Broken parsers mean those institutions are silently absent from the feed. Help us fix them.</p>
+      <div id="coverage-summary"></div>
+      <table id="coverage-table">
+        <thead><tr><th>Institution</th><th>Parser</th><th>Status</th><th>HTTP</th><th>Ads</th><th>Note</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="about-tab" style="display:none;">
+      <p>This tracker is a research-adjacent tool built as data infrastructure first, user-interface second. The underlying corpus of advertisements is archived daily and is the durable public good; this dashboard is a replaceable thin layer on top.</p>
+      <p><strong>Why you should not trust this tool as your primary source:</strong> India's HEI recruitment pages are heterogeneous, often PDF-only, sometimes JavaScript-rendered, and routinely restructured. Parsers break. When a parser breaks, an institution silently disappears from the feed. Check the <em>Coverage</em> tab to see which institutions were parsed in the last run.</p>
+      <p><strong>What this tracker does not cover:</strong> State public universities; state-funded private universities; deemed-to-be universities; most research institutions (TIFR, CSIR labs, ICAR institutes); Samarth-only institutions (Samarth eGov's ToS forbids automated access). If an institution has migrated recruitment to Samarth exclusively, it is flagged and excluded.</p>
+      <p><strong>On the politics of this object.</strong> Faculty and non-teaching advertisements in India are governed by a category-reservation regime — UR, SC, ST, OBC (NCL), EWS, PwBD — and many reserved-category posts are repeatedly re-advertised after Not Found Suitable declarations, then eventually de-reserved. A listings-only tracker surfaces the <em>advertisement</em> moment but cannot tell you what happened to the post afterwards. A future version will match re-advertisements of the same post code over time.</p>
+      <p><strong>Citations for analytical framing:</strong></p>
+      <ul style="font-size:13px; color:var(--muted); line-height:1.55;">
+        <li>Deshpande, Satish, and Usha Zacharias. 2013. <em>Beyond Inclusion.</em> New Delhi: Routledge.</li>
+        <li>Subramanian, Ajantha. 2019. <em>The Caste of Merit.</em> Cambridge, MA: Harvard University Press.</li>
+        <li>Thorat, Sukhadeo, and Katherine S. Newman, eds. 2010. <em>Blocked by Caste.</em> New Delhi: Oxford University Press.</li>
+        <li>Weisskopf, Thomas E. 2004. <em>Affirmative Action in the United States and India.</em> London: Routledge.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p><strong>Disclaimer.</strong> This is a personal research tool, not an official government or institutional service. Listings are reproduced from publicly-posted advertisements and may be incomplete, stale, or incorrectly parsed. Always verify against the original institutional source before applying. No personal data is collected.</p>
+  <p>Source code and contribution guide: see repository.</p>
+</footer>
+
+<script>
+let ADS = [];
+let COVERAGE = null;
+let INSTITUTIONS = {};
+const TYPE_ORDER = ["IIT","IIM","IISc","IISER","CentralUniversity","NIT","IIIT","AIIMS"];
+const POST_TYPES = ["Faculty","NonFaculty","Scientific","Administrative","Research","Contract","Unknown"];
+const CONTRACT_TYPES = ["Regular","TenureTrack","Contractual","Guest","AdHoc","Visiting","TFPP","TTAP","Unknown"];
+
+async function loadData() {
+  try {
+    const [current, coverage, registry] = await Promise.all([
+      fetch("../data/current.json").then(r => r.json()),
+      fetch("../data/coverage_report.json").then(r => r.json()).catch(()=>null),
+      fetch("../data/institutions_registry.json").then(r => r.json()),
+    ]);
+    ADS = current.ads || [];
+    COVERAGE = coverage;
+    for (const inst of registry) INSTITUTIONS[inst.id] = inst;
+  } catch (e) {
+    document.getElementById("ads").innerHTML = `<div class="banner"><strong>Data unavailable.</strong> Run <code>python scraper/run.py</code> to generate <code>data/current.json</code>.</div>`;
+    return;
+  }
+  populateFilters();
+  render();
+  renderCoverage();
+}
+
+function populateFilters() {
+  const typeCounts = {}, stateCounts = {};
+  for (const ad of ADS) {
+    const inst = INSTITUTIONS[ad.institution_id] || {};
+    typeCounts[inst.type] = (typeCounts[inst.type] || 0) + 1;
+    stateCounts[inst.state] = (stateCounts[inst.state] || 0) + 1;
+  }
+  renderCheckboxes("filter-type", TYPE_ORDER.filter(t => typeCounts[t]).map(t => ({value: t, label: `${t} (${typeCounts[t]||0})`})));
+  renderCheckboxes("filter-post", POST_TYPES.map(t => ({value: t, label: t})));
+  renderCheckboxes("filter-contract", CONTRACT_TYPES.map(t => ({value: t, label: t})));
+  renderCheckboxes("filter-state", Object.keys(stateCounts).sort().map(s => ({value: s, label: `${s} (${stateCounts[s]})`})));
+  for (const id of ["filter-type","filter-post","filter-contract","filter-state"]) {
+    document.getElementById(id).addEventListener("change", render);
+  }
+  document.getElementById("search").addEventListener("input", render);
+}
+
+function renderCheckboxes(containerId, options) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = options.map(o => `<label><input type="checkbox" value="${o.value}" />${o.label}</label>`).join("");
+}
+
+function getChecked(id) {
+  return [...document.querySelectorAll(`#${id} input:checked`)].map(el => el.value);
+}
+
+function render() {
+  const query = document.getElementById("search").value.trim().toLowerCase();
+  const types = new Set(getChecked("filter-type"));
+  const posts = new Set(getChecked("filter-post"));
+  const contracts = new Set(getChecked("filter-contract"));
+  const states = new Set(getChecked("filter-state"));
+
+  const filtered = ADS.filter(ad => {
+    const inst = INSTITUTIONS[ad.institution_id] || {};
+    if (types.size && !types.has(inst.type)) return false;
+    if (states.size && !states.has(inst.state)) return false;
+    if (posts.size && !posts.has(ad.post_type)) return false;
+    if (contracts.size && !contracts.has(ad.contract_status)) return false;
+    if (query) {
+      const hay = `${ad.title} ${ad.department||""} ${ad.discipline||""} ${inst.name||""}`.toLowerCase();
+      if (!hay.includes(query)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById("summary-row").textContent = `${filtered.length} advertisement${filtered.length===1?"":"s"} shown (of ${ADS.length} total)`;
+
+  const html = filtered.map(ad => {
+    const inst = INSTITUTIONS[ad.institution_id] || {name: ad.institution_id};
+    const close = ad.closing_date ? `closing ${ad.closing_date}` : "closing date not parsed";
+    const chips = [];
+    if (ad.post_type && ad.post_type !== "Unknown") chips.push(`<span class="chip ph-type-${ad.post_type}">${ad.post_type}</span>`);
+    if (ad.contract_status && ad.contract_status !== "Unknown") chips.push(`<span class="chip">${ad.contract_status}</span>`);
+    if (ad.number_of_posts) chips.push(`<span class="chip">${ad.number_of_posts} post${ad.number_of_posts===1?"":"s"}</span>`);
+    if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) chips.push(`<span class="chip confidence-low">low-confidence parse</span>`);
+    const cat = ad.category_breakdown || {};
+    const catBits = ["UR","SC","ST","OBC","EWS","PwBD"].filter(k => cat[k]!=null && cat[k]>0).map(k => `${k}:${cat[k]}`);
+    const catLine = catBits.length ? `<div class="ad-meta">Roster: ${catBits.join(" · ")}</div>` : "";
+    return `
+      <div class="ad">
+        <div class="ad-header">
+          <div class="ad-title">${escapeHTML(ad.title || "(untitled)")}</div>
+          <div class="ad-inst">${escapeHTML(inst.short_name || inst.name)}</div>
+        </div>
+        <div class="ad-meta">
+          ${chips.join(" ")}
+          ${ad.ad_number ? `<span>Advt: ${escapeHTML(ad.ad_number)}</span>`:""}
+          <span>${close}</span>
+        </div>
+        ${catLine}
+        <div class="ad-actions"><a href="${escapeAttr(ad.original_url)}" target="_blank" rel="noopener noreferrer">Open original →</a></div>
+      </div>`;
+  }).join("");
+  document.getElementById("ads").innerHTML = html || `<p style="color:var(--muted)">No advertisements match your filters.</p>`;
+}
+
+function renderCoverage() {
+  if (!COVERAGE) {
+    document.getElementById("coverage-summary").innerHTML = `<p style="color:var(--muted)">No coverage report available yet.</p>`;
+    return;
+  }
+  const s = COVERAGE;
+  document.getElementById("coverage-summary").innerHTML = `
+    <p style="font-size:13px; color:var(--muted);">Generated at <strong>${s.generated_at}</strong> · attempted ${s.institutions_attempted} · succeeded ${s.institutions_succeeded} · produced ads: ${s.institutions_with_ads} · total ads: ${s.ads_found_total}</p>`;
+  const tbody = document.querySelector("#coverage-table tbody");
+  tbody.innerHTML = (s.rows || []).map(r => {
+    const inst = INSTITUTIONS[r.institution_id] || {name: r.institution_id};
+    const cls = r.fetch_status === "ok" ? "status-ok" : (r.fetch_status === "no-url" ? "status-no" : "status-err");
+    return `<tr>
+      <td>${escapeHTML(inst.name || r.institution_id)}</td>
+      <td>${escapeHTML(r.parser)}</td>
+      <td class="${cls}">${r.fetch_status}</td>
+      <td>${r.http_status ?? "—"}</td>
+      <td>${r.ads_found}</td>
+      <td style="color:var(--muted); font-size:12px;">${escapeHTML(r.note || "")}</td>
+    </tr>`;
+  }).join("");
+}
+
+function escapeHTML(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+function escapeAttr(s) { return escapeHTML(s); }
+
+document.querySelectorAll(".tabs button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    for (const name of ["listings","coverage","about"]) {
+      document.getElementById(name + "-tab").style.display = (btn.dataset.tab === name) ? "" : "none";
+    }
+  });
+});
+
+loadData();
+</script>
+</body>
+</html>

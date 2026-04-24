@@ -1,0 +1,157 @@
+name: daily-sweep
+
+# Runs the Indian HEI Job Tracker scraper on GitHub-hosted Ubuntu runners,
+# which have unblocked outbound internet (Cowork's sandbox does not — that is
+# why this workflow exists). Produces data/current.json, an archive snapshot
+# dated YYYY-MM-DD, and data/coverage_report.json. Commits back to the repo.
+#
+# Schedule: 03:30 IST (22:00 UTC, previous day). Adjust 'cron' if you want
+# earlier / later. Also runs on push to main (safety / sanity check) and on
+# manual workflow_dispatch so you can re-run from the GitHub UI at any time.
+
+on:
+  schedule:
+    - cron: "0 22 * * *"  # 03:30 IST daily; GH Actions cron is UTC
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Limit to first N institutions (for debugging)"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+    paths:
+      - "scraper/**"
+      - "data/institutions_registry.json"
+      - ".github/workflows/daily-sweep.yml"
+
+permissions:
+  contents: write  # commit data/ back to the repo
+
+concurrency:
+  group: daily-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-scraper.txt
+
+      - name: Run scraper
+        id: scrape
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p data/archive
+          LIMIT_ARG=""
+          if [[ -n "${{ github.event.inputs.limit }}" ]]; then
+            LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
+          fi
+          python scraper/run.py $LIMIT_ARG | tee sweep-summary.txt
+          echo "--- scrape summary ---"
+          cat sweep-summary.txt
+        env:
+          PYTHONUNBUFFERED: "1"
+
+      - name: Show coverage report
+        if: always()
+        run: |
+          if [[ -f data/coverage_report.json ]]; then
+            python -c "import json, sys; d = json.load(open('data/coverage_report.json')); print(f\"attempted={d.get('institutions_attempted')} succeeded={d.get('institutions_succeeded')} with_ads={d.get('institutions_with_ads')} ads={d.get('ads_found_total')}\")"
+            echo ""
+            echo "Parser failures (if any):"
+            python -c "import json; d = json.load(open('data/coverage_report.json')); [print(f\"  {r['institution_id']} [{r['parser']}] {r['fetch_status']} http={r.get('http_status')} ads={r['ads_found']} note={r.get('note','')}\") for r in d.get('rows', []) if r.get('fetch_status') != 'ok']"
+          else
+            echo "no coverage_report.json produced"
+          fi
+
+      - name: Summarise HSS-match records for the run log
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, re, os
+          try:
+              current = json.load(open('data/current.json'))
+          except Exception as e:
+              print(f'no current.json ({e})')
+              raise SystemExit(0)
+          HSS_POS = [
+              r"\bsociolog", r"\banthropolog", r"\bdevelopment\s+stud",
+              r"\bscience\s+(and|&)\s+technology\s+stud", r"\bSTS\b",
+              r"\btechnology[-\s]+in[-\s]+society", r"\bdigital\s+societ",
+              r"\bmulti[-\s]?species\s+ethnograph", r"\bcaste\s+stud",
+              r"\bdevelopment,?\s+technology,?\s+and\s+society",
+              r"\bSoPP\b", r"\bADCPS\b", r"\bC[-\s]?TARA\b",
+              r"\bSchool\s+of\s+Public\s+Policy",
+              r"\bAshank\s+Desai\s+Centre\s+for\s+Policy",
+              r"\bCentre\s+for\s+Technology\s+Alternatives\s+for\s+Rural",
+          ]
+          HSS_NEG = [
+              r"\bnon[-\s]?teaching", r"\bregistrar\b", r"\bengineer",
+              r"\bchemistry\b", r"\bmathematics\b", r"\bphysics\b",
+              r"\beconomics?\b", r"\bliterature", r"\bpsycholog",
+              r"\bmanagement\s+stud", r"\bfinance\b",
+          ]
+          def cls(ad):
+              hay = ' | '.join(str(v) for v in [ad.get('title'), ad.get('ad_number'), ad.get('department'), ad.get('discipline'), ad.get('raw_text_excerpt')] if v)
+              if any(re.search(p, hay, re.IGNORECASE) for p in HSS_POS): return 'hss'
+              if any(re.search(p, hay, re.IGNORECASE) for p in HSS_NEG): return 'excluded'
+              if re.search(r'\bfaculty\b|\bassistant\s+professor\b|\bprofessor\b', hay, re.IGNORECASE): return 'ambiguous'
+              return 'excluded'
+          ads = current.get('ads', [])
+          counts = {'hss':0, 'ambiguous':0, 'excluded':0}
+          hss = []
+          for a in ads:
+              c = cls(a)
+              counts[c] += 1
+              if c == 'hss':
+                  hss.append(f"  [{a['institution_id']}] {a['title'][:100]} (closes: {a.get('closing_date') or 'rolling'})")
+          print(f'=== HSS summary for {current.get("generated_at")} ===')
+          print(f'total: {len(ads)} · HSS: {counts["hss"]} · ambiguous: {counts["ambiguous"]} · out-of-scope: {counts["excluded"]}')
+          if hss:
+              print('')
+              print('HSS-match records:')
+              for line in hss:
+                  print(line)
+          PY
+
+      - name: Commit updated data
+        if: always()
+        run: |
+          git config user.name "india-hei-tracker-bot"
+          git config user.email "solanki.aakash@gmail.com"
+          git add -A data/ || true
+          if git diff --cached --quiet; then
+            echo "no data changes to commit"
+            exit 0
+          fi
+          COUNT=$(python -c "import json; print(json.load(open('data/current.json')).get('ad_count', 0))" 2>/dev/null || echo "?")
+          git commit -m "daily sweep: $(date -u +%Y-%m-%d) · ${COUNT} records" || true
+          git push || true
+
+      - name: Archive run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweep-log-${{ github.run_id }}
+          path: |
+            sweep-summary.txt
+            data/coverage_report.json
+          retention-days: 14
+          if-no-files-found: ignore
