@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>India HEI Job Tracker · centrally-funded institutions</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root {
     --bg: #fafaf7;
@@ -56,6 +58,15 @@
   .status-no { color: var(--muted); }
   footer { max-width: 1500px; margin: 30px auto; padding: 20px 28px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
   footer p { margin: 8px 0; }
+  #map-container { height: 620px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .map-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; font-size: 12px; }
+  .map-legend-item { display: flex; align-items: center; gap: 5px; }
+  .map-legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .leaflet-popup-content { font-size: 13px; line-height: 1.5; min-width: 180px; }
+  .leaflet-popup-content strong { color: var(--accent); }
+  .popup-hss { color: var(--good); font-weight: 600; margin-top: 4px; }
+  .popup-link { color: var(--accent); text-decoration: none; font-size: 12px; }
+  .popup-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -92,6 +103,7 @@
   <section id="feed">
     <div class="tabs">
       <button class="active" data-tab="listings">Listings</button>
+      <button data-tab="map">Map</button>
       <button data-tab="coverage">Coverage</button>
       <button data-tab="about">About</button>
     </div>
@@ -103,6 +115,11 @@
     <div id="listings-tab">
       <div class="meta-row" id="summary-row"></div>
       <div id="ads"></div>
+    </div>
+
+    <div id="map-tab" style="display:none;">
+      <div id="map-container"></div>
+      <div class="map-legend" id="map-legend"></div>
     </div>
 
     <div id="coverage-tab" style="display:none;">
@@ -306,13 +323,75 @@ function escapeHTML(s) {
 }
 function escapeAttr(s) { return escapeHTML(s); }
 
+const TYPE_COLORS = {
+  IIT: "#1F4E79", IIM: "#2d6a4f", IISc: "#6b21a8", IISER: "#b45309",
+  NIT: "#64748b", IIIT: "#0e7490", AIIMS: "#be123c", CentralUniversity: "#92400e",
+};
+function typeColor(t) { return TYPE_COLORS[t] || "#888"; }
+
+let MAP = null;
+function initMap() {
+  if (MAP) { MAP.invalidateSize(); return; }
+  MAP = L.map("map-container").setView([22.5, 82], 5);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+  }).addTo(MAP);
+
+  // Count HSS ads per institution
+  const hssCount = {}, totalCount = {};
+  for (const ad of ADS) {
+    const iid = ad.institution_id;
+    totalCount[iid] = (totalCount[iid] || 0) + 1;
+    if (classifyAd(ad) === "hss") hssCount[iid] = (hssCount[iid] || 0) + 1;
+  }
+
+  const typeSeen = new Set();
+  for (const inst of Object.values(INSTITUTIONS)) {
+    if (!inst.lat || !inst.lon) continue;
+    const color = typeColor(inst.type);
+    const hss = hssCount[inst.id] || 0;
+    const total = totalCount[inst.id] || 0;
+    const radius = hss > 0 ? 10 : 7;
+    const marker = L.circleMarker([inst.lat, inst.lon], {
+      radius, color: hss > 0 ? "#b45309" : color,
+      fillColor: color, fillOpacity: 0.85, weight: hss > 0 ? 2.5 : 1,
+    }).addTo(MAP);
+
+    const coverageUrl = inst.career_page_url_guess || "#";
+    const hssLine = hss > 0 ? `<div class="popup-hss">▲ ${hss} HSS-match ad${hss > 1 ? "s" : ""}</div>` : "";
+    marker.bindPopup(`
+      <strong>${escapeHTML(inst.name)}</strong><br/>
+      <span style="color:#666">${inst.type} · ${inst.city}, ${inst.state}</span>
+      ${hssLine}
+      <div style="margin-top:6px">
+        ${total} ad${total !== 1 ? "s" : ""} in feed &nbsp;·&nbsp;
+        <a class="popup-link" href="${escapeAttr(coverageUrl)}" target="_blank" rel="noopener">career page →</a>
+      </div>`);
+
+    typeSeen.add(inst.type);
+  }
+
+  // Legend
+  const legend = document.getElementById("map-legend");
+  legend.innerHTML = [...typeSeen].sort().map(t =>
+    `<div class="map-legend-item">
+      <div class="map-legend-dot" style="background:${typeColor(t)}"></div>${t}
+    </div>`
+  ).join("") +
+  `<div class="map-legend-item">
+    <div class="map-legend-dot" style="background:#1F4E79;outline:2px solid #b45309;outline-offset:1px"></div>HSS ads open
+  </div>`;
+}
+
 document.querySelectorAll(".tabs button").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    for (const name of ["listings","coverage","about"]) {
+    for (const name of ["listings","map","coverage","about"]) {
       document.getElementById(name + "-tab").style.display = (btn.dataset.tab === name) ? "" : "none";
     }
+    if (btn.dataset.tab === "map") initMap();
   });
 });
 
