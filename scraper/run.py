@@ -54,6 +54,17 @@ def run(registry_path: Path, out_dir: Path, cache_dir: Path, limit: Optional[int
         parser_name = inst.get("parser", "generic") or "generic"
         url = inst.get("career_page_url_guess") or ""
 
+        if parser_name == "manual":
+            coverage.append(CoverageRow(
+                institution_id=inst["id"],
+                parser="manual",
+                fetch_status="manual",
+                http_status=None,
+                ads_found=0,
+                note=inst.get("notes", "Rolling call — check URL directly."),
+            ))
+            continue
+
         if not url:
             coverage.append(CoverageRow(
                 institution_id=inst["id"],

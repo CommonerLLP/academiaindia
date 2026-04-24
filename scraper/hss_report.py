@@ -29,6 +29,7 @@ HSS_POS = [
     r"\bSchool\s+of\s+Public\s+Policy",
     r"\bAshank\s+Desai\s+Centre\s+for\s+Policy",
     r"\bCentre\s+for\s+Technology\s+Alternatives\s+for\s+Rural",
+    r"\bPublic\s+Policy\b",
 ]
 
 HSS_NEG = [
