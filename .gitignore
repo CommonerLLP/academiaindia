@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Scraper working directory
+.cache/
+*.log
+sweep-summary.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Deliberate exceptions — DO keep these tracked:
+# data/*.json — produced by the scraper, checked in for history
+# sources/ — PDFs you've collected
+# .github/workflows/ — CI config
