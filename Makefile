@@ -14,6 +14,11 @@ serve:
 
 sweep: $(PYTHON)
 	$(PYTHON) scraper/run.py $(ARGS)
+	@find sources -name "*.pdf" | while read pdf; do \
+	  inst=$$(basename $$(dirname "$$pdf")); \
+	  echo "merging $$pdf ($$inst)"; \
+	  $(PYTHON) scraper/ingest_pdf.py --pdf "$$pdf" --institution "$$inst" --merge 2>&1 | tail -1; \
+	done
 
 report: $(PYTHON)
 	$(PYTHON) scraper/hss_report.py

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sIL --max-time 8 \"https://www.iitgn.ac.in/about/jobs\")",
+      "Bash(curl -sk --max-time 8 https://__TRACKED_VAR__)"
+    ]
+  }
+}
