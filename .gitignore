@@ -43,3 +43,14 @@ Thumbs.db
 /NOTES.md
 /notes/
 /internal/
+
+# Research data corpus — STAYS LOCAL ONLY.
+# These are the parliamentary PDFs, sansad-crawl outputs, IIT vacancy
+# disclosures, and historical JSON snapshots that drive the analysis.
+# They live on the maintainer's machine (iCloud-backed); the public
+# repo only carries what GitHub Pages needs to serve the site +
+# operational code (scraper, scripts, CI). Do not commit.
+/corpus/
+/sources/
+/data/
+
