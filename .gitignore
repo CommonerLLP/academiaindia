@@ -54,3 +54,5 @@ Thumbs.db
 /sources/
 /data/
 
+/corpus/parsed/
+/corpus/extracted/
