@@ -184,9 +184,6 @@
           <p class="vgb-sub">
             Institutions keep the rest open instead of filling them. <a href="#vacancies" data-tab-link="vacancies">See the breakdown →</a>
           </p>
-          <p class="vgb-disclaimer">
-            Compiled from public recruitment notices for research and reference. Verify with the issuing institution before applying. Errors possible.
-          </p>
         </div>
       </div>
 
@@ -226,6 +223,113 @@
 
     <div id="resources-tab" role="tabpanel" aria-labelledby="tab-resources" tabindex="0" style="display:none;"><h2 class="sr-only">Resources for candidates</h2></div>
 
+    <!-- About / methodology — accessible via the colophon link, not via the
+         top-nav tablist, because it is a destination rather than a tool. The
+         compact footer that ships on every other tab gets replaced here by a
+         substantive piece of writing about what the project is, how the data
+         is built, the disclaimers in full, and how to cite. -->
+    <section id="about-tab" aria-labelledby="about-heading" tabindex="0" style="display:none;" class="about-page">
+      <h2 id="about-heading" class="about-h2">About this project</h2>
+
+      <p class="about-lede">
+        Whose University? is a tracker of academic-work openings in India,
+        paired with an investigation of how the state administers — and fails
+        to administer — its constitutional reservation regime in faculty
+        hiring at centrally-funded higher-education institutions. The site
+        runs two registers in parallel.
+      </p>
+
+      <h3 class="about-h3">Vacancies</h3>
+      <p>
+        A live feed of advertised positions across Central Universities, the
+        IITs, IIMs, NITs, IIITs, AIIMS, and the major private universities.
+        Scraped from each institution's career page, occasionally PDF-parsed
+        from notification documents, and (rarely) hand-transcribed from
+        recruitment cards circulated outside the institutions' own
+        websites — those carry a yellow <strong>⚑ manual entry</strong>
+        badge so a candidate can weigh what they are reading. Confidence is
+        graded on every listing.
+      </p>
+
+      <h3 class="about-h3">The Gap</h3>
+      <p>
+        A research treatment of the parliamentary record on faculty vacancy
+        in centrally-funded higher-education institutions, September 2020 to
+        March 2026. 546 questions tabled across the Lok Sabha and Rajya
+        Sabha; one, RS Q.365 of 23 July 2025 (asked by the Leader of
+        Opposition, Shri Mallikarjun Kharge), surfaced rank-by-category
+        vacancy data. The rest were answered with cumulative "Mission Mode"
+        recruitment counters that conflate appointment with vacancy. The Gap
+        names this substitution and the institutions that perform it.
+      </p>
+
+      <h3 class="about-h3">Methodology</h3>
+      <p><strong>Listings.</strong>
+        ~185 institutions in the registry. Per-site parsers in
+        <code>scraper/parsers/</code>; an HTTP cache; a single shared SSRF
+        guard. Outputs land in <code>docs/data/current.json</code>, which
+        this page hydrates on load. Daily sweep on a GitHub Actions cron;
+        the full scraper code is in the public repository.
+      </p>
+      <p><strong>The Gap corpus.</strong>
+        Lok Sabha and Rajya Sabha questions crawled from
+        <code>elibrary.sansad.in</code> (LS, DSpace API) and
+        <code>rsdoc.nic.in</code> (RS), filtered by Education-ministry tag
+        and topical keyword, consolidated into a 546-document corpus with
+        PDF text extracts. Charts are computed from this corpus and
+        individually sourced in the bibliography at the foot of that tab.
+        The corpus itself is not redistributed through this site (the
+        primary documents are public on sansad.in); only the analysis is.
+      </p>
+
+      <h3 class="about-h3">No warranty; verify before applying</h3>
+      <p>
+        Listings are scraped from official institutional websites, parsed
+        automatically, and occasionally hand-transcribed from circulated
+        recruitment cards. Errors are possible — extraction errors, stale
+        data, missing posts, transcription gaps. Always verify against the
+        official advertisement and application portal before applying. This
+        site does not replace the original notification; it surfaces it.
+      </p>
+
+      <h3 class="about-h3">Independence and use at own risk</h3>
+      <p>
+        The site is not affiliated with, endorsed by, or operated on behalf
+        of any institution listed. The maintainer makes no warranty as to
+        the accuracy, completeness, currency, or availability of any
+        position. Use of this information is at the reader's own risk. The
+        site collects no personal data about visitors; it stores no
+        application records and acts as an index, not an intermediary.
+      </p>
+
+      <h3 class="about-h3">Analytical content</h3>
+      <p>
+        Material in <em>The Gap</em> is the maintainer's research
+        interpretation of publicly available parliamentary records, court
+        orders, and official Ministry of Education communications, all of
+        which are cited in the source bibliography on that page. It is
+        offered as research-and-reference public-interest commentary; it is
+        not legal advice and not an allegation against any named individual.
+      </p>
+
+      <h3 class="about-h3">Citation and licence</h3>
+      <p>
+        Code: <strong>MIT</strong>. Data and corpus: <strong>Creative
+        Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</strong>.
+        Cite as: <em>Whose University?, whoseuniversity.org, accessed
+        YYYY-MM-DD.</em>
+      </p>
+
+      <h3 class="about-h3">Corrections</h3>
+      <p>
+        Open an issue at
+        <a href="https://github.com/freelibraries4all/academiaindia" target="_blank" rel="noopener">github.com/freelibraries4all/academiaindia</a>,
+        or write to the maintainer.
+      </p>
+
+      <p class="about-verdict">The Constitution is not being violated by accident. It is being administered to that effect.</p>
+    </section>
+
     <div id="coverage-tab" style="display:none;">
       <h2 class="sr-only">Scraper coverage</h2>
       <p style="color:var(--muted); font-size:13px; margin-top:0;">How many institutions are being successfully scraped and when. Broken parsers mean those institutions are silently absent from the feed.</p>
@@ -239,36 +343,23 @@
   </section>
 </main>
 
+<!--
+  Compact colophon — appears at the foot of every tab. The full project
+  description, methodology, and disclaimer paragraphs live on the About
+  page (#about); this footer carries only what every page must signal:
+  the editorial verdict, a one-line research-and-reference caveat, the
+  data-update line, the licence, and the link to About.
+-->
 <footer class="colophon">
-  <div class="colophon-inner">
-    <div class="colophon-mission">
-      <h3>About this project</h3>
-      <p>An independent, public-interest tracker of academic work in India — faculty, visiting, and postdoctoral positions across central HEIs, IIMs and IITs, AIIMS, and major private universities. Paired with a corpus-driven investigation, in <em>The Gap</em>, into how the state's vacancy-disclosure regime is being administered. Built on 741 parliamentary questions, multi-year vacancy disclosures, and an ongoing scrape of institutional advertisements.</p>
-      <p><strong>No warranty; verify before applying.</strong> Listings are scraped from official institutional websites, parsed automatically, and occasionally hand-transcribed from circulated recruitment cards. Errors are possible — extraction errors, stale data, missing posts, transcription gaps. Always verify against the official advertisement and application portal before applying. This site does not replace the original notification; it surfaces it.</p>
-      <p><strong>Independence and use at own risk.</strong> The site is not affiliated with, endorsed by, or operated on behalf of any institution listed. The maintainer makes no warranty as to the accuracy, completeness, currency, or availability of any position. Use of this information is at the reader's own risk. The site collects no personal data about visitors; it stores no application records and acts as an index, not an intermediary.</p>
-      <p><strong>Analytical content.</strong> Material in <em>The Gap</em> is the maintainer's research interpretation of publicly available parliamentary records, court orders, and official Ministry communications, all of which are cited in the source bibliography on that page. It is offered as research-and-reference public-interest commentary; it is not legal advice and not an allegation against any individual.</p>
-      <p class="colophon-verdict">The Constitution is not being violated by accident. It is being administered to that effect.</p>
-    </div>
-    <dl class="colophon-meta">
-      <dt>Last data update</dt>
-      <dd id="colophon-updated">—</dd>
-
-      <dt>Maintenance</dt>
-      <dd>Independent project. No funding. No personal data collected.</dd>
-
-      <dt>Code &amp; data</dt>
-      <dd><a href="https://github.com/freelibraries4all/academiaindia" target="_blank" rel="noopener">github.com/freelibraries4all/academiaindia</a></dd>
-
-      <dt>License</dt>
-      <dd>Code: MIT. Data &amp; corpus: CC&nbsp;BY-SA&nbsp;4.0. Cite as appropriate.</dd>
-
-      <dt>Corrections</dt>
-      <dd>Open an issue on the repo or write to the maintainer.</dd>
-    </dl>
-  </div>
-  <hr class="colophon-rule" />
-  <p class="colophon-tagline">
-    <span class="verdict-mark">Public-interest service</span> · Built in solidarity with Bahujan PhD scholars · whoseuniversity.org
+  <p class="colophon-verdict">The Constitution is not being violated by accident. It is being administered to that effect.</p>
+  <p class="colophon-caveat">
+    Compiled from public recruitment notices for research and reference. Verify with the issuing institution before applying.
+    <a href="#about" data-tab-link="about" class="colophon-about-link">About &amp; methodology →</a>
+  </p>
+  <p class="colophon-meta-line">
+    <span id="colophon-updated">—</span>
+    · Code: MIT · Data: CC&nbsp;BY-SA&nbsp;4.0
+    · <a href="https://github.com/freelibraries4all/academiaindia" target="_blank" rel="noopener">github.com/freelibraries4all/academiaindia</a>
   </p>
 </footer>
 
