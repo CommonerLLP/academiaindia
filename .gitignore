@@ -29,3 +29,17 @@ Thumbs.db
 
 # Editor / agent state
 .claude/
+
+# Internal strategy / architecture / design notes — NEVER commit.
+# Public repo; this content includes risk-model and operational detail
+# that should not be visible to adversaries or random readers.
+# Anchored to repo root with a leading slash so it does NOT match
+# docs/ARCHITECTURE.md (the existing operational scraper-architecture
+# doc, which is fine to publish).
+/ARCHITECTURE.md
+/STYLEGUIDE.md
+/RISKS.md
+/RUNBOOK.md
+/NOTES.md
+/notes/
+/internal/
