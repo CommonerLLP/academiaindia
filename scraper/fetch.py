@@ -1,11 +1,44 @@
 """HTTP fetching with rate limiting, caching, robots.txt, retries.
 
 Design notes
+------------
 - User-Agent identifies the project and a contact email so operators can reach us.
 - Cache TTL is deliberately long (6 hours) so parsers can be iterated locally
   without hammering the upstream server.
-- robots.txt is honoured. If disallowed, the fetch returns (None, 'robots-blocked').
+- robots.txt is honoured by default. If disallowed, the fetch returns
+  'robots-blocked'. The orchestrator may then make an explicit public-interest
+  override for official recruitment sources, and must disclose that in coverage
+  output and listing provenance.
 - 4xx is non-retryable; 5xx is retried with exponential backoff (max 3 attempts).
+
+Cache semantics (`requests_cache.CachedSession`)
+------------------------------------------------
+- Cache keyed by (method, URL, body) — query strings differ → different cache
+  entries.
+- `expire_after=CACHE_TTL_SEC` (6h): a cached response is treated as fresh
+  within this window. Past the window it is treated as STALE.
+- `stale_if_error=True`: if the upstream returns a 5xx OR raises a network
+  error AND a stale cached copy exists, the stale copy is returned. We retain
+  status="ok" but `result.fetched_at` reflects the original cache-fill time —
+  if you need to know whether a response was served from stale cache, check
+  `response.from_cache`.
+- Cache is on disk under `<cache_path>/http_cache.sqlite`. Delete the file to
+  force re-fetch; `make scrape-fresh` does not currently bust this (it only
+  busts the PDF cache). To force a full HTML refresh:
+      rm -f .cache/http_cache.sqlite
+- `allowable_methods=("GET", "HEAD")` only — POST/PUT bypass cache, which is
+  what we want (a future authenticated POST should never hit a stale cache).
+
+Operational implication
+-----------------------
+If you want to know whether a parser change correctly handles the *current*
+upstream HTML, blow away both caches:
+    rm -f .cache/http_cache.sqlite
+    rm -rf .cache/pdfs/
+    make scrape
+
+The 6-hour TTL means within a single dev session you don't hammer upstream;
+across days it auto-refreshes.
 """
 
 from __future__ import annotations
@@ -89,6 +122,7 @@ def fetch(
     max_retries: int = 3,
     timeout: float = DEFAULT_TIMEOUT_SEC,
     respect_robots: bool = True,
+    verify_tls: bool = True,
 ) -> FetchResult:
     domain = urlparse(url).netloc
     fetched_at = datetime.now(timezone.utc)
@@ -115,7 +149,7 @@ def fetch(
     for attempt in range(max_retries):
         try:
             _rate_limit(domain, rate_limit_sec)
-            resp = session.get(url, timeout=timeout, allow_redirects=True)
+            resp = session.get(url, timeout=timeout, allow_redirects=True, verify=verify_tls)
             if 500 <= resp.status_code < 600:
                 last_err = RuntimeError(f"HTTP {resp.status_code}")
                 time.sleep(min(30, 2**attempt))
