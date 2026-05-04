@@ -13,12 +13,15 @@ this file when items move.
 | Hard-coded year floor in `find_deadline` | now `max(HARD_FLOOR_DEADLINE_YEAR, current_year - 1)` |
 | `download_pdf` cache TTL | new `max_age_seconds` param, default `PDF_CACHE_TTL_SECONDS = 24h`; `make scrape-fresh` deletes `.cache/pdfs/` to bust |
 | Centralized magic numbers + sentinel | `scraper/constants.py` |
-| SSRF allowlist | `_is_safe_url` in `scraper/pdf_extractor.py` (refuses non-http(s) and private/loopback IPs) |
+| SSRF allowlist | `is_safe_url` in `scraper/url_safety.py` — single shared surface used by `pdf_extractor.py` AND `fetch.py`. Rejects non-http(s), private, loopback, link-local, reserved, multicast (IPv4 224.0.0.0/4 / IPv6 ff00::/8), unspecified (`0.0.0.0` / `::`), and IPv6 ULA (`fc00::/7`). Multi-A-record hostnames are evaluated pessimistically (any private IP rejects the URL). 33 unit tests in `test_url_safety.py`. |
+| `stable_id` deduplication | was 4 implementations (one crashed on `None`); `curated_iit_hss.py` now delegates to the canonical `ad_factory.stable_id` so there is exactly one definition. |
+| `ad_factory` test coverage | 12 unit tests in `test_ad_factory.py` covering canonical-keys contract, defaults, date-coercion, and extras pass-through. Pre-requisite for the parser → factory migration listed below. |
+| Cross-parser contract floor | `test_parser_contracts.py` parametrises every parser in `scraper/parsers/` (9 modules) against three contract assertions: imports cleanly, returns `list` for empty input, returns `list` for malformed input. Catches regressions where a parser silently breaks. |
 | IIT-Kanpur frozen `KNOWN_DEPTS` | now 2-pass: known-name pass + generic `<ProperNoun phrase>:` fallback; unmatched matches log at INFO |
 | Pydantic schema drift | `JobAd` declares `model_config = ConfigDict(extra="allow")` and lists the parser-attached optional fields explicitly |
 | Single ad-factory | `scraper/ad_factory.make_ad(**kwargs)` available; full migration of every parser deferred (high-risk wholesale change) |
 | `run.py` mega-ternary CoverageRow | refactored to explicit if/elif branches in `record_outcome()` |
-| Unit tests | 56 tests across `scraper/tests/test_pdf_extractor.py`, `test_iim_recruit.py`, `test_iit_kanpur.py`, `test_run_orchestrator.py`. Run via `make test`. |
+| Unit tests | 119 tests + 9 deliberate skips across `scraper/tests/` (was 56). New files: `test_ad_factory.py`, `test_url_safety.py`, `test_parser_contracts.py`. Run via `make test`. |
 | Archive retention helper | `scraper/prune_archive.py` (30 days daily / 52 weeks weekly / quarterly thereafter); `make prune-archive` |
 | `fetch.py` cache semantics doc | inline docstring expanded |
 | Field-pill dark-mode border | added in `dashboard/index.html` for `[data-theme="dark"]` |
@@ -30,6 +33,45 @@ this file when items move.
 These items are real debt, not done in this pass either because they were
 out of scope for "code edits to the existing codebase" or because the
 remediation would itself be high-risk.
+
+### SSRF residual risks: DNS rebinding + TOCTOU
+
+**Status:** documented, not engineered around.
+**The exposures the current `is_safe_url` does NOT mitigate:**
+
+  * **DNS rebinding.** An attacker who controls the authoritative DNS for a
+    hostname can return a public IP to `socket.getaddrinfo` (passing the
+    guard) and then a private IP a few seconds later when `requests.get`
+    actually opens the TCP connection. The window is bounded by request
+    timeout + per-host rate limit.
+  * **TOCTOU.** `getaddrinfo` and the eventual TCP connect are separate
+    syscalls. A fast-flux DNS could differ between the two. Same window
+    as above.
+
+**Why not engineer around it:** the standard mitigation (resolve once, pin
+the IP, pass the IP to the connection with the original Host header) breaks
+TLS SNI for HTTPS and is overkill for the threat model — a single-maintainer
+research scraper hitting government and university PDFs. The realistic
+mitigations are (a) the `timeout=` already passed to `requests.get` (60s
+default) and (b) the per-host `_rate_limit()` in `fetch.py` (1.5s default).
+Both keep the rebinding window short enough that the residual risk is
+acceptable for the deployment model.
+
+**When to revisit:** if this scraper is ever deployed on shared infrastructure
+(e.g., as a hosted service rather than a one-user research tool), the cost
+of an in-network SSRF goes up substantially and the engineering investment
+becomes worth it. Until then, the timeout + rate-limit pair is the floor.
+
+### Ad-factory migration of remaining parsers
+
+**Status:** factory exists with 12 unit tests; ad_factory is the canonical
+construction path; 11 parsers in `scraper/parsers/` still emit dicts directly.
+**Why deferred:** `iit_rolling.py` is the most complex parser (~415 lines)
+and is currently working correctly across 3 IITs. Re-routing every code path
+through `make_ad` in one pass risks introducing a subtle field-omission
+regression. Better to migrate parser-by-parser the next time each is touched
+for unrelated reasons. The factory's test coverage and the parser-contract
+test floor are the prerequisites for safe migration; both are now in place.
 
 ### Dashboard `index.html` (1,200+ lines, single file)
 
@@ -59,15 +101,6 @@ a shared resource.
 and showing ~22 entries, search isn't critical yet. Becomes useful at 50+.
 **When to do it:** when the field count crosses ~40.
 
-### Wholesale parser migration to `make_ad`
-
-**Status:** factory exists; parsers still use their old construction styles.
-**Why deferred:** `iit_rolling.py` is the most complex parser (~415 lines)
-and is currently working correctly across 3 IITs. Re-routing every code path
-through `make_ad` in one pass risks introducing a subtle field-omission
-regression. Better to migrate parser-by-parser the next time each is touched
-for unrelated reasons.
-
 ### Touch-target compromise on `.chip-active button`
 
 **Status:** sized to 24×24 (WCAG 2.5.8 AAA minimum), not 44×44 (AA strict).
@@ -80,7 +113,7 @@ adds a touch-first mode.
 After any non-trivial edit to `scraper/`:
 
 ```sh
-make test                    # 56 tests; should be all green
+make test                    # 119 tests + 9 skips; should be all green
 make scrape ARGS='--limit 5' # smoke-test against 5 institutions
 ```
 

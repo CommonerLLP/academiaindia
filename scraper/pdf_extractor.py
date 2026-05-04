@@ -14,19 +14,16 @@ dependency on Poppler; we fall back gracefully if it's missing.
 
 from __future__ import annotations
 
-import ipaddress
 import logging
 import os
 import re
 import shutil
-import socket
 import subprocess
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
-from urllib.parse import urlparse
 
 import requests
 
@@ -36,6 +33,10 @@ from constants import (
     PDF_CACHE_TTL_SECONDS,
     UNIT_NAME_MAX_CHARS,
 )
+# SSRF guard lives in `url_safety` so the same policy surface is shared with
+# `fetch.py`. Imported here as `_is_safe_url` because the existing call sites
+# (and tests) reference that name; the alias is a single line of indirection.
+from url_safety import is_safe_url as _is_safe_url
 
 logger = logging.getLogger(__name__)
 
@@ -52,41 +53,6 @@ class UnitBlock:
 
 def has_pdftotext() -> bool:
     return PDFTOTEXT is not None
-
-
-def _is_safe_url(url: str) -> bool:
-    """SSRF guard: refuse URLs that resolve to private/loopback IPs or use
-    non-http(s) schemes. The PDF candidates we download come from BeautifulSoup
-    parses of upstream HTML — an attacker controlling the page (or a MITM)
-    could insert a redirect to `http://localhost:8080/...` and have us probe
-    internal services. Low-impact for this single-user research tool, real
-    if the scraper is ever deployed on shared infra.
-    """
-    try:
-        parsed = urlparse(url)
-    except Exception:
-        return False
-    if parsed.scheme not in ("http", "https"):
-        return False
-    if not parsed.hostname:
-        return False
-    # Resolve the hostname and reject if any returned IP is private/loopback/
-    # link-local. We accept multi-A-record hostnames pessimistically: if even
-    # one IP is bad, refuse.
-    try:
-        infos = socket.getaddrinfo(parsed.hostname, None)
-    except socket.gaierror:
-        return False
-    for info in infos:
-        sockaddr = info[4]
-        ip_str = sockaddr[0]
-        try:
-            ip = ipaddress.ip_address(ip_str)
-        except ValueError:
-            continue
-        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
-            return False
-    return True
 
 
 def download_pdf(
