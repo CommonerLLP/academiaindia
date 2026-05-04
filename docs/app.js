@@ -245,6 +245,50 @@ function escapeHTML(s) {
   return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 }
 const escapeAttr = escapeHTML;
+function escapeRegExp(s) {
+  return String(s ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Per-listing campus detection. Multi-campus institutions (Azim Premji
+// Bengaluru / Bhopal / Ranchi; AIIMS; BITS Pilani; etc.) carry one
+// registry city — usually the main campus. When the ad text actually
+// names a different campus, that's the campus the candidate would
+// move to. Override the registry default with what the ad says.
+function detectAdCampus(ad) {
+  const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""}`;
+  if (!text) return null;
+  // "Campus Bhopal" / "Campus: Bhopal"
+  let m = text.match(/\bCampus[:\s]+([A-Z][a-zA-Z]+)\b/);
+  if (m) return m[1];
+  // "Bhopal Campus" / "Bhopal campus"
+  m = text.match(/\b([A-Z][a-zA-Z]+)\s+(?:Campus|campus)\b/);
+  if (m) return m[1];
+  // "based in X" / "located in X"
+  m = text.match(/\b(?:based|located|positioned)\s+(?:in|at)\s+([A-Z][a-zA-Z]+)\b/i);
+  if (m) return m[1];
+  return null;
+}
+
+function cityAlreadyInInstitutionName(instName, city) {
+  if (!instName || !city) return false;
+  // Multi-campus brands need the location even when the brand is familiar:
+  // Azim Premji University has Bengaluru/Bhopal/Ranchi; Shiv Nadar has
+  // separate Uttar Pradesh and Chennai institutions. Keep the campus visible.
+  if (/\b(azim\s+premji|shiv\s+nadar)\b/i.test(instName)) return false;
+  const aliases = {
+    "new delhi": ["new delhi", "delhi"],
+    delhi: ["new delhi", "delhi"],
+    bengaluru: ["bengaluru", "bangalore"],
+    bangalore: ["bengaluru", "bangalore"],
+    mumbai: ["mumbai", "bombay"],
+    bombay: ["mumbai", "bombay"],
+    chennai: ["chennai", "madras"],
+    madras: ["chennai", "madras"],
+  };
+  const key = String(city).toLowerCase().trim();
+  const names = aliases[key] || [key];
+  return names.some(name => new RegExp(`\\b${escapeRegExp(name)}\\b`, "i").test(instName));
+}
 
 // Strip UI-widget bleed-through that the HTML→text scrape can't clean.
 // Each pattern is matched against a known offender on a real career page;
@@ -257,6 +301,7 @@ const escapeAttr = escapeHTML;
 // is the canonical case: 700 chars of multi-language address + bromides
 // before the actual position breakdown — this strips that prefix.
 const SUBSTANTIVE_MARKERS = /\b(vacant\s+positions?|the\s+vacant\s+position|sanctioned\s+(strength|posts?)|areas?\s+of\s+(specialization|specialisation|recruitment)|eligibilit(y|ies)|qualifications?\s+(and|&)\s+experience|qualifications?\s+required|applications?\s+are\s+invited|invites?\s+applications?|the\s+following\s+(?:areas?|positions?|departments?)|number\s+of\s+(?:posts?|positions?|vacancies?)|specialization|department[\s-]+wise|broad\s+areas?)\b/i;
+const INSTITUTIONAL_BOILERPLATE = /\b(?:pioneer\s+of\s+liberal\s+education|recognized\s+strengths\s+in\s+the\s+areas?|recognised\s+strengths\s+in\s+the\s+areas?|offers\s+undergraduate\s+programs?|offers\s+undergraduate\s+programmes?|provides\s+an\s+environment\s+for\s+faculty\s+to\s+conduct|overall,\s+the\s+school\s+stands\s+for)\b/i;
 
 // Devanagari-script range. We strip Hindi institutional address blocks
 // since the dashboard is English-first; if the user opens the source PDF,
@@ -283,6 +328,13 @@ function sanitizeExcerpt(text) {
     // Normalise leftover whitespace.
     .replace(/\s{2,}/g, " ")
     .trim();
+
+  // Repeated school/institution marketing copy is not job-specific
+  // evidence. It can help infer the recruiting unit elsewhere, but it
+  // should not appear as Description or feed Topical fit chips.
+  if (INSTITUTIONAL_BOILERPLATE.test(out) && !/\b(?:qualifications?|eligibilit|responsibilit|apply\s+by|deadline|last\s+date)\b/i.test(out)) {
+    return "";
+  }
 
   // (1) Suppress nav-crumb duplications. Many career pages render the
   // section title twice ("Faculty Recruitment Faculty Recruitment",
@@ -468,20 +520,134 @@ function contractLabel(cs) {
   return null; // Unknown → omit the line entirely
 }
 
-// The headline of the card — the discipline / field.
+const DEPARTMENT_UNIT_OVERRIDES = new Map([
+  ["aerospace engineering", "Department of Aerospace Engineering"],
+  ["applied mechanics", "Department of Applied Mechanics"],
+  ["biochemical engineering & biotechnology", "Department of Biochemical Engineering & Biotechnology"],
+  ["biological sciences and bioengineering", "Department of Biological Sciences and Bioengineering"],
+  ["biosciences & bioengineering", "Department of Biosciences & Bioengineering"],
+  ["biotechnology", "Department of Biotechnology"],
+  ["chemical engineering", "Department of Chemical Engineering"],
+  ["chemistry", "Department of Chemistry"],
+  ["civil engineering", "Department of Civil Engineering"],
+  ["cognitive science", "Department of Cognitive Science"],
+  ["computer science & engineering", "Department of Computer Science & Engineering"],
+  ["computer science and engineering", "Department of Computer Science and Engineering"],
+  ["data science and artificial intelligence", "Department of Data Science and Artificial Intelligence"],
+  ["earth sciences", "Department of Earth Sciences"],
+  ["economics", "Department of Economics"],
+  ["economic sciences", "Department of Economic Sciences"],
+  ["electrical engineering", "Department of Electrical Engineering"],
+  ["energy science and engineering", "Department of Energy Science and Engineering"],
+  ["engineering design", "Department of Engineering Design"],
+  ["environmental science and engineering", "Department of Environmental Science and Engineering"],
+  ["humanities & social sciences", "Department of Humanities & Social Sciences"],
+  ["humanities and social sciences", "Department of Humanities and Social Sciences"],
+  ["management studies", "Department of Management Studies"],
+  ["materials science and engineering", "Department of Materials Science and Engineering"],
+  ["mathematics", "Department of Mathematics"],
+  ["mathematics and statistics", "Department of Mathematics and Statistics"],
+  ["mechanical engineering", "Department of Mechanical Engineering"],
+  ["medical sciences and technology", "Department of Medical Sciences and Technology"],
+  ["metallurgical and materials engineering", "Department of Metallurgical and Materials Engineering"],
+  ["metallurgical engineering & materials science", "Department of Metallurgical Engineering & Materials Science"],
+  ["ocean engineering", "Department of Ocean Engineering"],
+  ["physics", "Department of Physics"],
+  ["textile & fibre engineering", "Department of Textile & Fibre Engineering"],
+]);
+
+function normalizeRecruitingUnitName(unit, ad = {}) {
+  if (!unit) return "";
+  const raw = String(unit).replace(/\s+/g, " ").trim();
+  if (!raw) return "";
+  if (/\b(?:job description|application process|developed and maintained by|thrust areas)\b/i.test(raw)) {
+    return "";
+  }
+  let clean = raw
+    .replace(/\bInterdisciplina\s+ry\b/gi, "Interdisciplinary")
+    .replace(/^Department\s+Of\b/i, "Department of")
+    .replace(/^Department\s+Textile\b/i, "Department of Textile")
+    .replace(/\bSchool\s+Of\b/g, "School of")
+    .replace(/\bCentre\s+Of\b/g, "Centre of")
+    .replace(/\bCenter\s+Of\b/g, "Center of")
+    .replace(/\s+(?:has|is|offers|provides)\b[\s\S]*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const key = clean.toLowerCase();
+  const instId = String(ad.institution_id || "");
+  const instType = String((INSTITUTIONS[instId] || {}).type || "");
+  const isPublicTechnical = /^(?:iit|nit|iiit|iiser)-/i.test(instId)
+    || /^(?:IIT|NIT|IIIT|IISER|IISc|CentralUniversity)$/i.test(instType);
+  if (isPublicTechnical && DEPARTMENT_UNIT_OVERRIDES.has(key)) {
+    return DEPARTMENT_UNIT_OVERRIDES.get(key);
+  }
+  if (/^Kanpur Department-Wise Area of Specialization Aerospace Engineering$/i.test(clean)) {
+    return "Department of Aerospace Engineering";
+  }
+  return clean;
+}
+
+function inferRecruitingUnitFromText(ad = {}) {
+  const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""}`.replace(/\s+/g, " ");
+  const m = text.match(/\b((?:School|Faculty|Centre|Center)\s+of\s+[A-Z][A-Za-z &]+?)(?=\s+(?:has|is|offers|provides|for|We|Campus|Location|$)|[.,;])/);
+  return m ? normalizeRecruitingUnitName(m[1], ad) : "";
+}
+
+function titleFieldLabel(title) {
+  const raw = String(title || "").replace(/\s+/g, " ").trim();
+  let m = raw.match(/\b(?:Assistant|Associate)?\s*Professor\s+in\s+(.+)$/i)
+    || raw.match(/\bFaculty Positions?\s+in\s+(.+?)(?:\s+[–—-]\s+|$)/i);
+  if (!m) return "";
+  const field = m[1].trim().replace(/[.,;:]+$/g, "");
+  const fixes = {
+    "Academic": "Academic Writing",
+    "Computer": "Computer Science",
+    "Digital": "Digital Marketing",
+    "Film &": "Film & Television Management",
+    "Political": "Political Science",
+  };
+  return fixes[field] || field;
+}
+
+// The headline of the card — the recruiting unit / field.
 // Fallback chain (most-specific first):
-//   1. ad.discipline if present
-//   2. ad.department if present and not a generic wrapper
+//   1. proper department/school/centre name, optionally plus a real subfield
+//   2. ad.discipline if the unit is generic or missing
 //   3. extracted from title via regex (e.g., "Faculty Positions in History")
 //   4. ad.department even if generic (better than nothing)
 //   5. derived from post_type (e.g., "Visiting position")
 function cardDiscipline(ad) {
-  if (ad.discipline) return ad.discipline;
-  const dept = ad.department;
-  const isGenericDept = dept && /^humanities|^social sciences|^various|^multiple|^all\s+departments/i.test(dept);
+  const dept = normalizeRecruitingUnitName(ad.department, ad);
+  const discipline = normalizeRecruitingUnitName(ad.discipline, ad);
+  const isProperUnit = dept && /\b(department|centre|center|school|faculty|institute)\b/i.test(dept);
+  const isGenericDept = dept && /^(?:humanities|social sciences|various|multiple|all\s+departments)$/i.test(dept.trim());
+  if (dept && isProperUnit && !isGenericDept) {
+    const unit = dept;
+    const sub = discipline && discipline !== dept && !unit.toLowerCase().includes(String(discipline).toLowerCase())
+      ? String(discipline).trim()
+      : "";
+    const noisySub = /^(?:sciences?|engineering|department|centre|center|school)$/i.test(sub);
+    return sub && !noisySub ? `${unit} — ${sub}` : unit;
+  }
+  if (discipline) return discipline;
   if (dept && !isGenericDept) return dept;
   // Derive from title
   const title = ad.title || "";
+  // Titles sometimes carry the real School even when the scraper left
+  // `department` empty, e.g. "Chemistry - School of Continuing Education..."
+  // or "Design Engineering and Robotics School of Engineering (SoE)".
+  let titleUnit = title.match(/Faculty Positions?\s+in\s+(.+?)\s+[–—-]\s+(School\s+of\s+.+)$/i);
+  if (titleUnit) return `${normalizeRecruitingUnitName(titleUnit[2], ad)} — ${titleUnit[1].trim()}`;
+  titleUnit = title.match(/[–—-]\s+(.+?)\s+(School\s+of\s+[^()]+(?:\([^)]+\))?)/i);
+  if (titleUnit) return `${normalizeRecruitingUnitName(titleUnit[2], ad)} — ${titleUnit[1].trim()}`;
+  titleUnit = title.match(/\b(School\s+of\s+[^()]+(?:\([^)]+\))?)/i);
+  if (titleUnit) return normalizeRecruitingUnitName(titleUnit[1], ad);
+  const inferredUnit = inferRecruitingUnitFromText(ad);
+  const titleField = titleFieldLabel(title);
+  if (inferredUnit && titleField) return `${inferredUnit} — ${titleField}`;
+  if (inferredUnit) return inferredUnit;
+  if (!dept && !discipline && /^Faculty Positions?\s+in\s+/i.test(title)) return title.trim();
   let m = title.match(/(?:in|of|for)\s+([A-Z][a-zA-Z &/-]+?)(?:\s*\(|$|,|\s+[—–-])/);
   if (m) return m[1].trim();
   m = title.match(/(?:Faculty|Position[s]?|Recruitment)\s*[—–-]\s*([A-Z][a-zA-Z &/-]+)/);
@@ -503,7 +669,8 @@ function cardDiscipline(ad) {
 // research and publications in the relevant area." We extract the high-
 // signal pieces and drop the boilerplate.
 //
-// Always returns `{ areas, methods, approach }` (values are null when
+// Always returns `{ areas, methods, approach, eligibility, evaluation }`
+// (values are null when
 // not extractable). The card renderer surfaces each piece — even when
 // missing — with explicit "Not specified by the department" labelling
 // so a reader scrolling through 30 cards SEES the pattern of
@@ -511,11 +678,107 @@ function cardDiscipline(ad) {
 // the same logic on the reservation row ("composite recruitment, per-
 // post breakdown not disclosed"): naming the absence is the political
 // point.
-function extractCardCues(text) {
-  const cues = { areas: null, methods: null, approach: null };
-  if (!text || text.length < 30) return cues;
+function canonicalAreaLabel(s) {
+  return String(s || "")
+    .replace(/\bHealth innovations?\s*(?:&|and)\s*systems?\b/i, "Health Innovations")
+    .replace(/\bInnovation Systems?\s*(?:&|and)\s*Processes\b/i, "Innovation Systems")
+    .replace(/\bInternet,\s*Digital Information\s*(?:&|and)\s*Society\b/i, "Digital Information & Society")
+    .replace(/\bTechnical Higher Education\b/i, "Technical Higher Education")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function cleanNumberedCueItem(s) {
+  return canonicalAreaLabel(String(s || "")
+    .replace(/Page\s+\d+\s+of\s+\d+/gi, " ")
+    .replace(/\([^)]*ver\.[^)]*\)/gi, " ")
+    .replace(/\s*[–-]\s+(?:Potential|Maximum age|At least|First class|Publications?|Academic Background|Teaching|Other)\b[\s\S]*$/i, "")
+    .replace(/\s+\b(?:those with professional experience|physical disability|may also be relaxed|candidates?\s+\(|First class|Potential for|Maximum age|At least)\b[\s\S]*$/i, "")
+    .replace(/[.;:,]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim());
+}
+
+function extractNumberedCueItems(text) {
+  const anchor = text.search(/\b(?:specific\s+areas?\s+of|areas?\s+of\s+speciali[sz]ation|following\s+(?:areas?|speciali[sz]ations?))\b/i);
+  const windowText = anchor >= 0 ? text.slice(anchor) : text;
+  const numberedRe = /(?:^|\s)(?:\((\d{1,2}(?:-[ivx]+|[a-z])?)\)|(\d{1,2})[.)])\s+([\s\S]*?)(?=\s+(?:\(\d{1,2}(?:-[ivx]+|[a-z])?\)|\d{1,2}[.)])\s+|$)/gi;
+  const items = [];
+  let m;
+  while ((m = numberedRe.exec(windowText)) && items.length < 20) {
+    const item = cleanNumberedCueItem(m[3]);
+    if (!item || item.length < 3 || item.length > 80) continue;
+    if (/^(?:No|Page|Annexure|Sr|Academic Unit|Areas of Speciali[sz]ation)$/i.test(item)) continue;
+    if (/\b(?:Grade|Publication Record|Academic Background|Teaching Requirement)\b/i.test(item)) continue;
+    items.push(item);
+  }
+  return [...new Set(items)];
+}
+
+function summarizeEligibilityCue(text, ad = {}) {
+  const combined = [
+    ad.unit_eligibility,
+    ad.general_eligibility,
+    text,
+  ].filter(Boolean).join(" ");
+
+  const bits = [];
+  if (/\bPh\.?\s*D\.?\b/i.test(combined)) {
+    let phd = "PhD";
+    if (/\bfirst\s+class\b[^.]{0,80}\bpreceding\s+degree\b/i.test(combined)) {
+      phd += " + first class preceding degree";
+    }
+    bits.push(phd);
+  }
+  if (/\bGrade\s*I\b[\s\S]{0,120}\bpost[-\s]?PhD\b/i.test(combined) || /\bpost[-\s]?PhD\b[\s\S]{0,120}\bGrade\s*I\b/i.test(combined)) {
+    bits.push("Grade I: post-PhD experience expected");
+  }
+  if (/\bGrade\s*II\b[\s\S]{0,120}\bpost[-\s]?PhD\s+experience\s+is\s+desirable\s+but\s+not\s+required\b/i.test(combined)) {
+    bits.push("Grade II: post-PhD desirable, not required");
+  } else if (/\bpost[-\s]?PhD\s+experience\s+is\s+desirable\s+but\s+not\s+required\b/i.test(combined)) {
+    bits.push("Post-PhD desirable, not required");
+  }
+  const age = combined.match(/\bmaximum\s+age\s+of\s+(\d{2})\s+years?\s+for\s+male\s+and\s+(\d{2})\s+years?\s+for\s+female\b/i);
+  if (age) bits.push(`Age cap: ${age[1]}(M), ${age[2]}(F)`);
+
+  return bits.length ? bits.slice(0, 4).join("; ") : null;
+}
+
+function summarizeEvaluationCue(text, ad = {}) {
+  const combined = [
+    ad.publications_required,
+    text,
+  ].filter(Boolean).join(" ");
+  const publicationSource = ad.publications_required || text;
+  const bits = [];
+
+  const pub = publicationSource.match(/\bAt\s+least\s+(\d+)\s+([^.;]{0,120}?(?:papers?|publications?|articles?)[^.;]{0,140}?(?:peer[-\s]?reviewed|journals?|conferences?)[^.;]*)/i)
+    || publicationSource.match(/\bminimum\s+of\s+(\d+)\s+([^.;]{0,120}?(?:papers?|publications?|articles?)[^.;]*)/i);
+  if (pub) {
+    bits.push(`Publications: ${pub[1]}+ ${pub[2].replace(/\s+/g, " ").replace(/[.,;:]+$/g, "").trim()}`);
+  }
+  if (/\bsingle-author\s+scholarly\s+book\b[\s\S]{0,120}\bequivalent\s+to\s+up\s+to\s+five\s+journal\s+articles\b/i.test(combined)) {
+    bits.push("Books/chapters considered as equivalents");
+  }
+  if (/\bpotential\s+for\s+(?:very\s+)?good\s+teaching\b/i.test(combined)) {
+    bits.push("Teaching potential assessed");
+  }
+
+  return bits.length ? bits.slice(0, 2).join("; ") : null;
+}
+
+function extractCardCues(text, ad = {}) {
+  text = String(text || "");
+  const cues = { areas: null, methods: null, approach: null, eligibility: null, evaluation: null };
+  const hasStructuredFields = Boolean(ad.unit_eligibility || ad.general_eligibility || ad.publications_required);
+  if (text.length < 30 && !hasStructuredFields) return cues;
 
   // --- Sub-areas list -------------------------------------------------
+  const numberedAreas = extractNumberedCueItems(text);
+  if (numberedAreas.length >= 2 && numberedAreas.length <= 20) {
+    cues.areas = numberedAreas;
+  }
+
   // Patterns: "in (the )?area(s) of X, Y, Z…" / "specialisation in X, Y"
   // The trailing lookahead stops the capture at a sentence end, a
   // semicolon, or a "with …" clause that introduces methods.
@@ -524,7 +787,7 @@ function extractCardCues(text) {
     /(?:research\s+(?:areas?|interests?))\s*[:\-–]\s*([^.]{8,400}?)(?=\s*(?:\.|;|$))/i,
     /(?:specialization|specialisation|expertise)\s+in\s+([^.]{8,400}?)(?=\s*(?:\.|;|with\s+a\s+|$))/i,
   ];
-  for (const re of areaPatterns) {
+  for (const re of cues.areas ? [] : areaPatterns) {
     const m = text.match(re);
     if (m) {
       const areas = m[1]
@@ -532,7 +795,7 @@ function extractCardCues(text) {
         .replace(/-\s+/g, '-')                          // "multi- species" -> "multi-species"
         .replace(/\s+/g, ' ')                           // collapse double spaces
         .split(/\s*,\s*|\s*;\s*|\s+(?:and|or|&)\s+/)    // split on , ; and or &
-        .map(s => s.trim().replace(/[.,;:]+$/, ''))
+        .map(s => canonicalAreaLabel(s.trim().replace(/[.,;:]+$/, '')))
         .filter(s => {
           if (!s || s.length < 2 || s.length > 60) return false;
           // Drop low-content phrases that come from awkward source text
@@ -571,6 +834,9 @@ function extractCardCues(text) {
   // "sociological/anthropological approach" / "humanistic approach"
   m = text.match(/\b((?:sociolog\w+|anthropolog\w+|historic\w+|philosoph\w+|cultur\w+|economic\w*|political\w*|geographic\w*|humanist\w+|critical|interdisciplinary|comparative)(?:\s*\/\s*\w+\w+)?)\s+approach/i);
   if (m) cues.approach = m[1];
+
+  cues.eligibility = summarizeEligibilityCue(text, ad);
+  cues.evaluation = summarizeEvaluationCue(text, ad);
 
   // Note: we ALWAYS return the cues object even if every field is null.
   // The renderer surfaces each row explicitly so missing values are
@@ -1099,8 +1365,8 @@ function wireEvents() {
     if (!a) return;
     e.preventDefault();
     const tab = a.dataset.tabLink;
-    const btn = document.querySelector(`nav.tabs button[data-tab="${tab}"]`);
-    if (btn) btn.click();
+    const ok = activateTab(tab, { writeHash: true });
+    if (!ok) location.href = a.href;
   });
 }
 
@@ -1495,6 +1761,9 @@ function renderAdList(filtered) {
 
 function renderAd(ad) {
   const inst = INSTITUTIONS[ad.institution_id] || { name: ad.institution_id };
+  const instType = String(inst.type || "");
+  const isPrivateInstitution = instType.toLowerCase().includes("private");
+  const institutionScope = isPrivateInstitution ? "private" : "public";
   const cls = classifyAd(ad);
   const tier = urgencyTier(ad);
   const cat = ad.category_breakdown || {};
@@ -1584,42 +1853,85 @@ function renderAd(ad) {
   // through the HTML→text strip (e.g. Azim Premji's "Add to Calendar"
   // dropdown, which appends "iCal Google Outlook Outlook.com Yahoo" to
   // every listing). The cleanup is conservative — only known patterns.
-  const cleanedExcerpt = sanitizeExcerpt(ad.raw_text_excerpt || "");
+  // PDF excerpt (when available) vs HTML scrape (default). For most
+  // institutions, the HTML career page captures only marketing copy
+  // ("We invite applications…"); the actual hiring criteria — sub-areas,
+  // methods, qualifications, evaluation — sit in the notification PDF
+  // the ad links to. The local enrichment script
+  // (scripts/enrich_current_with_pdf.py) extracts substantive chunks
+  // from those PDFs and writes them as ad.pdf_excerpt; we prefer it
+  // when present, falling back to ad.raw_text_excerpt.
+  const cleanedExcerpt = sanitizeExcerpt(ad.pdf_excerpt || ad.raw_text_excerpt || "");
   // The cover-letter scan: a candidate reads this section to decide
   // three things — (1) do my projects fit the sub-areas they're hiring
-  // in, (2) do my methods match what they want, (3) does my disciplinary
-  // self-presentation map onto theirs. We extract and label these three
-  // explicitly. When the recruiting department has not specified one of
+  // in, (2) do I clear the stated eligibility screen, (3) how will the
+  // committee evaluate my file. We extract and label these explicitly.
+  // When the recruiting department has not specified one of
   // them, we say so — the absence is named, not hidden. Across many
   // cards this surfaces a pattern: most departments do not enunciate
   // their requirements clearly, leaving candidates to guess. That
   // pattern IS the political point of this view; it should be visible.
-  const cues = extractCardCues(cleanedExcerpt);
-  const NS_TIP = "The recruiting department did not enunciate this in the advertisement. Candidates have to guess.";
-  const empty = `<span class="card-cue-empty" title="${NS_TIP}">Not specified by the department</span>`;
+  const cues = extractCardCues(cleanedExcerpt, ad);
+  const NS_TIP = "The source ad did not disclose this clearly enough to extract.";
+  const empty = `<span class="card-cue-empty" title="${NS_TIP}">Not disclosed in source ad</span>`;
   const areasValue = cues.areas
     ? `<span class="card-cue-tags">${cues.areas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>`
     : empty;
-  const methodsValue = cues.methods
-    ? `<span class="card-cue-value">${escapeHTML(cues.methods)}</span>`
+  const eligibilityValue = (cues.eligibility || cues.methods)
+    ? `<span class="card-cue-value">${escapeHTML(cues.eligibility || cues.methods)}</span>`
     : empty;
-  const approachValue = cues.approach
-    ? `<span class="card-cue-value">${escapeHTML(cues.approach)}</span>`
+  const evaluationValue = (cues.evaluation || cues.approach)
+    ? `<span class="card-cue-value">${escapeHTML(cues.evaluation || cues.approach)}</span>`
     : empty;
+  // The actual job description, in the institution's own words. Cues
+  // distill the high-signal pieces for fast scan; the description gives
+  // a candidate the exact language to pick up for a cover letter, the
+  // specific wording about teaching duties, and any context the
+  // structured cues miss. Truncated to ~280 chars by default — the full
+  // text is one click away on the "Official listing" link below the row.
+  let descriptionRow = "";
+  if (cleanedExcerpt) {
+    const SHORT = 280;
+    if (cleanedExcerpt.length > SHORT) {
+      const preview = cleanedExcerpt.slice(0, SHORT).replace(/\s+\S*$/, "");
+      descriptionRow = `
+        <div class="card-cue card-cue-description">
+          <span class="card-cue-label">Description</span>
+          <details class="card-cue-more">
+            <summary><span class="card-cue-value">${escapeHTML(preview)}…</span> <span class="card-cue-toggle card-cue-more-label">see more</span><span class="card-cue-toggle card-cue-less-label">see less</span></summary>
+            <div class="card-cue-full">${escapeHTML(cleanedExcerpt)}</div>
+          </details>
+        </div>`;
+    } else {
+      descriptionRow = `
+        <div class="card-cue card-cue-description">
+          <span class="card-cue-label">Description</span>
+          <span class="card-cue-value">${escapeHTML(cleanedExcerpt)}</span>
+        </div>`;
+    }
+  } else {
+    descriptionRow = `
+      <div class="card-cue card-cue-description is-empty">
+        <span class="card-cue-label">Description</span>
+        <span class="card-cue-empty" title="${NS_TIP}">Not provided in the advertisement</span>
+      </div>`;
+  }
+
   const areasHTML = `
     <div class="card-cues">
       <div class="card-cue card-cue-areas${cues.areas ? "" : " is-empty"}">
-        <span class="card-cue-label">Research areas</span>
+        <span class="card-cue-label">Topical fit</span>
         ${areasValue}
       </div>
-      <div class="card-cue card-cue-methods${cues.methods ? "" : " is-empty"}">
-        <span class="card-cue-label">Methods</span>
-        ${methodsValue}
+      <div class="card-cue card-cue-methods${(cues.eligibility || cues.methods) ? "" : " is-empty"}">
+        <span class="card-cue-label">Eligibility snapshot</span>
+        ${eligibilityValue}
       </div>
-      <div class="card-cue card-cue-approach${cues.approach ? "" : " is-empty"}">
-        <span class="card-cue-label">Approach</span>
-        ${approachValue}
+      <div class="card-cue card-cue-approach${(cues.evaluation || cues.approach) ? "" : " is-empty"}">
+        <span class="card-cue-label">Evaluation criteria</span>
+        ${evaluationValue}
       </div>
+      ${descriptionRow}
     </div>`;
 
   // Collapsible details — short label, button-ish
@@ -1628,6 +1940,7 @@ function renderAd(ad) {
     <details class="details">
       <summary>Eligibility &amp; how to apply ▾</summary>
       ${ad._source_note ? `<div class="detail-block"><span class="k">Source note</span><div class="v">${escapeHTML(ad._source_note)}</div></div>` : ""}
+      ${cues.areas && cues.areas.length > 3 ? `<div class="detail-block"><span class="k">Full topical fit</span><div class="v">${escapeHTML(cues.areas.join("; "))}</div></div>` : ""}
       ${ad.unit_eligibility ? `<div class="detail-block"><span class="k">Unit eligibility</span><div class="v">${escapeHTML(ad.unit_eligibility)}</div></div>` : ""}
       ${ad.publications_required ? `<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(ad.publications_required)}</div></div>` : ""}
       ${ad.general_eligibility ? `<div class="detail-block"><span class="k">General eligibility</span><div class="v">${escapeHTML(ad.general_eligibility)}</div></div>` : ""}
@@ -1652,20 +1965,26 @@ function renderAd(ad) {
 
   const instName = inst.short_name || inst.name || "(institution unknown)";
   // City as a parenthetical disambiguator — essential for multi-campus
-  // institutions where the same name covers multiple cities. Azim Premji
-  // University has campuses in Bengaluru, Bhopal, and Ranchi; AIIMS runs
-  // 20+ branded sites; BITS Pilani has Pilani / Goa / Hyderabad / Dubai.
-  // Without (City), a candidate cannot tell which campus a listing is for.
-  // We always show it (not styled as optional metadata) when the registry
-  // has the city; some redundancy with names that already include a city
-  // (e.g., "IIT Bombay (Mumbai)") is the lesser evil — clarity over
-  // brevity for an audience that includes international applicants.
-  const cityPart = inst.city ? ` <span class="card-campus">(${escapeHTML(inst.city)})</span>` : "";
+  // institutions, but redundant when the institution label already names
+  // the city/campus ("IIT Delhi", "IIM Bangalore").
+  // Per-listing campus override: a multi-campus institution's registry
+  // entry has only one city (usually the main campus); when the ad text
+  // names a different campus, that wins for display purposes — the
+  // candidate would relocate to where the JOB is, not where the
+  // headquarters is.
+  const adCampus = detectAdCampus(ad);
+  const cityForDisplay = adCampus || inst.city;
+  const cityInName = cityAlreadyInInstitutionName(instName, cityForDisplay);
+  const cityPart = cityForDisplay && !cityInName ? ` <span class="card-campus">(${escapeHTML(cityForDisplay)})</span>` : "";
   const discipline = cardDiscipline(ad);
   const rankLine = cardRankLine(ad);
   // A small flag-row for non-blocking but worth-knowing signals: low parse
   // confidence, hand-transcribed entry, posts count, posted/checked dates.
   const flags = [];
+  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private university" : "Public / CEI institution"}</span>`);
+  if (isPrivateInstitution && !catBits.length) {
+    flags.push(`<span class="card-flag dim" title="Private universities are outside the CEI(RTC) Act, 2019 faculty-reservation roster.">CEI roster n/a</span>`);
+  }
   if (ad.number_of_posts) {
     flags.push(`<span class="card-flag">${ad.number_of_posts} ${ad.number_of_posts === 1 ? "post" : "posts"}</span>`);
   }
@@ -1697,21 +2016,28 @@ function renderAd(ad) {
   }
 
   // Reservation operates at the cadre/institutional-roster level under the
-  // CEI(RTC) Act, 2019, not per individual ad. So:
-  //   - Composite ads (multi-post, cadre-level advertisements like an IIT
-  //     rolling call covering all areas, or IIM Bodh Gaya's 76-post call)
-  //     SHOULD publish a category breakdown — its absence is a disclosure
-  //     failure worth flagging.
-  //   - Single-position ads are one roster point being drawn from the
-  //     institute's standing roster; reservation arithmetic does not happen
-  //     at this granularity. Silent absence is correct.
-  // Composite heuristic: number_of_posts >= 2, OR a generic faculty-call
-  // title with no specific area named.
+  // CEI(RTC) Act, 2019. For public institutions we distinguish:
+  //   - composite / rolling source ads: shared source URL, explicit multi-post
+  //     count, rolling/cadre wording, or multiple units under one call;
+  //   - explicitly single-post ads: only when the ad says one/1 post;
+  //   - unknown roster point: no post-wise category/roster mapping visible.
+  // Private universities are handled separately below because the CEI(RTC)
+  // roster-disclosure question does not apply to them.
+  const _adText = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
+  const shapeText = `${_adText} ${ad.original_url || ""} ${ad.ad_number || ""} ${ad._source_method || ""}`.toLowerCase();
+  const sourcePeerCount = ad.original_url
+    ? ADS.filter(x => x.original_url === ad.original_url).length
+    : 0;
   const isCompositeAd = (() => {
     if (typeof ad.number_of_posts === "number" && ad.number_of_posts >= 2) return true;
-    const t = (ad.title || "").toLowerCase();
-    if (/\b(rolling|all\s+areas?|multiple\s+(areas?|disciplines?)|composite|cadre)\b/.test(t)) return true;
+    if (sourcePeerCount >= 2) return true;
+    if (/\b(rolling|rol?lling|all\s+areas?|multiple\s+(areas?|disciplines?)|composite|cadre|various\s+academic\s+units?|department[\s-]?wise|departments?,\s*centres?,\s*(and\s*)?schools?)\b/.test(shapeText)) return true;
     return false;
+  })();
+  const isExplicitSinglePostAd = (() => {
+    if (ad.number_of_posts === 1) return true;
+    if (isCompositeAd) return false;
+    return /\b(?:one|1)\s+(?:post|position|vacancy)\b|\bsingle[\s-]+(?:post|position|vacancy)\b/i.test(_adText);
   })();
   // Reservation messaging — four states (plus private-uni handled below):
   //   1. Per-post roster counts published → real coloured pills.
@@ -1724,40 +2050,40 @@ function renderAd(ad) {
   // The statutory percentages (SC-15%, ST-7.5%, OBC-27%, EWS-10%, PwBD-4%)
   // are the constitutional floor every CFTI is bound by; reproducing them
   // on every card is boilerplate noise, not information.
-  const _adText = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
   const isSRD = /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(_adText);
+  // Private universities are outside the CEI(RTC) faculty-reservation
+  // regime. Do not classify their shared jobs pages as "composite
+  // recruitment" failures; that roster-disclosure question applies to
+  // public/CEI institutions.
+  const isPrivate = isPrivateInstitution;
   // Each reservation-state row shows a label + an info icon. The
-  // long explanation that used to render inline now lives in a hover
-  // tooltip (title=) on the row + an aria-describedby element for AT.
-  // This keeps the political content present on every card without
-  // dumping a full paragraph into the candidate's scan path.
+  // explanation sits behind a click/keyboard disclosure so it works on
+  // touch devices too; browser-native title tooltips are too fragile for
+  // decision-critical context.
   let reservPillsHTML = "";
-  if (catBits.length) {
+  const reservInfo = (tip) => `
+    <details class="reserv-info">
+      <summary aria-label="Explain reservation status"><span aria-hidden="true">?</span></summary>
+      <div class="reserv-info-pop">${escapeHTML(tip)}</div>
+    </details>`;
+  if (isPrivate && !catBits.length) {
+    reservPillsHTML = "";
+  } else if (catBits.length) {
     reservPillsHTML = `<div class="row-reserv"><span class="reserv-label">Reserved seats</span>${
       catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")
     }</div>`;
   } else if (isSRD) {
     const tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
-    reservPillsHTML = `<div class="row-reserv reserv-srd" title="${escapeAttr(tip)}"><span class="reserv-label good">✓ Special Recruitment Drive</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
+    reservPillsHTML = `<div class="row-reserv reserv-srd"><span class="reserv-label good">✓ Special Recruitment Drive</span>${reservInfo(tip)}</div>`;
   } else if (isCompositeAd) {
-    const tip = "Multi-post cadre-level call. Per-post reservation breakdown not disclosed in this advertisement.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing" title="${escapeAttr(tip)}"><span class="reserv-label warn">⚠ Composite recruitment</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
+    const tip = "Composite or rolling faculty call. The ad may list many departments/areas under one recruitment PDF, but it does not disclose which roster category each selection point maps to.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing"><span class="reserv-label warn">⚠ Composite / rolling recruitment</span>${reservInfo(tip)}</div>`;
+  } else if (isExplicitSinglePostAd) {
+    const tip = "This public-institution ad appears to be for one post/position, but the roster category for that appointment is not disclosed in the advertisement.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Single post: roster point not disclosed</span>${reservInfo(tip)}</div>`;
   } else {
-    const tip = "Reservation operates at the institute's cadre roster, not at the individual-ad level. Whether this position falls to UR/SC/ST/OBC/EWS/PwBD depends on the institute's roster point — not visible in the ad.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost" title="${escapeAttr(tip)}"><span class="reserv-label">Single-position recruitment</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
-  }
-  // Private universities: not bound by the CEI(RTC) Act, 2019 nor by the
-  // Article 15(5) admissions-side reservation extension — TMA Pai (2002) and
-  // PA Inamdar (2005) carve out the autonomy private unaided institutions
-  // exercise on faculty hiring. The legal position is "not required";
-  // the political position is that elite private universities producing
-  // the country's professional class have chosen not to apply caste-based
-  // affirmative action and that choice has structural consequences.
-  const _instForReserv = INSTITUTIONS[ad.institution_id] || {};
-  const isPrivate = (_instForReserv.type || "").toLowerCase().includes("private");
-  if (isPrivate && !catBits.length) {
-    const tip = "This institution has not voluntarily adopted the CEI(RTC) Act, 2019 framework. Whether any affirmative-action policy applies in faculty hiring is unknown — the institution does not publish category-wise hiring data.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing private-univ" title="${escapeAttr(tip)}"><span class="reserv-label warn">⚠ Affirmative action: unknown</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
+    const tip = "This public-institution ad does not disclose enough post-wise roster information to tell whether the recruitment is single-post or bulk, or which UR/SC/ST/OBC/EWS/PwBD roster point is being used.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Roster point not disclosed</span>${reservInfo(tip)}</div>`;
   }
   // Hiring-language traps — surface known exclusion phrases that the ad
   // contains, so candidates can see the structural barriers up front.
@@ -1793,7 +2119,7 @@ function renderAd(ad) {
     : "";
 
   return `
-    <article class="listing tier-${tier}" data-jobid="${escapeAttr(ad.id)}">
+    <article class="listing tier-${tier} scope-${institutionScope}" data-jobid="${escapeAttr(ad.id)}">
       <div class="tier-bar"></div>
       <div class="card-body">
         <div class="card-headline">

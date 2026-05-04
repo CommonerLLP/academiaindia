@@ -536,7 +536,16 @@
     transition: border-color 0.15s, box-shadow 0.15s;
     position: relative; display: block;
   }
+  .listing.scope-public {
+    background: linear-gradient(90deg, rgba(34, 94, 84, 0.055), transparent 26%), var(--panel);
+    border-color: rgba(34, 94, 84, 0.24);
+  }
+  .listing.scope-private {
+    background: linear-gradient(90deg, rgba(184, 90, 28, 0.07), transparent 26%), var(--panel);
+    border-color: rgba(184, 90, 28, 0.30);
+  }
   .listing:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(31,58,138,0.10); }
+  .listing.scope-private:hover { border-color: #b85a1c; box-shadow: 0 2px 8px rgba(184,90,28,0.12); }
   /* Tier bar: 4-px coloured strip on the left. Saturated colour reads as
      a deliberate UI element with political weight, not a soft accent. */
   .listing .tier-bar {
@@ -598,6 +607,17 @@
   .listing .card-flag {
     color: var(--muted); font-weight: 500;
   }
+  .listing .card-flag.scope {
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .listing .card-flag.scope.public { color: #225e54; background: rgba(34, 94, 84, 0.08); }
+  .listing .card-flag.scope.private { color: #8a3a0a; background: rgba(184, 90, 28, 0.10); }
   .listing .card-flag.warn { color: #8a3a1a; font-weight: 600; }
   .listing .card-flag.manual { color: #78350f; font-weight: 600; }
   .listing .card-flag.dim { color: var(--muted); opacity: 0.85; }
@@ -660,19 +680,48 @@
   .listing .row-reserv.reserv-missing { background: #fdf2f2; border: 1px solid #f5c5c5; border-left: 3px solid var(--alarm); border-radius: 6px; padding: 6px 10px; }
   .listing .row-reserv .reserv-label.warn { color: var(--alarm); }
   .listing .row-reserv .reserv-missing-msg { font-size: 11.5px; color: #6b2020; line-height: 1.4; }
-  /* Info-icon affordance: the long explanation now lives in the row's
-     title= attribute (browser-native tooltip) plus aria. The visible
-     icon is just a hint that there's something to read on hover. */
+  /* Info-icon affordance: a real click/keyboard disclosure. */
   .listing .row-reserv .reserv-info {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 18px; height: 18px; margin-left: 6px;
-    font-size: 13px; color: var(--muted); cursor: help;
+    position: relative;
+    display: inline-flex;
+    margin-left: 4px;
+    color: var(--muted);
   }
-  .listing .row-reserv[title]:hover { background-color: rgba(0,0,0,0.02); }
-  .listing .row-reserv[title] { cursor: help; }
-  .listing .row-reserv.reserv-missing.private-univ { background: #fbe8d2; border-color: #e0a76a; border-left-color: #b85a1c; }
-  .listing .row-reserv.reserv-missing.private-univ .reserv-label.warn { color: #8a3a0a; }
-  .listing .row-reserv.reserv-missing.private-univ .reserv-missing-msg { color: #5a2a0a; }
+  .listing .row-reserv .reserv-info > summary {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    list-style: none;
+    background: var(--bg);
+  }
+  .listing .row-reserv .reserv-info > summary::-webkit-details-marker { display: none; }
+  .listing .row-reserv .reserv-info[open] > summary {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .listing .row-reserv .reserv-info-pop {
+    position: absolute;
+    z-index: 20;
+    top: 24px;
+    left: -12px;
+    width: min(320px, calc(100vw - 48px));
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0;
+    text-transform: none;
+  }
   .listing .row-reserv.reserv-missing.reserv-silent { background: var(--chip-bg); border: 1px dashed var(--border); border-left: 3px solid var(--muted); }
   .listing .row-reserv.reserv-missing.reserv-silent .reserv-label.warn { color: var(--muted); }
   .listing .row-reserv.reserv-missing.reserv-silent .reserv-missing-msg { color: var(--ink); }
@@ -685,8 +734,6 @@
   .listing .row-reserv.reserv-srd { background: rgba(31,58,138,0.06); border: 1px solid rgba(31,58,138,0.3); border-left: 3px solid var(--accent); border-radius: 6px; padding: 6px 10px; }
   .listing .row-reserv.reserv-srd .reserv-label.good { color: var(--accent); font-weight: 700; }
   .listing .row-reserv.reserv-srd .reserv-missing-msg { color: var(--accent-deep); }
-  .listing .row-reserv.reserv-missing.reserv-singlepost { background: var(--chip-bg); border: 1px dashed var(--border); border-left: 3px solid var(--muted); }
-  .listing .row-reserv.reserv-missing.reserv-singlepost .reserv-label { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.06em; }
   /* Hiring-language traps */
   .listing .row-traps { grid-column: 2 / span 3; margin: 8px 0 0; background: #fff8e7; border: 1px solid #f0d98e; border-left: 3px solid #d49a2a; border-radius: 6px; padding: 0; }
   .listing .row-traps summary { padding: 8px 12px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: #5c4a1a; list-style: none; display: flex; align-items: center; gap: 8px; }
@@ -822,10 +869,38 @@
     flex: 0 0 auto;
     font-size: 10.5px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.08em; color: var(--alarm);
-    min-width: 92px; padding-top: 1px;
+    min-width: 154px; padding-top: 1px;
   }
   .listing .card-cue-value {
     font-size: 13.5px; color: var(--ink); line-height: 1.45;
+    font-style: italic;
+  }
+  .listing .card-cue-more {
+    min-width: 0;
+  }
+  .listing .card-cue-more > summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  .listing .card-cue-more > summary::-webkit-details-marker {
+    display: none;
+  }
+  .listing .card-cue-toggle {
+    color: var(--accent);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .listing .card-cue-less-label {
+    display: none;
+  }
+  .listing .card-cue-more[open] .card-cue-more-label { display: none; }
+  .listing .card-cue-more[open] .card-cue-less-label { display: inline; }
+  .listing .card-cue-full {
+    margin-top: 6px;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.5;
     font-style: italic;
   }
   /* Areas: tag chips. Wrap freely; don't make a candidate hunt across
@@ -839,7 +914,7 @@
     border: 1px solid var(--border);
   }
   /* Empty state: when the recruiting department has not enunciated the
-     sub-area / methods / approach in the advertisement, name that
+     topical fit / eligibility / evaluation criteria in the advertisement, name that
      absence explicitly. Italic muted phrasing is visible without
      screaming, so the pattern is legible across many cards — most ads
      do not specify; that's the political point. The `cursor: help`
@@ -1267,7 +1342,11 @@
   #vacancies-tab .jbm-card { --jbm-emph: var(--alarm); --jbm-context: #b3b1a6; --jbm-promise: var(--accent); --jbm-grid: rgba(0,0,0,0.08); }
   html[data-theme="dark"] #vacancies-tab .jbm-card { --jbm-grid: rgba(255,255,255,0.10); }
   /* Standard SVG primitives (apply within .jbm-card) */
-  #vacancies-tab .jbm-card svg.jbm-svg { width: 100%; max-width: 760px; display: block; overflow: visible; font-family: var(--sans, "Inter"); }
+  /* `height: auto` is defensive: modern browsers compute it from
+     viewBox aspect-ratio when only width is set, but some Android
+     WebView versions and older mobile Safari render the SVG at its
+     intrinsic 760×H instead. Explicit `height: auto` guards both. */
+  #vacancies-tab .jbm-card svg.jbm-svg { width: 100%; max-width: 760px; height: auto; display: block; overflow: visible; font-family: var(--sans, "Inter"); }
   #vacancies-tab .jbm-card svg.jbm-svg .grid-y, #vacancies-tab .jbm-card svg.jbm-svg .grid-x { stroke: var(--jbm-grid); stroke-width: 1; }
   #vacancies-tab .jbm-card svg.jbm-svg .axis-label { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
   #vacancies-tab .jbm-card svg.jbm-svg .axis-label.bold { font-weight: 700; fill: var(--ink); }
@@ -1409,6 +1488,15 @@
     #vacancies-tab .hero-stat-strip { grid-template-columns: 1fr !important; gap: 12px !important; }
     #vacancies-tab .act-header .act-title { font-size: 20px; }
     #vacancies-tab .act-deck { font-size: 15px; line-height: 1.5; }
+    /* SVG text scales WITH the SVG via viewBox; on a 320-px-wide phone
+       a 760-wide chart becomes ~0.42x, so 11-px labels render at ~5px.
+       Bump in-SVG font-sizes proportionally so labels stay readable. */
+    #vacancies-tab .jbm-card svg.jbm-svg .axis-label,
+    #vacancies-tab .jbm-card svg.jbm-svg .axis-title,
+    #vacancies-tab .jbm-card svg.jbm-svg .data-label,
+    #vacancies-tab .jbm-card svg.jbm-svg .anno-text,
+    #vacancies-tab .jbm-card svg.jbm-svg text { font-size: 22px; }
+    #vacancies-tab .jbm-card svg.jbm-svg .axis-title { font-size: 18px; }
   }
 
   /* Section headers tightened */
