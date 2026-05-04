@@ -660,6 +660,16 @@
   .listing .row-reserv.reserv-missing { background: #fdf2f2; border: 1px solid #f5c5c5; border-left: 3px solid var(--alarm); border-radius: 6px; padding: 6px 10px; }
   .listing .row-reserv .reserv-label.warn { color: var(--alarm); }
   .listing .row-reserv .reserv-missing-msg { font-size: 11.5px; color: #6b2020; line-height: 1.4; }
+  /* Info-icon affordance: the long explanation now lives in the row's
+     title= attribute (browser-native tooltip) plus aria. The visible
+     icon is just a hint that there's something to read on hover. */
+  .listing .row-reserv .reserv-info {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; margin-left: 6px;
+    font-size: 13px; color: var(--muted); cursor: help;
+  }
+  .listing .row-reserv[title]:hover { background-color: rgba(0,0,0,0.02); }
+  .listing .row-reserv[title] { cursor: help; }
   .listing .row-reserv.reserv-missing.private-univ { background: #fbe8d2; border-color: #e0a76a; border-left-color: #b85a1c; }
   .listing .row-reserv.reserv-missing.private-univ .reserv-label.warn { color: #8a3a0a; }
   .listing .row-reserv.reserv-missing.private-univ .reserv-missing-msg { color: #5a2a0a; }
@@ -789,6 +799,63 @@
      sit immediately after, so the row stays compact at rest. */
   .listing .row-areas { font-size: 12.5px; color: var(--ink); margin: 8px 0 0; line-height: 1.5; grid-column: 2 / span 3; }
   .listing .row-areas .k { display: none; }
+
+  /* === Card cues — the cover-letter scan ============================
+   *
+   * The previous design rendered ad.raw_text_excerpt as a 500-character
+   * paragraph. Candidates couldn't scan it: the high-signal pieces
+   * (sub-areas list, methods preference, sub-disciplinary approach)
+   * were embedded in boilerplate ("specialisation must be clearly
+   * evidenced through research and publications…"). Now we parse and
+   * label the three pieces explicitly so a candidate can answer in two
+   * seconds: do my projects fit the sub-areas listed; do my methods
+   * match what they want; does my disciplinary self-presentation map
+   * onto theirs. The boilerplate stays in the expanded details and
+   * gets surfaced separately by the trap-detector.
+   */
+  .listing .card-cues { margin: 12px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .listing .card-cue {
+    display: flex; align-items: baseline; gap: 10px;
+    font-family: var(--sans);
+  }
+  .listing .card-cue-label {
+    flex: 0 0 auto;
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--alarm);
+    min-width: 92px; padding-top: 1px;
+  }
+  .listing .card-cue-value {
+    font-size: 13.5px; color: var(--ink); line-height: 1.45;
+    font-style: italic;
+  }
+  /* Areas: tag chips. Wrap freely; don't make a candidate hunt across
+     a wall of comma-separated text. */
+  .listing .card-cue-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .listing .card-area-chip {
+    display: inline-flex; align-items: center;
+    padding: 2px 9px; border-radius: 4px;
+    font-size: 12.5px; font-weight: 500; line-height: 1.4;
+    background: var(--chip-bg); color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  /* Empty state: when the recruiting department has not enunciated the
+     sub-area / methods / approach in the advertisement, name that
+     absence explicitly. Italic muted phrasing is visible without
+     screaming, so the pattern is legible across many cards — most ads
+     do not specify; that's the political point. The `cursor: help`
+     surfaces the tooltip explaining the silence. */
+  .listing .card-cue-empty {
+    font-family: var(--sans); font-size: 12.5px;
+    color: var(--muted); font-style: italic; line-height: 1.45;
+    cursor: help;
+  }
+  .listing .card-cue.is-empty .card-cue-label {
+    color: var(--muted); font-weight: 600;
+  }
+  @media (max-width: 720px) {
+    .listing .card-cue { flex-direction: column; gap: 4px; }
+    .listing .card-cue-label { min-width: 0; padding-top: 0; }
+  }
   .listing .details { font-size: 12.5px; color: var(--ink); margin: 6px 0 0; grid-column: 2 / span 3; }
   .listing .details > summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 4px 0; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
   .listing .details > summary:hover { color: var(--accent); }
