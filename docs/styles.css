@@ -875,33 +875,37 @@
     font-size: 13.5px; color: var(--ink); line-height: 1.45;
     font-style: italic;
   }
-  .listing .card-cue-more {
+  /* Description "see more / see less" — line-clamp + button toggle.
+     The full text stays in the DOM at all times; only the clamp class
+     flips. Single text node grows in place: no jump, no duplication.
+     Previous <details>/<summary> approach kept the truncated preview
+     inside <summary>, so when expanded both preview and full text
+     rendered — duplicate text, ugly. This pattern is the standard
+     web one (clamp + toggle) and reads naturally. */
+  .listing .card-cue-description .card-desc-body {
     min-width: 0;
   }
-  .listing .card-cue-more > summary {
-    cursor: pointer;
-    list-style: none;
+  .listing .card-cue-description .card-desc-text {
+    margin: 0;
+    font-family: var(--serif); font-size: 13.5px;
+    color: var(--ink); line-height: 1.5; font-style: italic;
   }
-  .listing .card-cue-more > summary::-webkit-details-marker {
-    display: none;
+  .listing .card-cue-description .card-desc-body[data-expanded="false"] .card-desc-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
+    overflow: hidden;
   }
-  .listing .card-cue-toggle {
-    color: var(--accent);
-    font-size: 12.5px;
-    font-weight: 600;
-    white-space: nowrap;
+  .listing .card-cue-description .card-desc-toggle {
+    background: none; border: 0; padding: 0;
+    margin-top: 4px;
+    font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+    color: var(--accent); cursor: pointer;
+    display: inline-block;
   }
-  .listing .card-cue-less-label {
-    display: none;
-  }
-  .listing .card-cue-more[open] .card-cue-more-label { display: none; }
-  .listing .card-cue-more[open] .card-cue-less-label { display: inline; }
-  .listing .card-cue-full {
-    margin-top: 6px;
-    font-size: 13.5px;
-    color: var(--ink);
-    line-height: 1.5;
-    font-style: italic;
+  .listing .card-cue-description .card-desc-toggle:hover {
+    text-decoration: underline;
   }
   /* Areas: tag chips. Wrap freely; don't make a candidate hunt across
      a wall of comma-separated text. */
