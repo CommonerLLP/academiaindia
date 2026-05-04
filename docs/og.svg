@@ -15,9 +15,8 @@
     so Georgia is the production rendering face here — close enough to
     Newsreader at the sizes used.
 
-    To regenerate as PNG: open in any browser, resize to 1200×630, screenshot.
-    Or: `npx puppeteer-screenshot og.svg og.png --width 1200 --height 630`
-  -->
+    To regenerate as PNG: open in any browser at 1200x630 and screenshot.
+-->
 
   <defs>
     <!-- Clip for right-panel decorative content -->
