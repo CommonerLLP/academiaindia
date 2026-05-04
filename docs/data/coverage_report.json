@@ -1,0 +1,513 @@
+{
+  "generated_at": "2026-05-03T19:39:43.149571+00:00",
+  "institutions_attempted": 63,
+  "institutions_succeeded": 51,
+  "institutions_with_ads": 46,
+  "ads_found_total": 335,
+  "rows": [
+    {
+      "institution_id": "iit-kharagpur",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-bombay",
+      "parser": "iit_rolling",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 31,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-madras",
+      "parser": "iit_rolling",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 18,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-kanpur",
+      "parser": "iit_kanpur",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 38,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-delhi",
+      "parser": "iit_rolling",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 24,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-guwahati",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 2,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "iit-roorkee",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 5,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-bhubaneswar",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 4,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-gandhinagar",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 2,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-hyderabad",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 57,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-jodhpur",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-patna",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-ropar",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-indore",
+      "parser": "iit_indore",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 3,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-mandi",
+      "parser": "generic",
+      "fetch_status": "http-error",
+      "http_status": 403,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-bhilai",
+      "parser": "generic",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTPSConnectionPool(host='www.iitbhilai.ac.in', port=443): Max retries exceeded with url: /index.php/recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+    },
+    {
+      "institution_id": "iit-goa",
+      "parser": "generic",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTPSConnectionPool(host='www.iitgoa.ac.in', port=443): Max retries exceeded with url: /index.php/recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+    },
+    {
+      "institution_id": "iit-jammu",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-dharwad",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 4,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-palakkad",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 4,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-tirupati",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iit-ism-dhanbad",
+      "parser": "generic",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTPSConnectionPool(host='www.iitism.ac.in', port=443): Max retries exceeded with url: /recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+    },
+    {
+      "institution_id": "iit-varanasi-bhu",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 3,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-calcutta",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 404,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-ahmedabad",
+      "parser": "iim_recruit",
+      "fetch_status": "rolling-stub",
+      "http_status": null,
+      "ads_found": 1,
+      "note": "network-error; preserved known rolling call"
+    },
+    {
+      "institution_id": "iim-bangalore",
+      "parser": "iim_recruit",
+      "fetch_status": "rolling-stub",
+      "http_status": null,
+      "ads_found": 1,
+      "note": "network-error; preserved known rolling call after robots override"
+    },
+    {
+      "institution_id": "iim-lucknow",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-kozhikode",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-indore",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-shillong",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "iim-rohtak",
+      "parser": "iim_recruit",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTPSConnectionPool(host='www.iimrohtak.ac.in', port=443): Max retries exceeded with url: /careers (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+    },
+    {
+      "institution_id": "iim-ranchi",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "iim-raipur",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 404,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-trichy",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-kashipur",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-udaipur",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 404,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-amritsar",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 404,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-bodhgaya",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-nagpur",
+      "parser": "iim_recruit",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTPSConnectionPool(host='www.iimnagpur.ac.in', port=443): Max retries exceeded with url: /careers (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+    },
+    {
+      "institution_id": "iim-sambalpur",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-sirmaur",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-visakhapatnam",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-jammu",
+      "parser": "iim_recruit",
+      "fetch_status": "http-error",
+      "http_status": 404,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iim-mumbai",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iisc-bangalore",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 23,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "iiser-pune",
+      "parser": "generic",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTPSConnectionPool(host='www.iiserpune.ac.in', port=443): Max retries exceeded with url: /jobs (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1081)')))"
+    },
+    {
+      "institution_id": "iiser-kolkata",
+      "parser": "generic",
+      "fetch_status": "http-error",
+      "http_status": 404,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iiser-mohali",
+      "parser": "generic",
+      "fetch_status": "http-error",
+      "http_status": 404,
+      "ads_found": 0,
+      "note": ""
+    },
+    {
+      "institution_id": "iiser-bhopal",
+      "parser": "generic",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTP 500"
+    },
+    {
+      "institution_id": "iiser-thiruvananthapuram",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 404,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iiser-tirupati",
+      "parser": "generic",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 24,
+      "note": ""
+    },
+    {
+      "institution_id": "iiser-berhampur",
+      "parser": "generic",
+      "fetch_status": "network-error",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "HTTPSConnectionPool(host='www.iiserbpr.ac.in', port=443): Max retries exceeded with url: /jobs (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+    },
+    {
+      "institution_id": "iiit-bangalore",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iiit-hyderabad",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "iiit-delhi",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "nls-bangalore",
+      "parser": "iim_recruit",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "ashoka-university",
+      "parser": "private_university",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 2,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "jgu-sonipat",
+      "parser": "private_university",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 5,
+      "note": ""
+    },
+    {
+      "institution_id": "azim-premji-university",
+      "parser": "private_university",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 21,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "ahmedabad-university",
+      "parser": "private_university",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "krea-university",
+      "parser": "private_university",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 1,
+      "note": ""
+    },
+    {
+      "institution_id": "shiv-nadar-university",
+      "parser": "private_university",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 8,
+      "note": "robots override"
+    },
+    {
+      "institution_id": "flame-university",
+      "parser": "private_university",
+      "fetch_status": "ok",
+      "http_status": 200,
+      "ads_found": 31,
+      "note": "TLS verification disabled for official source; robots override"
+    }
+  ]
+}

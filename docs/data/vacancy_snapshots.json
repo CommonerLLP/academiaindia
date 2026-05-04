@@ -1,0 +1,1660 @@
+{
+  "schema_version": "1.0",
+  "generated_at": null,
+  "definitions": {
+    "scope": "Faculty and non-teaching sanctioned/in-position/vacant positions at centrally-funded HEIs (IITs, IIMs, IISERs, IISc, Central Universities, NITs, IIITs), as reported in Parliamentary Q&A, MoE/UGC annual reports, and RTI responses, 2015–2026.",
+    "category_convention": {
+      "rule": "GEN = UR + EWS, forced across the entire 10-year horizon.",
+      "reason": "The 103rd Constitutional Amendment (Jan 2019) carved a 10% EWS quota out of the earlier Unreserved pool. Post-2019 MoE tables report UR and EWS separately; pre-2019 tables report only UR. Forcing GEN = UR + EWS produces a single continuous time series with pre-2019-comparable semantics. The raw UR and EWS splits are preserved under `_raw.by_category` when the source reported them, so the merge is reversible for any analysis that needs the break.",
+      "visual_treatment": "Dashboard must display this convention as a visible footnote on any vacancy view — not just in the About tab. Any year where EWS was folded in should show a small ⓘ marker in the GEN column."
+    },
+    "reported_on_vs_as_of": "`reported_on` is the date the parliamentary answer or report was delivered. `as_of` is the effective date of the vacancy snapshot ('as on DD Month YYYY'). Always prefer `as_of` for time-series alignment; fall back to `reported_on` when `as_of` is missing.",
+    "coverage_caveat": "Coverage is uneven by institution type. IITs, NITs, and Central Universities are asked about nearly every parliamentary session; IIMs, IISERs, IISc, and IIITs are asked about far less often. Gaps in this dataset are honest gaps in the public record, not failures of scraping — display them as 'no data' rather than interpolating.",
+    "definitional_drift_warning": "MoE, UGC, and individual institutions use 'sanctioned strength', 'effective strength', 'working strength', and 'vacancy' inconsistently. This dataset normalizes to: sanctioned = posts sanctioned by the competent authority; in_position = persons currently in post (= effective/working strength); vacant = sanctioned − in_position. Where a source defines these differently, the original definition goes in `notes`."
+  },
+  "record_schema": {
+    "grain": "'institution' | 'institution_group' — 'institution' when a single HEI is reported; 'institution_group' when the source aggregates across a type (e.g. all IITs pooled). AISHE and MoE Annual Reports publish almost exclusively at the group grain; parliamentary Q&A occasionally publishes per-institution. Both grains coexist in this table and must be filtered on read.",
+    "institution_id": "string or null — matches data/institutions_registry.json. Null when grain = 'institution_group'.",
+    "institution_group": "string or null — one of 'all_iits' | 'all_iims' | 'all_iisers' | 'all_nits' | 'all_iiits' | 'all_central_universities' | 'iisc'. Null when grain = 'institution'.",
+    "post_type": "'Faculty' | 'NonTeaching'",
+    "source": {
+      "kind": "'parliamentary_qa' | 'moe_annual_report' | 'ugc_report' | 'rti' | 'aishe'",
+      "_source_priority_note": "MoE Annual Report is the spine for 10-year sanctioned-vs-in-position-by-category at institution-group grain. AISHE reliably publishes teachers-in-position by category but rarely sanctioned strength, so AISHE is used to cross-validate in_position rather than as primary. Parliamentary Q&A is supplementary — used only where it genuinely adds per-institution granularity (grain = 'institution') that the annual reports do not provide.",
+      "house": "'Lok Sabha' | 'Rajya Sabha' | null",
+      "question_type": "'starred' | 'unstarred' | null",
+      "question_no": "string or null",
+      "session": "string — e.g. '17/14' for 17th LS, 14th session",
+      "answered_on": "ISO date",
+      "ministry": "string",
+      "asked_by": "string",
+      "source_url": "string — primary URL (sansad.in, PRS, MoE)",
+      "source_pdf": "string or null — archived local path under sources/_vacancies/"
+    },
+    "reported_on": "ISO date",
+    "as_of": "ISO date or null",
+    "totals": {
+      "sanctioned": "int",
+      "in_position": "int",
+      "vacant": "int"
+    },
+    "by_category": {
+      "GEN": {
+        "sanctioned": "int",
+        "in_position": "int",
+        "vacant": "int"
+      },
+      "SC": {
+        "sanctioned": "int",
+        "in_position": "int",
+        "vacant": "int"
+      },
+      "ST": {
+        "sanctioned": "int",
+        "in_position": "int",
+        "vacant": "int"
+      },
+      "OBC": {
+        "sanctioned": "int",
+        "in_position": "int",
+        "vacant": "int"
+      }
+    },
+    "_raw": {
+      "description": "If the source reported UR and EWS separately, preserve the split here so the GEN-merge is reversible.",
+      "by_category_optional": {
+        "UR": {
+          "sanctioned": "int",
+          "in_position": "int",
+          "vacant": "int"
+        },
+        "EWS": {
+          "sanctioned": "int",
+          "in_position": "int",
+          "vacant": "int"
+        }
+      },
+      "ews_folded_in": "bool — true when GEN in the canonical view includes EWS that the source reported separately."
+    },
+    "notes": "string — free-text: definitional peculiarities, missing columns, footnotes on the source table."
+  },
+  "snapshots": [
+    {
+      "_pilot_record_note": "All three records below are derived from a single PQ answer (LS 17 Starred Q 78, 12.12.2022) — the only clean category-split annexure found across a 10-year search of sansad.in. The 2023-02-13 (U 1674) and 2024-12-02 (S 100) answers to structurally identical questions refused to provide institution-wise or category-wise breakdowns, returning only aggregate narrative numbers. Treat non-disclosure itself as data: see About-tab methodology note."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "starred",
+        "question_no": "78",
+        "session": "17/10",
+        "answered_on": "2022-12-12",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Adv. A.M. Ariff; Shri Ravikumar D.",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "sources/_vacancies/ls17-s78-2022-12-12.pdf"
+      },
+      "reported_on": "2022-12-12",
+      "as_of": "2022-12-01",
+      "totals": {
+        "sanctioned": 18956,
+        "in_position": 12776,
+        "vacant": 6180
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": 11566,
+          "in_position": 8698,
+          "vacant": 2868
+        },
+        "SC": {
+          "sanctioned": 2284,
+          "in_position": 1376,
+          "vacant": 908
+        },
+        "ST": {
+          "sanctioned": 1142,
+          "in_position": 598,
+          "vacant": 544
+        },
+        "OBC": {
+          "sanctioned": 3451,
+          "in_position": 1892,
+          "vacant": 1559
+        }
+      },
+      "_raw": {
+        "description": "Source table reported UR and EWS separately and broke out by professor rank. All numbers here are summed across Professor + Associate Professor + Assistant Professor.",
+        "by_category_optional": {
+          "UR": {
+            "sanctioned": 10736,
+            "in_position": 8469,
+            "vacant": 2267
+          },
+          "EWS": {
+            "sanctioned": 830,
+            "in_position": 229,
+            "vacant": 601
+          },
+          "PWD": {
+            "sanctioned": 513,
+            "in_position": 212,
+            "vacant": 301
+          }
+        },
+        "ews_folded_in": true,
+        "by_post_rank": {
+          "Professor": {
+            "sanctioned": 2553,
+            "vacant": 1529,
+            "by_cat_sanctioned": {
+              "GEN": 1564,
+              "SC": 307,
+              "ST": 142,
+              "OBC": 367,
+              "EWS": 111,
+              "PWD": 62
+            },
+            "by_cat_vacant": {
+              "GEN": 705,
+              "SC": 231,
+              "ST": 124,
+              "OBC": 311,
+              "EWS": 101,
+              "PWD": 57
+            }
+          },
+          "Associate Professor": {
+            "sanctioned": 5110,
+            "vacant": 2304,
+            "by_cat_sanctioned": {
+              "GEN": 3073,
+              "SC": 620,
+              "ST": 302,
+              "OBC": 752,
+              "EWS": 233,
+              "PWD": 130
+            },
+            "by_cat_vacant": {
+              "GEN": 771,
+              "SC": 401,
+              "ST": 232,
+              "OBC": 576,
+              "EWS": 211,
+              "PWD": 113
+            }
+          },
+          "Assistant Professor": {
+            "sanctioned": 11293,
+            "vacant": 2347,
+            "by_cat_sanctioned": {
+              "GEN": 6099,
+              "SC": 1357,
+              "ST": 698,
+              "OBC": 2332,
+              "EWS": 486,
+              "PWD": 321
+            },
+            "by_cat_vacant": {
+              "GEN": 791,
+              "SC": 276,
+              "ST": 188,
+              "OBC": 672,
+              "EWS": 289,
+              "PWD": 131
+            }
+          }
+        }
+      },
+      "notes": "Source narrative: 'Out of 18956 sanctioned teaching posts in 45 Central Universities in regular mode under the purview of Ministry of Education, 12776 posts are filled up and 6180 posts are vacant as on 01.12.2022'. Annexure reconciles exactly with narrative totals. PWD reported as a vertical 7th column alongside GEN/SC/ST/OBC/EWS — preserved in _raw.by_category_optional.PWD. Horizontal/vertical reservation distinction not specified in source."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_iits",
+      "post_type": "Faculty",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "starred",
+        "question_no": "78",
+        "session": "17/10",
+        "answered_on": "2022-12-12",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Adv. A.M. Ariff; Shri Ravikumar D.",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "sources/_vacancies/ls17-s78-2022-12-12.pdf"
+      },
+      "reported_on": "2022-12-12",
+      "as_of": "2022-12-01",
+      "totals": {
+        "sanctioned": 11170,
+        "in_position": 6668,
+        "vacant": 4502
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        }
+      },
+      "_raw": {
+        "description": "Source annexure marks IITs as 'flexi cadre for faculty posts' and provides only aggregate sanctioned/vacant with no category split. This non-disclosure is itself a finding — the Act-created IITs institutionally refuse caste-disaggregated sanctioned-strength reporting while CUs and IIMs comply.",
+        "ews_folded_in": false
+      },
+      "notes": "The 'flexi cadre' doctrine is a disclosure strategy, not a technical accounting constraint. Individual IIT responses to this same Q (visible in IIT-BHU's internal collection at sources/_vacancies/rs-usq-820-2022-12-14.txt) show some IITs (Dhanbad, Indore, Patna) do maintain category-wise post counts, while others (Bombay, Ropar, Goa, Jodhpur) invoke flexi-cadre to refuse. Centralized MoE reporting aggregates to the refusal."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_iims",
+      "post_type": "Faculty",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "starred",
+        "question_no": "78",
+        "session": "17/10",
+        "answered_on": "2022-12-12",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Adv. A.M. Ariff; Shri Ravikumar D.",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "sources/_vacancies/ls17-s78-2022-12-12.pdf"
+      },
+      "reported_on": "2022-12-12",
+      "as_of": "2022-12-01",
+      "totals": {
+        "sanctioned": 1566,
+        "in_position": 1073,
+        "vacant": 493
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": 1245,
+          "in_position": 937,
+          "vacant": 308
+        },
+        "SC": {
+          "sanctioned": 97,
+          "in_position": 44,
+          "vacant": 53
+        },
+        "ST": {
+          "sanctioned": 40,
+          "in_position": 6,
+          "vacant": 34
+        },
+        "OBC": {
+          "sanctioned": 184,
+          "in_position": 86,
+          "vacant": 98
+        }
+      },
+      "_raw": {
+        "description": "IIMs report UR and EWS separately; no PWD column (source footnote: 'No separate category').",
+        "by_category_optional": {
+          "UR": {
+            "sanctioned": 1197,
+            "in_position": 931,
+            "vacant": 266
+          },
+          "EWS": {
+            "sanctioned": 48,
+            "in_position": 6,
+            "vacant": 42
+          }
+        },
+        "ews_folded_in": true
+      },
+      "notes": "IIMs also follow flexi cadre per source footnote but still publish category splits — unlike IITs. Suggests the flexi-cadre doctrine is differentially weaponized across institution types; comparative ethnographic material worth probing in fieldwork."
+    },
+    {
+      "_disclosure_regression_note": "The two records below document the disclosure regression 2022 → 2023 → 2024. Same question (vacant faculty posts in HEIs), same ministry, same statutory duty to answer. In 2022 an annexure with category × rank × institution-group splits was tabled (LS S78, record above). In 2023 only an aggregate figure was given (LS U1674). In 2024 only Mission Mode fill-counts were given, with no sanctioned-strength figures and no institution-group split (LS S100). Non-disclosure is itself evidence — these records preserve the regression in the time-series rather than letting it appear as a gap."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_centrally_funded_heis",
+      "post_type": "Faculty",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "unstarred",
+        "question_no": "1674",
+        "session": "17/11",
+        "answered_on": "2023-02-13",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Sha.Bra.Dr.Jai Siddeshwar Shivacharya Mahaswamiji; Shri L.S. Tejasvi Surya; Shri Annasaheb Shankar Jolle; Dr. Umesh G. Jadhav; Shri Prathap Simha",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "sources/_vacancies/ls17-u1674-2023-02-13.pdf"
+      },
+      "reported_on": "2023-02-13",
+      "as_of": null,
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 14606
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        }
+      },
+      "_raw": {
+        "description": "Answer refuses institution-group and category splits; provides only a single aggregate vacancy count across all HEIs under MoE. The accompanying narrative claim is that 'more than 6000 posts of faculty/non-faculty have been filled up' in Mission Mode — not vacancy-reducing stock, a cumulative flow with no baseline.",
+        "ews_folded_in": false
+      },
+      "notes": "Disclosure regression indicator. Question was substantively identical to LS S78 (2022-12-12) but was answered with only: 'As reported, there are 14606 faculty vacancies in HEIs under this Ministry.' No annexure. Contrast with the 18956/12776/6180 CU-only figure in S78 from 10 weeks earlier — 14606 across ALL MoE HEIs is implausibly close to the 6180 CU-only vacancy (plus ~4500 IIT + ~500 IIM = ~11200 already), suggesting either scope-contraction, undercount, or definitional shift that the answer does not disclose."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_centrally_funded_heis",
+      "post_type": "Faculty",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "starred",
+        "question_no": "100",
+        "session": "18/2",
+        "answered_on": "2024-12-02",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Vijay Kumar Hansdak",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "sources/_vacancies/ls18-s100-2024-12-02.pdf"
+      },
+      "reported_on": "2024-12-02",
+      "as_of": "2024-10-29",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": null
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        }
+      },
+      "_raw": {
+        "description": "Answer substitutes Mission Mode cumulative fill-counts for the sanctioned/in-position/vacant stock that the question explicitly asked for. 'Total number of 25,777 posts have been filled up including 15,139 faculty positions, in Mission Mode by all CHEIs.' 'A total number of 25,257 vacancies have been filled up by CUs, IITs, IIITs, NITs, IIMs, IISERs and IISc Bangalore collectively, out of which 15,047 are faculty positions including 1869 SC, 739 ST, 3089 OBC and 254 PwD.' These are cumulative flows since September 2022; no baseline is disclosed.",
+        "mission_mode_fills_since_sept_2022": {
+          "total_posts": 25777,
+          "faculty_posts": 15139,
+          "by_category_faculty_cheis_only": {
+            "SC": 1869,
+            "ST": 739,
+            "OBC": 3089,
+            "PwD": 254
+          }
+        },
+        "ews_folded_in": false
+      },
+      "notes": "Disclosure regression — maximum severity. Question (a) asked: 'the total number of faculty positions sanctioned, filled and vacant in Central Universities, IITs, IIITs, NITs, IIMs and IISER as on 31 October, 2024'. The answer gives none of these three numbers for any of those institution types; it gives only cumulative Mission Mode fills. Note also that the minister categorically (and falsely) asserts: 'As autonomous institutions, faculty recruitment is done within the institutions' — which is the same autonomy-invocation used to refuse earlier disclosure, now deployed to deflect even the aggregate question."
+    },
+    {
+      "grain": "institution",
+      "institution_id": "iit_bombay",
+      "institution_group": null,
+      "post_type": "Faculty",
+      "source": {
+        "kind": "rti",
+        "house": "Lok Sabha",
+        "question_type": "starred",
+        "question_no": "100 (IIT Bombay internal reply to MoE request, dy. no. 2252)",
+        "session": "18/2",
+        "answered_on": "2024-11-21",
+        "ministry": "IIT Bombay, Office of the Registrar",
+        "asked_by": "Under Secretary (IITs), Department of Higher Education",
+        "source_url": null,
+        "source_pdf": "sources/_vacancies/iitb-pq-merged-2024.pdf"
+      },
+      "reported_on": "2024-11-21",
+      "as_of": "2024-10-31",
+      "totals": {
+        "sanctioned": 1225,
+        "in_position": 742,
+        "vacant": 483
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        }
+      },
+      "_raw": {
+        "description": "IIT Bombay's internal reply (captured via RTI-adjacent release of the MoE-to-institute correspondence) for LS S100. Sanctioned strength 1225 is explicitly derived as 'faculty student ratio 1:10', not as a cadre-approved fixed number. Institute invokes flexi-cadre to refuse rank splits and category splits.",
+        "ews_folded_in": false
+      },
+      "notes": "Only per-institution datapoint in this file so far. IITB registrar: 'IIT Bombay follow flexible cadre system for appointment of faculty. Thus, the overall sanctioned strength of faculty in different grades (i.e. Professor, Associate Professor & Assistant Professor) is not fixed.' On reservation: 'Despite efforts made, vacancies of faculty positions in a given year, do not have representation of SC/ST/OBC to the extent of the laid down percentage. Due to non-availability of sufficient suitable candidates with qualifications and experience, faculty positions, remains unfilled' — the 'not finding suitable candidates' formulation is a legible object of study in its own right."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_centrally_funded_heis",
+      "post_type": "Faculty",
+      "source": {
+        "kind": "no_disclosure",
+        "house": null,
+        "question_type": null,
+        "question_no": null,
+        "session": null,
+        "answered_on": null,
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": null,
+        "source_url": null,
+        "source_pdf": null
+      },
+      "reported_on": null,
+      "as_of": "2025-12-31",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": null
+      },
+      "by_category": null,
+      "_no_data": true,
+      "notes": "No aggregate faculty-vacancy disclosure for 2025 has been identified in this corpus. Possibilities: (a) no Lok Sabha or Rajya Sabha question on faculty vacancies was tabled in the relevant 2025 sessions; (b) such a question was tabled but answered with non-substantive narrative (continuing the Dec 2024 disclosure pattern); (c) the question exists in sansad.in's archive but has not yet been added to this corpus. The absence itself is significant — Feb 2023 remains the last useful aggregate, and the trend is regression. If you find a 2025 LS/RS question on this data, please open a PR to add it here."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty (Teaching)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "unstarred",
+        "question_no": "81",
+        "session": null,
+        "answered_on": "2024-07-22",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Dharmendra Yadav (SP)",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "data/AU81_Wh5uVR.pdf"
+      },
+      "reported_on": "2024-07-22",
+      "as_of": "2024-04-01",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 5060
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 736
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 466
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 1446
+        }
+      },
+      "_lscorpus": true,
+      "notes": "Category-wise breakdown disclosed (teaching posts in CUs running in regular mode). Mentions of OBC counts include both teaching and non-teaching in source language; figures here are teaching only."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty (Teaching)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "unstarred",
+        "question_no": "47",
+        "session": null,
+        "answered_on": "2024-11-25",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Shafi Parambil; Selvaganapathi T.M.; Dr. Kalanidhi Veeraswamy",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "data/AU47_hm0RzM.pdf"
+      },
+      "reported_on": "2024-11-25",
+      "as_of": "2024-10-31",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 5182
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 740
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 464
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 1546
+        }
+      },
+      "_lscorpus": true,
+      "notes": "Last LS answer disclosing category-wise vacancy for Central Universities. From Mar 2025 onward, the breakdown is replaced with cumulative Mission Mode fills."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty (Teaching)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "starred",
+        "question_no": "328",
+        "session": null,
+        "answered_on": "2025-03-24",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri K Gopinath (DMK)",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "data/AS328_WoeaRw.pdf"
+      },
+      "reported_on": "2025-03-24",
+      "as_of": "2025-03-01",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 4915
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        }
+      },
+      "_lscorpus": true,
+      "notes": "Disclosure regression. Question (a) explicitly asked for State-wise breakdown; answer gave aggregate only. No category breakdown despite CEI(RTC) Act requiring per-category roster maintenance."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty (Teaching)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "unstarred",
+        "question_no": "1206",
+        "session": null,
+        "answered_on": "2025-07-28",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Ms Sayani Ghosh (TMC); Selvaraj V (CPI); Subbarayan K (CPI-M)",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "data/AU1206_MGlEMS.pdf"
+      },
+      "reported_on": "2025-07-28",
+      "as_of": "2025-07-01",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 4889
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": null
+        }
+      },
+      "_lscorpus": true,
+      "notes": "Aggregate maintained at ~4,900 vacant since Mar 2025; effectively flat. Ad hoc faculty in CUs reported as 176 (as on 01.04.2025)."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_aiims",
+      "post_type": "Faculty",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Lok Sabha",
+        "question_type": "starred",
+        "question_no": "207",
+        "session": null,
+        "answered_on": "2026-02-13",
+        "ministry": "Ministry of Health and Family Welfare",
+        "asked_by": "Shri Kishori Lal; Shri Bapi Haldar",
+        "source_url": "https://sansad.in/ls/questions/questions-and-answers",
+        "source_pdf": "data/AS207_6AIbm6.pdf"
+      },
+      "reported_on": "2026-02-13",
+      "as_of": "2026-02-13",
+      "totals": {
+        "sanctioned": 6297,
+        "in_position": 3941,
+        "vacant": 2356
+      },
+      "by_category": null,
+      "_per_institution": [
+        {
+          "name": "New Delhi",
+          "sanctioned": 1306,
+          "in_position": 860,
+          "vacant": 446,
+          "vacancy_rate": 34.2,
+          "backlog_sc": 84,
+          "backlog_st": 91,
+          "backlog_obc": 97
+        },
+        {
+          "name": "Bhopal",
+          "sanctioned": 312,
+          "in_position": 241,
+          "vacant": 71,
+          "vacancy_rate": 22.8,
+          "backlog_sc": 8,
+          "backlog_st": 3,
+          "backlog_obc": 22
+        },
+        {
+          "name": "Bhubaneswar",
+          "sanctioned": 337,
+          "in_position": 238,
+          "vacant": 99,
+          "vacancy_rate": 29.4,
+          "backlog_sc": 65,
+          "backlog_st": 65,
+          "backlog_obc": 118
+        },
+        {
+          "name": "Jodhpur",
+          "sanctioned": 405,
+          "in_position": 221,
+          "vacant": 184,
+          "vacancy_rate": 45.4,
+          "backlog_sc": 195,
+          "backlog_st": 69,
+          "backlog_obc": 172
+        },
+        {
+          "name": "Patna",
+          "sanctioned": 305,
+          "in_position": 219,
+          "vacant": 86,
+          "vacancy_rate": 28.2,
+          "backlog_sc": 36,
+          "backlog_st": 22,
+          "backlog_obc": 51
+        },
+        {
+          "name": "Raipur",
+          "sanctioned": 305,
+          "in_position": 200,
+          "vacant": 105,
+          "vacancy_rate": 34.4,
+          "backlog_sc": 14,
+          "backlog_st": 13,
+          "backlog_obc": 43
+        },
+        {
+          "name": "Rishikesh",
+          "sanctioned": 355,
+          "in_position": 229,
+          "vacant": 126,
+          "vacancy_rate": 35.5,
+          "backlog_sc": 101,
+          "backlog_st": 47,
+          "backlog_obc": 217
+        },
+        {
+          "name": "Bathinda",
+          "sanctioned": 219,
+          "in_position": 143,
+          "vacant": 76,
+          "vacancy_rate": 34.7,
+          "backlog_sc": 38,
+          "backlog_st": 17,
+          "backlog_obc": 64
+        },
+        {
+          "name": "Bibinagar",
+          "sanctioned": 183,
+          "in_position": 132,
+          "vacant": 51,
+          "vacancy_rate": 27.9,
+          "backlog_sc": 18,
+          "backlog_st": 7,
+          "backlog_obc": 23
+        },
+        {
+          "name": "Bilaspur",
+          "sanctioned": 217,
+          "in_position": 130,
+          "vacant": 87,
+          "vacancy_rate": 40.1,
+          "backlog_sc": 45,
+          "backlog_st": 19,
+          "backlog_obc": 74
+        },
+        {
+          "name": "Deoghar",
+          "sanctioned": 208,
+          "in_position": 132,
+          "vacant": 76,
+          "vacancy_rate": 36.5,
+          "backlog_sc": 75,
+          "backlog_st": 42,
+          "backlog_obc": 139
+        },
+        {
+          "name": "Gorakhpur",
+          "sanctioned": 213,
+          "in_position": 117,
+          "vacant": 96,
+          "vacancy_rate": 45.1,
+          "backlog_sc": 4,
+          "backlog_st": 2,
+          "backlog_obc": 5
+        },
+        {
+          "name": "Guwahati",
+          "sanctioned": 183,
+          "in_position": 117,
+          "vacant": 66,
+          "vacancy_rate": 36.1,
+          "backlog_sc": 47,
+          "backlog_st": 17,
+          "backlog_obc": 46
+        },
+        {
+          "name": "Jammu",
+          "sanctioned": 183,
+          "in_position": 119,
+          "vacant": 64,
+          "vacancy_rate": 35.0,
+          "backlog_sc": 20,
+          "backlog_st": 10,
+          "backlog_obc": 42
+        },
+        {
+          "name": "Kalyani",
+          "sanctioned": 309,
+          "in_position": 175,
+          "vacant": 134,
+          "vacancy_rate": 43.4,
+          "backlog_sc": 26,
+          "backlog_st": 19,
+          "backlog_obc": 29
+        },
+        {
+          "name": "Madurai",
+          "sanctioned": 183,
+          "in_position": 70,
+          "vacant": 113,
+          "vacancy_rate": 61.7,
+          "backlog_sc": 5,
+          "backlog_st": 7,
+          "backlog_obc": 8
+        },
+        {
+          "name": "Mangalagiri",
+          "sanctioned": 309,
+          "in_position": 171,
+          "vacant": 138,
+          "vacancy_rate": 44.7,
+          "backlog_sc": 8,
+          "backlog_st": 5,
+          "backlog_obc": 12
+        },
+        {
+          "name": "Nagpur",
+          "sanctioned": 373,
+          "in_position": 238,
+          "vacant": 135,
+          "vacancy_rate": 36.2,
+          "backlog_sc": 30,
+          "backlog_st": 19,
+          "backlog_obc": 45
+        },
+        {
+          "name": "Raebareli",
+          "sanctioned": 209,
+          "in_position": 111,
+          "vacant": 98,
+          "vacancy_rate": 46.9,
+          "backlog_sc": 34,
+          "backlog_st": 16,
+          "backlog_obc": 68
+        },
+        {
+          "name": "Rajkot",
+          "sanctioned": 183,
+          "in_position": 78,
+          "vacant": 105,
+          "vacancy_rate": 57.4,
+          "backlog_sc": 20,
+          "backlog_st": 10,
+          "backlog_obc": 39
+        }
+      ],
+      "_backlog_totals": {
+        "SC": 873,
+        "ST": 500,
+        "OBC": 1314
+      },
+      "_lscorpus": true,
+      "notes": "20 operational AIIMS reported. Faculty vacancy rate range: 22.7% (Bibinagar) to 61.7% (Madurai). The backlog SC/ST/OBC numbers are from AU2457 (Feb 2026); AS207 reports the same faculty/non-faculty totals without backlog. Headline outliers: Madurai 70/183 = 38% staffed; Rajkot 78/183 = 43%; Kalyani 175/309 = 57%."
+    },
+    {
+      "grain": "policy_aggregate",
+      "institution_id": null,
+      "institution_group": "all_chei_mission_mode",
+      "post_type": "Faculty (Mission Mode cumulative fills)",
+      "source": {
+        "kind": "synthesised",
+        "house": "Lok Sabha",
+        "question_type": "multiple",
+        "question_no": "various",
+        "session": "compiled",
+        "answered_on": "2026-03-30",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "synthesised across LS questions Sep 2022 → Jan 2026",
+        "source_url": null,
+        "source_pdf": "data/AU5842_KvIU1T.pdf, data/AU5040_ps9rcx.pdf, data/AU3742_KUsF22.pdf, data/AU414_EvHGT6.pdf, data/AU1476_5aEBKu.pdf, data/AU3613_EWsjDl.pdf, data/AU2348_Gb5NDE.pdf, data/AU45_DlSLdO.pdf, data/AU1111_IJkDrH.pdf, data/AU1122_DZgb9W.pdf"
+      },
+      "reported_on": "2026-03-30",
+      "as_of": "2026-01-24",
+      "totals": null,
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": 10463,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": 2216,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": 872,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": 3778,
+          "vacant": null
+        },
+        "EWS": {
+          "sanctioned": null,
+          "in_position": 549,
+          "vacant": null
+        }
+      },
+      "_mission_mode_timeline": [
+        {
+          "as_of": "2024-02-12",
+          "total_posts": 22286,
+          "faculty": null,
+          "sc": null,
+          "st": null,
+          "obc": null,
+          "ews": null,
+          "gen_residual": null,
+          "source_q": "AU1122 — IIT Tirupati"
+        },
+        {
+          "as_of": "2024-12-23",
+          "total_posts": 26751,
+          "faculty": 15637,
+          "sc": null,
+          "st": null,
+          "obc": null,
+          "ews": null,
+          "gen_residual": null,
+          "source_q": "AU1111 — Sanctioned & Vacancies in HEIs"
+        },
+        {
+          "as_of": "2025-07-12",
+          "total_posts": 28450,
+          "faculty": 16507,
+          "sc": null,
+          "st": null,
+          "obc": null,
+          "ews": null,
+          "gen_residual": null,
+          "source_q": "AU3613 / AU2348 / AU45"
+        },
+        {
+          "as_of": "2025-10-24",
+          "total_posts": 29979,
+          "faculty": 17494,
+          "sc": null,
+          "st": null,
+          "obc": null,
+          "ews": null,
+          "gen_residual": null,
+          "source_q": "AU414 / AU1476"
+        },
+        {
+          "as_of": "2026-01-24",
+          "total_posts": 30720,
+          "faculty": 17878,
+          "sc": 2216,
+          "st": 872,
+          "obc": 3778,
+          "ews": 549,
+          "gen_residual": 10463,
+          "source_q": "AU3742 / AU5040 / AU5842 — first category disclosure"
+        }
+      ],
+      "_lscorpus": true,
+      "notes": "Mission Mode cumulative faculty fills since the Aug 2021 special drive / Sep 2022 formalisation. The Jan 2026 number is the first time category-wise fills were disclosed in this corpus — disclosure surfaced only after the Supreme Court Article 142 order of 15 Jan 2026 (Criminal Appeal No. 1425/2025). Realisation against statutory mandate (faculty only, Jan 2026): SC 12.4% (mandate 15%) → 83% realisation; ST 4.9% (7.5%) → 65%; OBC 21.1% (27%) → 78%; EWS 3.1% (10%) → 31%; GEN-residual 58.5% (~40.5%) → 144%."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty + Non-Faculty (combined)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "starred",
+        "question_no": "215",
+        "session": null,
+        "answered_on": "2023-08-09",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Dr. John Brittas (CPI(M), Kerala)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AS215.pdf"
+      },
+      "reported_on": "2023-08-09",
+      "as_of": "2023-07-01",
+      "totals": {
+        "sanctioned": 54512,
+        "in_position": 32100,
+        "vacant": 22412
+      },
+      "by_category": null,
+      "_rscorpus": true,
+      "notes": "FOUNDATIONAL BASELINE. Total faculty + non-faculty in 45 CUs running in regular mode. 22,412 vacant out of 54,512 sanctioned (41% vacancy rate). The largest aggregate disclosure in the corpus. Cumulative special-recruitment fills: 6,087 at this point — three months before the Mission Mode count starts being tracked across both houses."
+    },
+    {
+      "grain": "policy_aggregate",
+      "institution_id": null,
+      "institution_group": "all_chei_mission_mode",
+      "post_type": "Faculty + Non-Faculty (Mission Mode cumulative)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "2273",
+        "session": null,
+        "answered_on": "2023-08-09",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri M. Mohamed Abdulla (DMK, Tamil Nadu)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU2273.pdf"
+      },
+      "reported_on": "2023-08-09",
+      "as_of": "2023-08-07",
+      "totals": {
+        "sanctioned": null,
+        "in_position": 13516,
+        "vacant": null
+      },
+      "by_category": null,
+      "_breakdown_by_inst_type": {
+        "CUs": 6087,
+        "IITs": 3253,
+        "IIMs": 438
+      },
+      "_rscorpus": true,
+      "notes": "First explicit Mission Mode counter we can pin to a date. 13,516 cumulative fills across CUs+IITs+IIMs over the 10 months from Oct 2022 (start of Rozgar Mela) to Jul 2023."
+    },
+    {
+      "grain": "policy_aggregate",
+      "institution_id": null,
+      "institution_group": "all_chei_mission_mode",
+      "post_type": "Faculty (Mission Mode cumulative)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "1941",
+        "session": null,
+        "answered_on": "2023-12-20",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Vaiko (MDMK, Tamil Nadu)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU1941.pdf"
+      },
+      "reported_on": "2023-12-20",
+      "as_of": "2023-11-30",
+      "totals": {
+        "sanctioned": null,
+        "in_position": 8212,
+        "vacant": null
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": 5081,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": 1009,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": 458,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": 1664,
+          "vacant": null
+        }
+      },
+      "_rscorpus": true,
+      "notes": "First disclosure of category-wise Mission Mode fills (CUs + IITs only, 8,212 faculty). Vaiko's question explicitly asked about IIT 20% recruitment of vacancies and shortfall reasons by reservation category — the answer gave the cumulative breakdown but invoked flexi-cadre to refuse rank-wise data."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Non-Teaching Technical Staff (university-wise)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "2280",
+        "session": null,
+        "answered_on": "2023-08-09",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Muzibulla Khan (BJD, Odisha)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU2280.pdf"
+      },
+      "reported_on": "2023-08-09",
+      "as_of": "2023-08-09",
+      "totals": null,
+      "by_category": null,
+      "_per_institution_highlights": [
+        {
+          "name": "University of Delhi",
+          "vacant_tech_staff": 842
+        },
+        {
+          "name": "Visva-Bharati",
+          "vacant_tech_staff": 304
+        },
+        {
+          "name": "Banaras Hindu University",
+          "vacant_tech_staff": 284
+        },
+        {
+          "name": "Aligarh Muslim University",
+          "vacant_tech_staff": 233
+        },
+        {
+          "name": "University of Allahabad",
+          "vacant_tech_staff": 149
+        },
+        {
+          "name": "Dr. Harisingh Gour Vishwavidyalaya",
+          "vacant_tech_staff": 97
+        },
+        {
+          "name": "Jamia Millia Islamia",
+          "vacant_tech_staff": 69
+        },
+        {
+          "name": "Jawaharlal Nehru University",
+          "vacant_tech_staff": 59
+        }
+      ],
+      "_rscorpus": true,
+      "notes": "Rare granular university-wise disclosure (technical staff only). Demonstrates that the Ministry CAN disclose institution-wise data when the question is sharply scoped to non-teaching staff."
+    },
+    {
+      "grain": "policy_aggregate",
+      "institution_id": null,
+      "institution_group": "all_chei_mission_mode",
+      "post_type": "Faculty (Mission Mode cumulative)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "195",
+        "session": null,
+        "answered_on": "2024-11-27",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Mukul Balkrishna Wasnik (INC, Maharashtra)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU195_Duffli.pdf"
+      },
+      "reported_on": "2024-11-27",
+      "as_of": "2024-10-29",
+      "totals": {
+        "sanctioned": null,
+        "in_position": 25777,
+        "vacant": null
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": 9350,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": 1869,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": 739,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": 3089,
+          "vacant": null
+        }
+      },
+      "_rscorpus": true,
+      "notes": "By Oct 2024: 25,777 cumulative posts filled in Mission Mode. Of these, 25,257 by CUs+IITs+IIITs+NITs+IIMs+IISERs+IISc collectively, 15,047 faculty positions including 1869 SC, 739 ST, 3089 OBC. Realisation at this point: SC 12.4%, ST 4.9%, OBC 20.5% — already showing the under-realisation pattern that would persist."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Sanctioned strength (teaching + non-teaching)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "994",
+        "session": null,
+        "answered_on": "2024-12-04",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Derek O'Brien (TMC, West Bengal)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU994_yyYw8b.pdf"
+      },
+      "reported_on": "2024-12-04",
+      "as_of": "2024-10-31",
+      "totals": {
+        "sanctioned": 54580,
+        "in_position": null,
+        "vacant": null
+      },
+      "by_category": null,
+      "_breakdown": {
+        "sanctioned_teaching": 18940,
+        "sanctioned_non_teaching": 35640
+      },
+      "_rscorpus": true,
+      "notes": "Full sanctioned-strength disclosure. Confirms the AS215 baseline figure (~54,500). Special-recruitment fills since Sep 2022: 11,080 (1482 SC, 720 ST, 2350 OBC)."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty (Teaching) — VACANCY by rank × category",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "365",
+        "session": null,
+        "answered_on": "2025-07-23",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Mallikarjun Kharge (INC, Karnataka — Leader of Opposition, Rajya Sabha)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU365_ZoIxgJ.pdf"
+      },
+      "reported_on": "2025-07-23",
+      "as_of": "2025-07-01",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 4889
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 2259
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 711
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 428
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 1491
+        }
+      },
+      "_rank_wise_vacancy": {
+        "Professor": {
+          "SC": 197,
+          "ST": 120,
+          "OBC": 339
+        },
+        "Associate Professor": {
+          "SC": 324,
+          "ST": 199,
+          "OBC": 608
+        },
+        "Assistant Professor": {
+          "SC": 190,
+          "ST": 109,
+          "OBC": 544
+        }
+      },
+      "_rscorpus": true,
+      "_kharge_disclosure": true,
+      "notes": "THE UNIQUE DOCUMENT IN THE CORPUS. Mallikarjun Kharge — Leader of Opposition, Rajya Sabha — is the only MP whose question extracted a position-wise × category-wise vacancy breakdown. The same data was withheld from every Lok Sabha questioner that cycle. Reading: disclosure is contingent on the political weight of the asker, not on the constitutional weight of the question. The data shows that across all CU faculty ranks, the largest gap is OBC (1,491 unfilled) and the steepest rank-stratification is SC (190 → 324 → 197 across Asst/Assoc/Full — Associate Professor is the worst-served rank for SC, suggesting the rank-promotion bottleneck is real even where entry-level appointments happen)."
+    },
+    {
+      "grain": "institution",
+      "institution_id": "iit-bhubaneswar",
+      "institution_group": null,
+      "post_type": "Faculty",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "3570",
+        "session": null,
+        "answered_on": "2025-04-02",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Niranjan Bishi (BJD); Smt. Sulata Deo (BJD), Odisha",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU3570_GTjyDB.pdf"
+      },
+      "reported_on": "2025-04-02",
+      "as_of": "2025-04-02",
+      "totals": {
+        "sanctioned": 300,
+        "in_position": 207,
+        "vacant": 93
+      },
+      "by_category": null,
+      "_rscorpus": true,
+      "notes": "IIT Bhubaneswar: 31% faculty vacancy rate. Question explicitly asked for SC/ST vacant posts breakdown — answer refused, citing flexi-cadre. The single per-institute disclosure for IITs in the entire RS corpus."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Special Recruitment fills (cumulative since Sep 2022)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "1962",
+        "session": null,
+        "answered_on": "2025-08-06",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Jose K. Mani (KC(M), Kerala)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU1962_TdRBRe.pdf"
+      },
+      "reported_on": "2025-08-06",
+      "as_of": "2025-07-01",
+      "totals": {
+        "sanctioned": null,
+        "in_position": 12230,
+        "vacant": null
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": 7187,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": 1616,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": 803,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": 2624,
+          "vacant": null
+        }
+      },
+      "_rscorpus": true,
+      "notes": "CU-only special recruitment counter. By Jul 2025: 12,230 fills (teaching + non-teaching). Categories disclosed."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Special Recruitment fills (cumulative since Sep 2022)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "1145",
+        "session": null,
+        "answered_on": "2025-12-10",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Dr. John Brittas (CPI(M), Kerala) — second appearance",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU1145_XyKQvL.pdf"
+      },
+      "reported_on": "2025-12-10",
+      "as_of": "2025-12-10",
+      "totals": {
+        "sanctioned": null,
+        "in_position": 12600,
+        "vacant": null
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": 6823,
+          "vacant": null
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": 1648,
+          "vacant": null
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": 841,
+          "vacant": null
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": 2700,
+          "vacant": null
+        },
+        "EWS": {
+          "sanctioned": null,
+          "in_position": 588,
+          "vacant": null
+        }
+      },
+      "_rscorpus": true,
+      "notes": "Brittas's second question — asked for university-wise/state-wise/category-wise data. Got cumulative counter only. Compare to AS215 (Aug 2023) where he extracted the foundational 22,412 baseline. The same MP's leverage diminishes over time as the Ministry calibrates its non-disclosure."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty (Teaching)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "1938",
+        "answered_on": "2022-08-03",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Dr. Sumer Singh Solanki (BJP, Madhya Pradesh)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU1938.pdf"
+      },
+      "reported_on": "2022-08-03",
+      "as_of": "2022-04-01",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 6549
+      },
+      "by_category": null,
+      "_rscorpus_v2": true,
+      "_rscorpus": true,
+      "notes": "Pre-Mission-Mode-era figure: 6,549 teaching + 14,254 non-teaching vacant across 45 CUs, as on 01.04.2022. Compare to Jul 2025: 4,889 teaching vacant. The Mission Mode drive has reduced teaching vacancy by roughly 25% over 3 years — non-trivial, but well short of resolving the standing inventory."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Faculty (Teaching) — full category breakdown",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "starred",
+        "question_no": "153",
+        "answered_on": "2023-03-15",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Dr. C.M. Ramesh (BJP, Andhra Pradesh)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AS153.pdf"
+      },
+      "reported_on": "2023-03-15",
+      "as_of": "2023-03-15",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 6028
+      },
+      "by_category": {
+        "GEN": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 2154
+        },
+        "SC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 878
+        },
+        "ST": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 520
+        },
+        "OBC": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 1543
+        },
+        "EWS": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 611
+        },
+        "PwBD": {
+          "sanctioned": null,
+          "in_position": null,
+          "vacant": 322
+        }
+      },
+      "_iit_aggregate_vacant": 4526,
+      "_iim_aggregate_vacant": 496,
+      "_pwbd_disclosure": true,
+      "_rscorpus_v2": true,
+      "_rscorpus": true,
+      "notes": "THE ONLY DOCUMENT IN THE 80-PDF CORPUS WITH PwBD VACANCY DATA. Full category-wise teaching vacancy in 45 CUs as of Mar 2023: GEN 2154, SC 878, ST 520, OBC 1543, EWS 611, PwBD 322 (Total 6028). IITs and IIMs cited only in aggregate (4526 + 496) under flexi-cadre doctrine. After this answer, PwBD vacancy data DISAPPEARS from the parliamentary record for 3+ years."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Sanctioned + Vacant (teaching + non-teaching)",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "starred",
+        "question_no": "374",
+        "answered_on": "2022-04-06",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri Sujeet Kumar (BJD, Odisha)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AS374.pdf"
+      },
+      "reported_on": "2022-04-06",
+      "as_of": "2022-04-06",
+      "totals": {
+        "sanctioned": null,
+        "in_position": null,
+        "vacant": 21785
+      },
+      "_breakdown": {
+        "vacant_teaching": 6558,
+        "vacant_non_teaching": 15227,
+        "posts_advertised": 4749
+      },
+      "_rscorpus_v2": true,
+      "_rscorpus": true,
+      "notes": "Pre-Mission-Mode-era CU baseline. Mission Mode formally requested 5 Sep 2021; this answer (Apr 2022) was 7 months in. By that point only 4,749 faculty posts had been advertised against 6,558 teaching vacancies."
+    },
+    {
+      "grain": "institution_group",
+      "institution_id": null,
+      "institution_group": "all_central_universities",
+      "post_type": "Vice-Chancellor positions",
+      "source": {
+        "kind": "parliamentary_qa",
+        "house": "Rajya Sabha",
+        "question_type": "unstarred",
+        "question_no": "1338",
+        "answered_on": "2020-09-22",
+        "ministry": "Ministry of Education, Department of Higher Education",
+        "asked_by": "Shri C.M. Ramesh (BJP, Andhra Pradesh)",
+        "source_url": "https://sansad.in/rs/questions/questions-and-answers",
+        "source_pdf": "data/AU1338.pdf"
+      },
+      "reported_on": "2020-09-22",
+      "as_of": "2020-09-22",
+      "totals": null,
+      "_no_data": true,
+      "_rscorpus_v2": true,
+      "_rscorpus": true,
+      "notes": "EARLIEST CORPUS POINT (Sep 2020). Pre-Mission-Mode answer to a VC vacancy question. The Ministry's reply: 'no time-frame can be indicated'. The pre-2022 disclosure posture was simpler than today's: it didn't deflect to a substitute counter, it simply refused to commit. Mission Mode is best understood as the rhetorical apparatus that replaced this earlier candor with performance."
+    }
+  ]
+}

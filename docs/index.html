@@ -1651,9 +1651,9 @@ async function loadData() {
   const opts = { cache: "no-cache" };
   try {
     const [current, coverage, registry] = await Promise.all([
-      fetch("../data/current.json", opts).then(r => r.json()),
-      fetch("../data/coverage_report.json", opts).then(r => r.json()).catch(() => null),
-      fetch("../data/institutions_registry.json", opts).then(r => r.json()),
+      fetch("data/current.json", opts).then(r => r.json()),
+      fetch("data/coverage_report.json", opts).then(r => r.json()).catch(() => null),
+      fetch("data/institutions_registry.json", opts).then(r => r.json()),
     ]);
     ADS = current.ads || [];
     COVERAGE = coverage;
@@ -4323,7 +4323,7 @@ function mpsAskingPanel() {
 async function renderVacancies() {
   const host = document.getElementById("vacancies-tab");
   if (!VACANCY_DATA) {
-    try { VACANCY_DATA = await fetch("../data/vacancy_snapshots.json").then(r => r.json()); }
+    try { VACANCY_DATA = await fetch("data/vacancy_snapshots.json").then(r => r.json()); }
     catch(e) { host.innerHTML = `<p style="color:var(--muted)">Vacancy data unavailable.</p>`; return; }
   }
   // Real snapshots (with totals data); separately, no-disclosure placeholders
