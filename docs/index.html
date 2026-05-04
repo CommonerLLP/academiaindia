@@ -459,6 +459,21 @@
   #resources-tab .postdoc-subgroup li a:hover { text-decoration: underline; }
   #resources-tab .postdoc-subgroup li .res-note { font-size: 12px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
   #resources-tab .postdoc-subgroup li .ext { font-size: 11px; color: var(--muted); margin-left: 2px; }
+  /* Eligibility chip — surfaces citizenship/residency restrictions per
+     fellowship so an Indian-PhD applicant doesn't waste hours on a
+     program that excludes them at the door. Three visual registers:
+     open (green), caveat (amber), restricted (red). */
+  #resources-tab .elig { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 6px; vertical-align: middle; letter-spacing: 0.02em; line-height: 1.3; white-space: nowrap; }
+  #resources-tab .elig.elig-open { background: rgba(46,125,50,0.10); color: #2e7d32; border: 1px solid rgba(46,125,50,0.30); }
+  #resources-tab .elig.elig-caveat { background: rgba(180,120,30,0.10); color: #8a5a10; border: 1px solid rgba(180,120,30,0.35); }
+  #resources-tab .elig.elig-restricted { background: rgba(180,30,40,0.10); color: var(--alarm); border: 1px solid rgba(180,30,40,0.35); }
+  #resources-tab .elig.elig-varies { background: var(--chip-bg); color: var(--muted); border: 1px solid var(--border); }
+  html[data-theme="dark"] #resources-tab .elig.elig-open { background: rgba(111,207,138,0.10); color: #88dd9d; border-color: rgba(111,207,138,0.35); }
+  html[data-theme="dark"] #resources-tab .elig.elig-caveat { background: rgba(232,180,120,0.10); color: #e8b478; border-color: rgba(232,180,120,0.35); }
+  html[data-theme="dark"] #resources-tab .elig.elig-restricted { background: rgba(240,133,133,0.10); color: #f08585; border-color: rgba(240,133,133,0.35); }
+  /* Eligibility legend at the top of the postdoc block. */
+  #resources-tab .elig-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 14px; padding: 10px 12px; background: var(--bg); border: 1px dashed var(--border); border-radius: 8px; font-size: 11.5px; color: var(--muted); align-items: center; }
+  #resources-tab .elig-legend .leg-label { font-weight: 600; color: var(--ink); margin-right: 4px; }
   @media (min-width: 720px) {
     #resources-tab .postdoc-subgroup ul { grid-template-columns: 1fr 1fr; }
   }
@@ -4733,7 +4748,7 @@ Yours sincerely,
 // tier up. The strategic case for applying is real; the political case
 // is mixed — the page presents both.
 const POSTDOC_ABROAD = {
-  title: "Postdoctoral fellowships abroad — strategic, not romantic",
+  title: "Postdoctoral fellowships abroad",
   cls: "postdoc-block",
   intro: `
     <p>These programs sit outside the Indian state's reservation regime — and outside its administered failure to implement it. They cannot replace structural reform of central HEI hiring, but for a Bahujan PhD facing the Indian academic job market documented in the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a> — 10,637 known vacancies processed into 335 advertised positions over five years — the pragmatic move is to build the international record that lets you set your terms when you return, or stay abroad on those terms.</p>
@@ -4743,52 +4758,52 @@ const POSTDOC_ABROAD = {
     {
       title: "Society of Fellows / humanities & SSH postdocs (US)",
       items: [
-        { name: "Harvard Society of Fellows (Junior Fellows)", url: "https://socfell.fas.harvard.edu/", note: "3-year, no teaching obligation, all disciplines including SSH and lab sciences. Letters-of-recommendation-driven; pedigree-sensitive." },
-        { name: "Princeton Society of Fellows in the Liberal Arts", url: "https://sf.princeton.edu/", note: "3-year, light teaching, humanities and humanistic social sciences. Reads applicants in cohorts; statement of purpose carries unusual weight." },
-        { name: "Columbia Society of Fellows in the Humanities", url: "https://societyoffellows.columbia.edu/", note: "3-year, teach one course/semester in the Core Curriculum, generous research budget. Humanities-focused; SSH at the qualitative end fits." },
-        { name: "Michigan Society of Fellows", url: "https://societyoffellows.umich.edu/", note: "3-year, half-time teaching, all disciplines. Has historically had stronger non-elite-pedigree intake than HSP/Princeton." },
-        { name: "Chicago Society of Fellows / Harper-Schmidt (Collegiate Asst Profs)", url: "https://socsci.uchicago.edu/society-fellows", note: "4-year, teach in the Core. Slightly different model — full-time teaching faculty position with research time, not a pure postdoc." },
-        { name: "Cornell Society for the Humanities", url: "https://societyhumanities.cornell.edu/", note: "1-year focus-themed fellowship; the annual theme determines the cohort. Lighter commitment, useful as a bridge year." },
-        { name: "Penn Wolf Humanities Center Postdoctoral Fellows", url: "https://wolfhumanities.upenn.edu/postdoctoral-fellowships", note: "1-year theme-based humanities fellowship at Penn. Smaller cohort, themed (recent: 'Migration', 'Choice', 'Breath')." },
-        { name: "Dartmouth Society of Fellows", url: "https://societyoffellows.dartmouth.edu/", note: "3-year, mixed teaching/research, all disciplines. Less pedigree-locked than Ivy SoFs in published cohort histories." },
-        { name: "Stanford Humanities Center fellowships", url: "https://shc.stanford.edu/", note: "External-faculty plus residential postdoc tracks. The Mellon Fellowship of Scholars in the Humanities is the relevant postdoc line." },
+        { name: "Harvard Society of Fellows (Junior Fellows)", url: "https://socfell.fas.harvard.edu/", note: "3-year, no teaching obligation, all disciplines including SSH and lab sciences. Letters-of-recommendation-driven; pedigree-sensitive.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Princeton Society of Fellows in the Liberal Arts", url: "https://sf.princeton.edu/", note: "3-year, light teaching, humanities and humanistic social sciences. Reads applicants in cohorts; statement of purpose carries unusual weight.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Columbia Society of Fellows in the Humanities", url: "https://societyoffellows.columbia.edu/", note: "3-year, teach one course/semester in the Core Curriculum, generous research budget. Humanities-focused; SSH at the qualitative end fits.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Michigan Society of Fellows", url: "https://societyoffellows.umich.edu/", note: "3-year, half-time teaching, all disciplines. Has historically had stronger non-elite-pedigree intake than HSP/Princeton.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Chicago Society of Fellows / Harper-Schmidt (Collegiate Asst Profs)", url: "https://socsci.uchicago.edu/society-fellows", note: "4-year, teach in the Core. Slightly different model — full-time teaching faculty position with research time, not a pure postdoc.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Cornell Society for the Humanities", url: "https://societyhumanities.cornell.edu/", note: "1-year focus-themed fellowship; the annual theme determines the cohort. Lighter commitment, useful as a bridge year.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Penn Wolf Humanities Center Postdoctoral Fellows", url: "https://wolfhumanities.upenn.edu/postdoctoral-fellowships", note: "1-year theme-based humanities fellowship at Penn. Smaller cohort, themed (recent: 'Migration', 'Choice', 'Breath').", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Dartmouth Society of Fellows", url: "https://societyoffellows.dartmouth.edu/", note: "3-year, mixed teaching/research, all disciplines. Less pedigree-locked than Ivy SoFs in published cohort histories.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Stanford Humanities Center fellowships", url: "https://shc.stanford.edu/", note: "External-faculty plus residential postdoc tracks. The Mellon Fellowship of Scholars in the Humanities is the relevant postdoc line.", elig: { status: "open", label: "Indian PhDs eligible" } },
       ],
     },
     {
       title: "Area-studies postdocs — South Asia–relevant",
       items: [
-        { name: "CASI — Center for the Advanced Study of India (UPenn)", url: "https://casi.sas.upenn.edu/", note: "Penn's South Asia centre. Postdoctoral fellows; Kapur and Mehta have run substantive critique programmes here. Apply if your work is on contemporary India political economy or social policy." },
-        { name: "Harvard Mittal South Asia Institute", url: "https://mittalsouthasiainstitute.harvard.edu/", note: "Postdoc programmes vary year to year; check the Fellowships page. Strong on contemporary India, public-policy adjacent." },
-        { name: "Harvard Academy for International and Area Studies", url: "https://academy.wcfia.harvard.edu/", note: "2-year postdoc, area-studies and international affairs. Politics, IR, sociology, anthro of non-US regions including South Asia." },
-        { name: "Yale South Asian Studies Council postdoctoral associate", url: "https://southasia.macmillan.yale.edu/", note: "Annual postdoc; competition usually announced late autumn. Yale's Whitney Humanities and the Edward J. and Dorothy Clarke Kempf Memorial Fund also support South Asia work." },
-        { name: "Princeton — PIIRS, South Asian Studies, Niehaus", url: "https://piirs.princeton.edu/", note: "PIIRS Postdoctoral Research Associate position runs annually, area- and theme-specific. Check the South Asian Studies Program and the Liechtenstein Institute on Self-Determination as well." },
-        { name: "Princeton — Niehaus Center for Globalization & Governance", url: "https://niehaus.princeton.edu/", note: "Postdoctoral research associate in international political economy / globalisation governance. Highly competitive but explicit interest in non-US scholars." },
-        { name: "Brown India Initiative / Watson Institute", url: "https://watson.brown.edu/southasia/", note: "Postdoctoral fellow in Contemporary South Asia at the Watson Institute; SSH-leaning, policy-adjacent. The India Initiative has run focused India-research postdocs." },
-        { name: "Chicago — Committee on Southern Asian Studies (COSAS)", url: "https://southasia.uchicago.edu/", note: "South Asia language and area training centre. Postdoctoral teaching fellowships in South Asian languages and area studies are advertised through COSAS and the Humanities Division." },
-        { name: "Columbia South Asia Institute", url: "https://southasia.columbia.edu/", note: "Postdoc and visiting-scholar programmes through SAI; check also the Saltzman Institute of War & Peace and the Institute for Comparative Literature & Society for crossover positions." },
-        { name: "NYU — fellowships directory (anthropology, SSH-wide)", url: "https://as.nyu.edu/departments/anthropology/graduate/fellowship-directory/postdoctoral-fellowships.html", note: "NYU Anthropology's curated catalogue of postdoctoral fellowships across programmes globally. Useful as an aggregator beyond what's listed here." },
+        { name: "CASI — Center for the Advanced Study of India (UPenn)", url: "https://casi.sas.upenn.edu/", note: "Penn's South Asia centre. Postdoctoral fellows; Kapur and Mehta have run substantive critique programmes here. Apply if your work is on contemporary India political economy or social policy.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Harvard Mittal South Asia Institute", url: "https://mittalsouthasiainstitute.harvard.edu/", note: "Postdoc programmes vary year to year; check the Fellowships page. Strong on contemporary India, public-policy adjacent.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Harvard Academy for International and Area Studies", url: "https://academy.wcfia.harvard.edu/", note: "2-year postdoc, area-studies and international affairs. Politics, IR, sociology, anthro of non-US regions including South Asia.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Yale South Asian Studies Council postdoctoral associate", url: "https://southasia.macmillan.yale.edu/", note: "Annual postdoc; competition usually announced late autumn. Yale's Whitney Humanities and the Edward J. and Dorothy Clarke Kempf Memorial Fund also support South Asia work.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Princeton — PIIRS, South Asian Studies, Niehaus", url: "https://piirs.princeton.edu/", note: "PIIRS Postdoctoral Research Associate position runs annually, area- and theme-specific. Check the South Asian Studies Program and the Liechtenstein Institute on Self-Determination as well.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Princeton — Niehaus Center for Globalization & Governance", url: "https://niehaus.princeton.edu/", note: "Postdoctoral research associate in international political economy / globalisation governance. Highly competitive but explicit interest in non-US scholars.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Brown India Initiative / Watson Institute", url: "https://watson.brown.edu/southasia/", note: "Postdoctoral fellow in Contemporary South Asia at the Watson Institute; SSH-leaning, policy-adjacent. The India Initiative has run focused India-research postdocs.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Chicago — Committee on Southern Asian Studies (COSAS)", url: "https://southasia.uchicago.edu/", note: "South Asia language and area training centre. Postdoctoral teaching fellowships in South Asian languages and area studies are advertised through COSAS and the Humanities Division.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "Columbia South Asia Institute", url: "https://southasia.columbia.edu/", note: "Postdoc and visiting-scholar programmes through SAI; check also the Saltzman Institute of War & Peace and the Institute for Comparative Literature & Society for crossover positions.", elig: { status: "open", label: "Indian PhDs eligible" } },
+        { name: "NYU — fellowships directory (anthropology, SSH-wide)", url: "https://as.nyu.edu/departments/anthropology/graduate/fellowship-directory/postdoctoral-fellowships.html", note: "NYU Anthropology's curated catalogue of postdoctoral fellowships across programmes globally. Useful as an aggregator beyond what's listed here.", elig: { status: "varies", label: "Aggregator — varies per program" } },
       ],
     },
     {
       title: "Government & national programmes",
       items: [
-        { name: "SSHRC Postdoctoral Fellowships (Canada)", url: "https://www.sshrc-crsh.gc.ca/funding-financement/programs-programmes/postdoctoral-postdoctorale-eng.aspx", note: "C$45,000/year for 2 years; SSH-specific. Open to non-Canadian citizens for postdocs at Canadian universities. Substantial cohort each year, less pedigree-skewed than US SoFs." },
-        { name: "Banting Postdoctoral Fellowships (Canada)", url: "https://banting.fellowships-bourses.gc.ca/en/home-accueil.html", note: "C$70,000/year for 2 years; the prestige tier of Canadian postdocs. Fewer slots, very competitive; nominated through host institution." },
-        { name: "JSPS Postdoctoral Fellowship — Standard (Japan)", url: "https://www.jsps.go.jp/english/e-ipd/", note: "12–24 months in Japan with full stipend, travel, settling-in allowance. Open to all disciplines; recommendation from a Japanese host required. JSPS Short-Term is also useful as a 1–12 month bridge." },
-        { name: "Marie Skłodowska-Curie Postdoctoral Fellowships (EU)", url: "https://marie-sklodowska-curie-actions.ec.europa.eu/actions/postdoctoral-fellowships", note: "European Postdoctoral Fellowships (12–24 months) and Global Fellowships (24–36 months, with outgoing phase). All disciplines; non-EU PhDs eligible. Annual call, usually April–September." },
-        { name: "Newton International Fellowships (UK)", url: "https://royalsociety.org/grants/newton-international-fellowships/", note: "2-year UK postdoc for non-UK PhDs; jointly administered by the Royal Society, British Academy, and Royal Academy of Engineering. SSH covered through the British Academy stream." },
-        { name: "British Academy Postdoctoral Fellowships", url: "https://www.thebritishacademy.ac.uk/funding/postdoctoral-fellowships/", note: "3-year SSH postdoc at a UK institution. Highly competitive; usually requires a UK PhD or equivalent residency — verify eligibility for non-UK PhDs each call." },
-        { name: "Humboldt Research Fellowship (Germany)", url: "https://www.humboldt-foundation.de/en/apply/sponsorship-programmes/humboldt-research-fellowship", note: "6–24 months at a German host institution; rolling deadlines, all disciplines. The Humboldt Foundation has explicitly supported scholars from the Global South." },
-        { name: "DAAD postdoctoral programmes (Germany)", url: "https://www.daad.de/en/study-and-research-in-germany/scholarships/", note: "Multiple postdoc tracks; the Postdoctoral Researchers International Mobility Experience (PRIME) and country-specific calls are the relevant entry points for Indian PhDs." },
+        { name: "SSHRC Postdoctoral Fellowships (Canada)", url: "https://www.sshrc-crsh.gc.ca/funding-financement/programs-programmes/postdoctoral-postdoctorale-eng.aspx", note: "C$45,000/year for 2 years; SSH-specific. Eligibility is restrictive: applicant must be a Canadian citizen or permanent resident, OR a foreign national with a PhD from a Canadian institution. An Indian PhD from an Indian university is NOT directly eligible — verify each call as rules occasionally shift. If you don't have a Canadian connection, apply for Banting (below) or Marie Curie instead.", elig: { status: "restricted", label: "Restricted: Canadian PhD or PR/citizenship usually required" } },
+        { name: "Banting Postdoctoral Fellowships (Canada)", url: "https://banting.fellowships-bourses.gc.ca/en/home-accueil.html", note: "C$70,000/year for 2 years; the prestige tier of Canadian postdocs. Open to all citizenships including Indian. Fewer slots, very competitive; must be nominated through a host Canadian institution — line up the host before the call.", elig: { status: "caveat", label: "Open — host nomination required" } },
+        { name: "JSPS Postdoctoral Fellowship — Standard (Japan)", url: "https://www.jsps.go.jp/english/e-ipd/", note: "12–24 months in Japan with full stipend, travel, settling-in allowance. Explicitly open to non-Japanese researchers. Requires a Japanese host researcher — typically arranged via a prior visit or co-author connection. JSPS Short-Term (1–12 months) is a useful bridge if you don't have a host yet.", elig: { status: "caveat", label: "Open — Japanese host required" } },
+        { name: "Marie Skłodowska-Curie Postdoctoral Fellowships (EU)", url: "https://marie-sklodowska-curie-actions.ec.europa.eu/actions/postdoctoral-fellowships", note: "European Postdoctoral Fellowships (12–24 months) and Global Fellowships (24–36 months, with outgoing phase). All nationalities eligible including Indian. Mobility rule: applicant must NOT have resided or carried out main activity in the host EU country for more than 12 months in the 36 months immediately before the call deadline.", elig: { status: "caveat", label: "Open — EU mobility rule applies" } },
+        { name: "Newton International Fellowships (UK)", url: "https://royalsociety.org/grants/newton-international-fellowships/", note: "2-year UK postdoc explicitly designed for non-UK citizens working outside the UK. Jointly administered by the Royal Society, British Academy, and Royal Academy of Engineering — SSH applicants enter through the British Academy stream. India is on the eligible-country list.", elig: { status: "open", label: "Indian PhDs eligible — designed for non-UK applicants" } },
+        { name: "British Academy Postdoctoral Fellowships", url: "https://www.thebritishacademy.ac.uk/funding/postdoctoral-fellowships/", note: "3-year SSH postdoc at a UK institution. The standard scheme requires the applicant to be ordinarily resident in the UK or to have a UK PhD; an Indian PhD from an Indian university is not directly eligible through this scheme. Apply via Newton International (above) instead, which the British Academy administers for non-UK PhDs.", elig: { status: "restricted", label: "Restricted: UK residence/PhD required — use Newton International instead" } },
+        { name: "Humboldt Research Fellowship (Germany)", url: "https://www.humboldt-foundation.de/en/apply/sponsorship-programmes/humboldt-research-fellowship", note: "6–24 months at a German host institution; rolling deadlines, all disciplines. Explicitly open to non-German researchers including from the Global South — the foundation has a long-standing programme line for South Asian scholars. Requires a German host who agrees to support the application.", elig: { status: "open", label: "Indian PhDs eligible — German host required" } },
+        { name: "DAAD postdoctoral programmes (Germany)", url: "https://www.daad.de/en/study-and-research-in-germany/scholarships/", note: "Multiple postdoc tracks; many have country-specific allocations for India. The PRIME programme (re-integration after a stay abroad) is for German PhDs only — Indian PhDs should look at the DAAD Research Stays for University Academics and Scientists, or the bilateral India-Germany calls.", elig: { status: "caveat", label: "Open — verify per programme line" } },
       ],
     },
     {
       title: "Discipline-spanning humanities & social science",
       items: [
-        { name: "ACLS — American Council of Learned Societies", url: "https://www.acls.org/", note: "Multiple postdoc programmes including the Emerging Voices Fellowship (focused on scholars from groups underrepresented in academia) and the Mellon/ACLS Scholars & Society. Some require US institutional affiliation; verify per call." },
-        { name: "Wenner-Gren Foundation postdoctoral grants (anthropology)", url: "https://wennergren.org/", note: "Hunt Postdoctoral Fellowship for write-up; Engaged Anthropology Grant for follow-up dissemination. Anthropology-specific; explicitly international applicant pool." },
-        { name: "SSRC International Dissertation Research Fellowship → postdoc bridges", url: "https://www.ssrc.org/", note: "SSRC's IDRF is mostly pre-doctoral, but the Council runs several postdoctoral and bridge fellowships (Mellon-Mays, Abe Fellowship Program for Japan-related work). Follow announcements." },
-        { name: "Mellon Foundation — Sawyer Seminars and partner postdocs", url: "https://www.mellon.org/grant-programs", note: "Mellon-funded postdocs are usually administered through host universities (Chicago, Princeton, Cornell etc.) rather than Mellon directly. Search 'Mellon postdoctoral' on department pages." },
+        { name: "ACLS — American Council of Learned Societies", url: "https://www.acls.org/", note: "Most ACLS postdoctoral programmes (Emerging Voices, Mellon/ACLS Scholars & Society, etc.) require either US citizenship/permanent residency OR a US PhD plus US institutional affiliation. The Emerging Voices Fellowship is specifically for scholars who have completed a PhD at a US institution. An Indian PhD without US affiliation is generally not directly eligible — verify each call.", elig: { status: "restricted", label: "Restricted: US PhD or US affiliation usually required" } },
+        { name: "Wenner-Gren Foundation postdoctoral grants (anthropology)", url: "https://wennergren.org/", note: "Hunt Postdoctoral Fellowship for write-up; Engaged Anthropology Grant for follow-up dissemination. Wenner-Gren explicitly funds international applicants regardless of citizenship — its dissertation fieldwork and postdoctoral programmes have substantial Indian-applicant cohorts.", elig: { status: "open", label: "Indian PhDs eligible — international pool" } },
+        { name: "SSRC International Dissertation Research Fellowship → postdoc bridges", url: "https://www.ssrc.org/", note: "SSRC's IDRF is for US-enrolled PhD students (not most Indian PhDs). The Abe Fellowship Program (for Japan-related work) and Mellon-Mays are similarly restricted to US-affiliated scholars. Other SSRC postdoc bridges may be open to international applicants — check per call.", elig: { status: "restricted", label: "Restricted: most SSRC programmes require US affiliation" } },
+        { name: "Mellon Foundation — Sawyer Seminars and partner postdocs", url: "https://www.mellon.org/grant-programs", note: "Mellon-funded postdocs are administered through host US universities, so eligibility follows the host's rules — most are open to international applicants. Search 'Mellon postdoctoral' on the relevant department page rather than applying through Mellon directly.", elig: { status: "varies", label: "Varies — eligibility set by host institution" } },
       ],
     },
   ],
@@ -4837,12 +4852,19 @@ function renderResources() {
   const host = document.getElementById("resources-tab");
 
   // Helper: render a single list item the same way for both flat and
-  // sub-grouped block schemas.
+  // sub-grouped block schemas. If the item carries an `elig` annotation
+  // (citizenship/residency status), surface it as a coloured chip next
+  // to the link so the applicant sees the eligibility verdict at a
+  // glance — this matters because several Canadian/UK/US programmes
+  // exclude Indian-PhD applicants at the door.
+  const eligChip = (e) => e
+    ? `<span class="elig elig-${escapeAttr(e.status)}">${escapeHTML(e.label)}</span>`
+    : "";
   const renderItem = (i) => `
     <li>
       ${i.url && i.url !== "#"
         ? `<a href="${escapeAttr(i.url)}" target="_blank" rel="noopener">${escapeHTML(i.name)} <span class="ext">↗</span></a>`
-        : `<span class="res-name">${escapeHTML(i.name)}</span>`}
+        : `<span class="res-name">${escapeHTML(i.name)}</span>`}${eligChip(i.elig)}
       <div class="res-note">${escapeHTML(i.note)}</div>
     </li>`;
 
@@ -4855,6 +4877,13 @@ function renderResources() {
     <div class="res-block ${escapeAttr(POSTDOC_ABROAD.cls)}">
       <h3>${escapeHTML(POSTDOC_ABROAD.title)}</h3>
       <div class="res-block-intro">${POSTDOC_ABROAD.intro}</div>
+      <div class="elig-legend">
+        <span class="leg-label">Eligibility key:</span>
+        <span class="elig elig-open">Indian PhDs eligible</span>
+        <span class="elig elig-caveat">Open with caveat</span>
+        <span class="elig elig-restricted">Restricted</span>
+        <span class="elig elig-varies">Varies / verify per call</span>
+      </div>
       ${POSTDOC_ABROAD.subgroups.map(g => `
         <div class="postdoc-subgroup">
           <h4>${escapeHTML(g.title)}</h4>
