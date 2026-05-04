@@ -702,11 +702,18 @@ function cleanNumberedCueItem(s) {
 function extractNumberedCueItems(text) {
   const anchor = text.search(/\b(?:specific\s+areas?\s+of|areas?\s+of\s+speciali[sz]ation|following\s+(?:areas?|speciali[sz]ations?))\b/i);
   const windowText = anchor >= 0 ? text.slice(anchor) : text;
-  const numberedRe = /(?:^|\s)(?:\((\d{1,2}(?:-[ivx]+|[a-z])?)\)|(\d{1,2})[.)])\s+([\s\S]*?)(?=\s+(?:\(\d{1,2}(?:-[ivx]+|[a-z])?\)|\d{1,2}[.)])\s+|$)/gi;
+  // Marker grammar: parenthesised token (i), (ii), (1), (1a), (1-iii),
+  // (a), (b)  OR  unparenthesised "1." / "1)" / "a." Roman numerals
+  // (i…iv etc.) are essential here — many Indian academic ads
+  // enumerate sub-areas as (i) (ii) (iii) rather than (1) (2) (3).
+  const MARKER = `\\((?:[ivx]{1,4}|[a-z]|\\d{1,2}(?:-[ivx]+|[a-z])?)\\)|\\d{1,2}[.)]`;
+  const numberedRe = new RegExp(
+    `(?:^|\\s)(${MARKER})\\s+([\\s\\S]*?)(?=\\s+(?:${MARKER})\\s+|$)`, "gi"
+  );
   const items = [];
   let m;
   while ((m = numberedRe.exec(windowText)) && items.length < 20) {
-    const item = cleanNumberedCueItem(m[3]);
+    const item = cleanNumberedCueItem(m[2]);
     if (!item || item.length < 3 || item.length > 80) continue;
     if (/^(?:No|Page|Annexure|Sr|Academic Unit|Areas of Speciali[sz]ation)$/i.test(item)) continue;
     if (/\b(?:Grade|Publication Record|Academic Background|Teaching Requirement)\b/i.test(item)) continue;
@@ -1887,20 +1894,27 @@ function renderAd(ad) {
   // distill the high-signal pieces for fast scan; the description gives
   // a candidate the exact language to pick up for a cover letter, the
   // specific wording about teaching duties, and any context the
-  // structured cues miss. Truncated to ~280 chars by default — the full
-  // text is one click away on the "Official listing" link below the row.
+  // structured cues miss.
+  //
+  // Long descriptions render with a CSS line-clamp (3 lines) and a
+  // separate "see more" button. The previous <details>/<summary>
+  // implementation kept the truncated preview inside <summary> so when
+  // expanded BOTH the preview and the full text appeared — duplicate
+  // text, awkward jump. Line-clamp + button keeps the FULL text in
+  // the DOM the whole time; the only thing that changes is whether
+  // the clamp is applied. No layout jump, no duplication, the same
+  // text grows in place.
   let descriptionRow = "";
   if (cleanedExcerpt) {
     const SHORT = 280;
     if (cleanedExcerpt.length > SHORT) {
-      const preview = cleanedExcerpt.slice(0, SHORT).replace(/\s+\S*$/, "");
       descriptionRow = `
         <div class="card-cue card-cue-description">
           <span class="card-cue-label">Description</span>
-          <details class="card-cue-more">
-            <summary><span class="card-cue-value">${escapeHTML(preview)}…</span> <span class="card-cue-toggle card-cue-more-label">see more</span><span class="card-cue-toggle card-cue-less-label">see less</span></summary>
-            <div class="card-cue-full">${escapeHTML(cleanedExcerpt)}</div>
-          </details>
+          <div class="card-desc-body" data-expanded="false">
+            <p class="card-desc-text">${escapeHTML(cleanedExcerpt)}</p>
+            <button type="button" class="card-desc-toggle" aria-expanded="false">see more</button>
+          </div>
         </div>`;
     } else {
       descriptionRow = `
@@ -2155,6 +2169,19 @@ function wireAdActions(host) {
       btn.textContent = SAVED.has(id) ? "★" : "☆";
       btn.setAttribute("aria-pressed", SAVED.has(id));
       document.getElementById("count-saved").textContent = SAVED.size > 0 ? SAVED.size : "";
+    });
+  });
+  // Description "see more / see less" toggle. The text node stays in
+  // the DOM the whole time; only the line-clamp class flips. No layout
+  // jump, no duplicate text — the same paragraph just grows in place.
+  host.querySelectorAll(".card-desc-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const body = btn.closest(".card-desc-body");
+      if (!body) return;
+      const expanded = body.getAttribute("data-expanded") === "true";
+      body.setAttribute("data-expanded", expanded ? "false" : "true");
+      btn.setAttribute("aria-expanded", expanded ? "false" : "true");
+      btn.textContent = expanded ? "see more" : "see less";
     });
   });
 }
