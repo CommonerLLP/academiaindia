@@ -27,6 +27,12 @@ this file when items move.
 | Field-pill dark-mode border | added in `dashboard/index.html` for `[data-theme="dark"]` |
 | Dashboard cache-bust on JSON | replaced with `cache: "no-cache"` so 304-conditional reloads work |
 | Logo `onerror=` inline → event listener | `wirePortrait()` in `dashboard/index.html` |
+| Dashboard single-file split | `docs/index.html` (277 lines, was 5,512) + `docs/styles.css` (1,230 lines) + `docs/app.js` (4,003 lines). Theme-flash-prevention script stays inline in `<head>`. Saves ~370 KB on every page-load after the first because CSS/JS are cached separately from HTML. |
+| Visiting Faculty post-type | `scraper/schema.py` already had `PostType.Visiting`; surfaced as a 5th Position-filter checkbox in `docs/app.js` with a dedicated `isVisitingMatch` predicate so visiting positions don't silently mix into Asst/Assoc/Full counts. |
+| Manual-entry provenance pill | `docs/app.js` adds a yellow "⚑ manual entry" pill on listing cards where `_manual_stub === true` and `_source_method` matches `/manual transcription/i`. Hover-tooltip explains the provenance gap. Auto-applies to any future hand-transcribed entry. |
+| Disclaimer pass (liability shield) | Lede simplified ("A public-interest tracker of academic work in India."); meta tags realigned. On-page disclaimers added: research/reference caveat below the vacancy-gap banner; CFHEI-only scope statement at the top of The Gap; expanded colophon with no-warranty / independence / analytical-content paragraphs. |
+| WCAG 2.1 AA pass | All 7 findings from `/design:accessibility-review` audit resolved: `role="tablist"` + roving `tabindex` + arrow-key nav on the top tabs; 44×44 touch targets on filter triggers, Reserved-posts toggle, and star save buttons; `aria-haspopup` + `aria-expanded` on filter-dropdown triggers; explicit `type="button"` on every non-form button; global `*:focus { outline: none }` removed in favour of `:focus-visible` only; `<html lang="en-IN">`. |
+| Favicon + OG card | `docs/favicon.svg` (oxblood rounded square + ivory italic "?"), `docs/og.svg` (1200×630, two-column publication-register layout), `docs/og.png` (raster fallback for X/Twitter, generated via `rsvg-convert -w 1200 -h 630 og.svg -o og.png`). Wired into `<head>` via `<link rel="icon">`, `og:image`, `twitter:image`, plus `theme-color` meta. |
 
 ## Deferred (with rationale)
 
