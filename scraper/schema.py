@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 
 class InstitutionType(str, Enum):
@@ -17,6 +17,7 @@ class InstitutionType(str, Enum):
     NIT = "NIT"
     IIIT = "IIIT"
     AIIMS = "AIIMS"
+    PrivateUniversity = "PrivateUniversity"
     Other = "Other"
 
 
@@ -95,6 +96,19 @@ class Institution(BaseModel):
 
 
 class JobAd(BaseModel):
+    """Core job-advertisement record.
+
+    Parsers attach several optional fields beyond what's declared here —
+    `apply_url`, `info_url`, `unit_eligibility`, `publications_required`,
+    `annexure_pdf_url`, plus several `_*`-prefixed metadata fields used by
+    the orchestrator (`_pdf_parsed`, `_rolling_stub`, `_manual_stub`,
+    `_source_method`, `_source_note`). `extra="allow"` lets these flow
+    through validation; the canonical optional fields are also declared
+    explicitly below so static analysers can reason about them.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
     id: str
     institution_id: str
     ad_number: Optional[str] = None
@@ -112,6 +126,19 @@ class JobAd(BaseModel):
     snapshot_fetched_at: datetime
     parse_confidence: float = 0.5
     raw_text_excerpt: Optional[str] = None
+
+    # ---- parser-attached extras (typed for static-analyser benefit) ----
+    apply_url: Optional[str] = None              # recruitment-portal URL
+    info_url: Optional[str] = None               # listing/cover page URL
+    unit_eligibility: Optional[str] = None       # per-unit eligibility text
+    publications_required: Optional[str] = None  # publication-threshold text
+    annexure_pdf_url: Optional[str] = None       # technical annexure link
+    # Orchestrator metadata (prefix `_` for "implementation detail"):
+    _pdf_parsed: Optional[bool] = None
+    _rolling_stub: Optional[bool] = None
+    _manual_stub: Optional[bool] = None
+    _source_method: Optional[str] = None
+    _source_note: Optional[str] = None
 
 
 class ParseError(Exception):

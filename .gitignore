@@ -26,3 +26,6 @@ Thumbs.db
 # data/*.json — produced by the scraper, checked in for history
 # sources/ — PDFs you've collected
 # .github/workflows/ — CI config
+
+# Editor / agent state
+.claude/

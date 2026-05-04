@@ -1,0 +1,18 @@
+# India HEI Job Tracker — runtime dependencies
+#
+# Versions pinned to the set verified against this codebase. Bumping any of
+# these is a deliberate change — Pydantic 3.x will break our `model_dump()`
+# usage, requests-cache has had several BC breaks in minor releases, and
+# bs4's HTML-parser semantics shift quietly.
+#
+# To upgrade in a controlled way:
+#   .venv/bin/pip install -U <package>
+#   make test                # runs the unit tests
+#   make scrape --limit 5    # smoke-test 5 institutions
+# Then commit the new pin with a one-line note.
+
+requests==2.33.1
+requests-cache==1.3.1
+pydantic==2.13.3
+beautifulsoup4==4.14.3
+lxml==5.4.0

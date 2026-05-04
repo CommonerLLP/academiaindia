@@ -35,7 +35,6 @@ RECRUITMENT_KEYWORDS = [
     r"recruit",
     r"vacanc",
     r"advert",
-    r"faculty",
     r"non[- ]?teaching",
     r"ministerial",
     r"scientist",
@@ -59,15 +58,34 @@ DATE_RE = re.compile(
 
 CLOSING_HINTS = re.compile(r"(last|closing|deadline|apply\s*by)\s*(date)?", re.IGNORECASE)
 PUBLISHED_HINTS = re.compile(r"(advertise|publish|issued|dated)", re.IGNORECASE)
+RECRUITMENT_LINK_RE = re.compile(
+    r"\b(advertisement|advt|recruitment|vacancy|position|opening|job|jobs|"
+    r"fellow|jrf|srf|post[- ]?doctoral|research\s+associate|project\s+scientist|"
+    r"professor|faculty\s+recruitment)\b",
+    re.I,
+)
+GENERIC_NAV_TEXT_RE = re.compile(
+    r"^\s*(home|about|about us|academics?|admissions?|programs?|departments?|"
+    r"calendars?|career(s)?|donate(\s+to\s+\w+)?|visit\s+\w+|search|faculty|"
+    r"staff|students?|directory|registrar|director|apply\s+now|"
+    r"office\s+of\s+.*|centre\s+for\s+continuing\s+education)\s*$",
+    re.I,
+)
+CAREERS_JOB_URL_RE = re.compile(r"/(career|careers|jobs?)/(staff/)?[^/]*\.(pdf|docx?)$|/(career|careers|jobs?)/jobs?/\d+", re.I)
 
 
 def _is_recruitment_link(link_text: str, href: str, surrounding_text: str) -> bool:
-    hay = f"{link_text} {href} {surrounding_text}".lower()
+    link_hay = f"{link_text} {href}"
+    context_hay = f"{link_hay} {surrounding_text}"
+    if GENERIC_NAV_TEXT_RE.match(link_text):
+        return False
+    if RECRUITMENT_LINK_RE.search(link_hay) or CAREERS_JOB_URL_RE.search(href):
+        return True
     for kw in RECRUITMENT_KEYWORDS:
-        if re.search(kw, hay, re.IGNORECASE):
+        if re.search(kw, link_hay, re.IGNORECASE):
             return True
     return href.lower().endswith(".pdf") and any(
-        re.search(k, surrounding_text, re.IGNORECASE) for k in ("advert", "recruit", "vacanc", "faculty")
+        re.search(k, context_hay, re.IGNORECASE) for k in ("advert", "recruit", "vacanc", "fellow", "position")
     )
 
 
@@ -202,6 +220,7 @@ def parse(html: str, url: str, fetched_at: datetime) -> list[JobAd]:
             title = link_text
 
         ad_id = _stable_id("pending-inst-id", ad_number or title, pub or close or "")
+        confidence = 0.5 if RECRUITMENT_LINK_RE.search(f"{link_text} {href}") else 0.4
         ad = JobAd(
             id=ad_id,
             institution_id="__placeholder__",  # overwritten by orchestrator
@@ -214,7 +233,7 @@ def parse(html: str, url: str, fetched_at: datetime) -> list[JobAd]:
             closing_date=close,
             original_url=abs_url,
             snapshot_fetched_at=fetched_at,
-            parse_confidence=0.35,
+            parse_confidence=confidence,
             raw_text_excerpt=context[:500],
         )
         ads.append(ad)
