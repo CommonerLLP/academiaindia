@@ -437,6 +437,88 @@ function isVisitingMatch(ad) {
 // Backwards-compatible alias used by quick-chip handlers and any older code.
 const isFacultyMatch = isAsstProfMatch;
 
+// === Display-label helpers for cards ==================================
+//
+// These translate the raw schema values into the labels a candidate
+// actually scans. Two principles:
+//
+//   1. Indian academic vocabulary, not US imports. The schema's
+//      `ContractStatus.TenureTrack` is meaningful to a tiny subset of
+//      private universities (Ashoka, Krea, FLAME, IIM-flexi); to
+//      everybody else it's noise. Map both Regular and TenureTrack to
+//      "Permanent" so the binary that matters in the Indian academic
+//      labour market — permanent vs. contract — is what the card says.
+//
+//   2. Discipline-first card heading. The previous design put the
+//      institution's title ("Faculty Positions in History") above
+//      everything else. That's the institution's marketing language;
+//      it's also redundant once you've also shown the discipline pill,
+//      the rank pill, and the contract pill below. The card now leads
+//      with the discipline (the candidate's primary scan target),
+//      followed by rank · contract, followed by institution + city.
+//
+// All helpers are pure functions of the ad object so they can be unit-
+// tested in isolation if/when frontend tests land.
+
+function contractLabel(cs) {
+  // Map ContractStatus enum → Indian academic vocabulary.
+  if (cs === "Regular" || cs === "TenureTrack") return "Permanent";
+  if (cs === "Contractual") return "Contract";
+  if (cs === "Guest") return "Visiting";
+  return null; // Unknown → omit the line entirely
+}
+
+// The headline of the card — the discipline / field.
+// Fallback chain (most-specific first):
+//   1. ad.discipline if present
+//   2. ad.department if present and not a generic wrapper
+//   3. extracted from title via regex (e.g., "Faculty Positions in History")
+//   4. ad.department even if generic (better than nothing)
+//   5. derived from post_type (e.g., "Visiting position")
+function cardDiscipline(ad) {
+  if (ad.discipline) return ad.discipline;
+  const dept = ad.department;
+  const isGenericDept = dept && /^humanities|^social sciences|^various|^multiple|^all\s+departments/i.test(dept);
+  if (dept && !isGenericDept) return dept;
+  // Derive from title
+  const title = ad.title || "";
+  let m = title.match(/(?:in|of|for)\s+([A-Z][a-zA-Z &/-]+?)(?:\s*\(|$|,|\s+[—–-])/);
+  if (m) return m[1].trim();
+  m = title.match(/(?:Faculty|Position[s]?|Recruitment)\s*[—–-]\s*([A-Z][a-zA-Z &/-]+)/);
+  if (m) return m[1].trim();
+  if (/rolling|all\s+areas|multiple/i.test(title)) return "Faculty (all areas)";
+  // Generic dept as a last resort before post_type fallback
+  if (dept) return dept;
+  if (ad.post_type === "Visiting") return "Visiting position";
+  if (ad.post_type === "Research" || ad.post_type === "Scientific") return "Research / Postdoc";
+  if (ad.post_type === "NonFaculty") return "Non-faculty";
+  return "Faculty position";
+}
+
+// "Rank · Contract" line. For Visiting the contract is implied so we
+// just say "Visiting Faculty"; otherwise the line is "<Rank> · <Contract>".
+function cardRankLine(ad) {
+  let rank;
+  if (ad.post_type === "Visiting") {
+    rank = "Visiting Faculty";
+  } else if (ad.post_type === "Research" || ad.post_type === "Scientific") {
+    rank = "Postdoc / Research Fellow";
+  } else if (ad.post_type === "NonFaculty") {
+    rank = "Non-faculty staff";
+  } else {
+    const ranks = [];
+    if (isFullProfMatch(ad)) ranks.push("Professor");
+    if (isAssocProfMatch(ad)) ranks.push("Associate Professor");
+    if (isAsstProfMatch(ad)) ranks.push("Assistant Professor");
+    if (ranks.length === 1) rank = ranks[0];
+    else if (ranks.length > 1) rank = "Faculty (multiple ranks)";
+    else rank = "Faculty";
+  }
+  const cs = contractLabel(ad.contract_status);
+  if (cs && ad.post_type !== "Visiting") return `${rank} · ${cs}`;
+  return rank;
+}
+
 // Three-way relevance label, surfaced as the "Relevance" filter section.
 // Replaces the previous parser-quality "Review status" filter (which was
 // internal-monitoring concern, not a user-facing filter).
@@ -830,28 +912,38 @@ function wireEvents() {
   // Switch to the named tab — used both by user clicks and by hash routing.
   // Returns true if `name` matched a real tab. The hash is updated only
   // when the caller asks (so initial-load activation doesn't push history).
+  // Panels that exist in the DOM but are not rendered as tablist tabs
+  // (no <button role="tab"> in nav). These are destinations linked from
+  // elsewhere — currently the colophon's "About & methodology →" link.
+  const NON_NAV_PANELS = new Set(["about"]);
+  // All panels the activator knows about — for the show/hide loop.
+  const ALL_PANELS = ["listings", "saved", "map", "vacancies", "resources", "coverage", "about"];
+
   function activateTab(name, { writeHash = false, focusTab = false } = {}) {
     const btn = document.querySelector(`nav.tabs button[data-tab="${name}"]`);
-    if (!btn) return false;
-    // Flip the visual class AND the WAI-ARIA state in lockstep. aria-selected
-    // is what screen readers announce as the "selected" indicator; tabindex
-    // implements roving-tabindex (only the active tab is in the Tab order, so
-    // Tab moves out of the tablist instead of stepping through every tab).
+    const isNonNav = NON_NAV_PANELS.has(name);
+    if (!btn && !isNonNav) return false;
+    // Flip the visual class AND the WAI-ARIA state on the tablist tabs in
+    // lockstep. For a non-nav panel (About), de-select all tabs; the panel
+    // is reachable but not "selected" in the tablist sense.
     document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => {
       const isActive = (b === btn);
       b.classList.toggle("active", isActive);
       b.setAttribute("aria-selected", isActive ? "true" : "false");
       b.setAttribute("tabindex", isActive ? "0" : "-1");
     });
-    if (focusTab) btn.focus();
-    for (const n of ["listings","saved","map","vacancies","resources","coverage"]) {
+    if (focusTab) {
+      if (btn) btn.focus();
+      else if (isNonNav) document.getElementById(name + "-tab")?.focus();
+    }
+    for (const n of ALL_PANELS) {
       const panel = document.getElementById(n + "-tab");
       if (panel) panel.style.display = (name === n) ? "" : "none";
     }
     // Filter strip is only meaningful on tabs that filter the ad corpus —
-    // Vacancies (the listings feed) and Map. On The Gap, Resources, and
-    // Saved the filters do nothing; showing them adds clutter and implies
-    // they affect those views.
+    // Vacancies (the listings feed) and Map. On The Gap, Resources, Saved,
+    // and About the filters do nothing; showing them adds clutter and
+    // implies they affect those views.
     const filterStrip = document.getElementById("filter-strip");
     if (filterStrip) {
       const filtersApply = (name === "listings" || name === "map");
@@ -862,9 +954,7 @@ function wireEvents() {
     if (name === "vacancies") renderVacancies();
     if (name === "resources") renderResources();
     if (writeHash) {
-      // Use replaceState for the default tab and pushState for everything
-      // else so the back button takes you out of the deep-link, not back
-      // through every tab you've clicked.
+      // Use pushState so back/forward survive the deep-link.
       const hash = name === "listings" ? "" : `#${name}`;
       const url = location.pathname + location.search + hash;
       history.pushState({ tab: name }, "", url);
@@ -900,11 +990,11 @@ function wireEvents() {
     });
   }
 
-  // Hash routing: deep links (#vacancies, #resources, #map, #saved) survive
-  // refresh, share, and the browser's back/forward buttons. `listings` is
-  // the default and uses no hash. Unknown hashes (e.g. #coverage when
-  // location.hash is a marketing anchor) are ignored.
-  const VALID_TAB_HASHES = new Set(["listings","saved","map","vacancies","resources"]);
+  // Hash routing: deep links (#vacancies, #resources, #map, #saved, #about)
+  // survive refresh, share, and the browser's back/forward buttons.
+  // `listings` is the default and uses no hash. Unknown hashes (e.g.
+  // #coverage when location.hash is a marketing anchor) are ignored.
+  const VALID_TAB_HASHES = new Set(["listings","saved","map","vacancies","resources","about"]);
   function activateFromHash() {
     const h = location.hash.replace(/^#/, "");
     if (h === "coverage") return; // handled separately at load time
@@ -1430,65 +1520,38 @@ function renderAd(ad) {
       ${ad.contact ? `<div class="detail-block"><span class="k">Contact</span><div class="v">${escapeHTML(ad.contact)}</div></div>` : ""}
     </details>` : "";
 
-  // ---- Phase-1 row layout ---------------------------------------------
-  // The row condenses the previous 3-band card into a single grid row:
-  //   [4-px tier-bar] [main content] [large deadline column] [actions]
-  // Areas excerpt + collapsible details span the full row width below
-  // (grid-column: 2 / span 3) so the row stays compact at rest.
+  // ---- Card layout (discipline-first) ---------------------------------
+  // Three tight lines lead the card, in the order a candidate scans:
+  //   1. DISCIPLINE   (primary scan target — am I qualified?)
+  //   2. RANK · CONTRACT  (career-stage match — Asst/Assoc/Full · Permanent/Contract/Visiting)
+  //   3. INSTITUTION, CITY  (the institutional + geographic constraint)
+  // The reservation row, deadline, and actions follow. The institution's
+  // own ad title (e.g., "Faculty Positions in History") is no longer the
+  // headline — it appeared institutional-marketing-shaped and duplicated
+  // information already in the discipline + rank pills below.
 
-  // Title + HSS badge.
-  const hssBadgeHTML = fields.length
-    ? `<span class="hss-badge">${escapeHTML(fields[0])}</span>`
-    : "";
-
-  // Meta-line: institution pill + dept pill (if distinct from title) +
-  // post-type/contract chips + reservation pills + checked-today + advno.
-  const meta = [];
-  // Institution pill — strongest secondary identifier.
-  meta.push(`<span class="meta-pill m-inst">${escapeHTML(inst.short_name || inst.name)}${inst.city ? ' · ' + escapeHTML(inst.city) : ''}</span>`);
-  // Department / discipline as a quieter pill, only when not in the title.
-  if (ad.department && !inTitle(ad.department)) {
-    meta.push(`<span class="meta-pill m-dept">${escapeHTML(ad.department)}</span>`);
+  const heading = cardDiscipline(ad);
+  const rankLine = cardRankLine(ad);
+  const instCity = inst.short_name || inst.name || "(institution unknown)";
+  const cityPart = inst.city ? `, ${escapeHTML(inst.city)}` : "";
+  // A small flag-row for non-blocking but worth-knowing signals: low parse
+  // confidence, hand-transcribed entry, posts count, posted/checked dates.
+  const flags = [];
+  if (ad.number_of_posts) {
+    flags.push(`<span class="card-flag">${ad.number_of_posts} ${ad.number_of_posts === 1 ? "post" : "posts"}</span>`);
   }
-  if (ad.discipline && ad.discipline !== ad.department && !inTitle(ad.discipline)) {
-    meta.push(`<span class="meta-pill m-dept">${escapeHTML(ad.discipline)}</span>`);
-  }
-  // Post-type / contract.
-  if (ad.post_type && ad.post_type !== "Unknown") {
-    const label = ad.post_type === "Research" || ad.post_type === "Scientific" ? "Research/Postdoc"
-                : ad.post_type === "NonFaculty" ? "Non-Faculty" : ad.post_type;
-    meta.push(`<span class="meta-pill m-job">${escapeHTML(label)}</span>`);
-  }
-  if (ad.contract_status && ad.contract_status !== "Unknown") {
-    const cs = ad.contract_status === "TenureTrack" ? "Tenure-Track" : ad.contract_status;
-    meta.push(`<span class="meta-pill m-job">${escapeHTML(cs)}</span>`);
-  }
-  if (ad.number_of_posts) meta.push(`<span class="meta-pill m-job">${ad.number_of_posts} ${ad.number_of_posts === 1 ? "post" : "posts"}</span>`);
   if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) {
-    meta.push(`<span class="meta-pill m-job lowconf">⚠ rough parse</span>`);
+    flags.push(`<span class="card-flag warn" title="Heuristically parsed; verify all details against the original notification.">⚠ rough parse</span>`);
   }
-  // Provenance disclaimer pill — surfaces hand-transcribed entries (the ones
-  // where _source_method indicates a manual transcription from a circulated
-  // card rather than a scrape from a primary URL). Reader sees the flag, can
-  // weight the entry accordingly. The full _source_note is in current.json
-  // for anyone reading the data directly.
   if (ad._manual_stub && /manual transcription/i.test(ad._source_method || "")) {
-    meta.push(`<span class="meta-pill m-job manual-stub-pill" title="Hand-transcribed from a circulated recruitment card; only the application URL is verifiable. Verify with the issuing institution before applying.">⚑ manual entry</span>`);
+    flags.push(`<span class="card-flag manual" title="Hand-transcribed from a circulated recruitment card; only the application URL is verifiable. Verify with the issuing institution before applying.">⚑ manual entry</span>`);
   }
-  // Reservation pills — colour-coded per category. Only render when the
-  // schema has actual counts (not null and not all zero); otherwise the
-  // institute-wide reservation_note in the disclosure carries the policy.
-  if (catBits.length) {
-    const pills = catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("");
-    meta.push(`<span class="reserv-group">${pills}</span>`);
-  }
-  // Tertiary metadata: posted-date + checked-today + advno.
-  const tert = [];
-  if (ad.publication_date) tert.push(`posted ${escapeHTML(formatDate(ad.publication_date))}`);
-  if (seenDays != null) tert.push(`checked ${seenDays === 0 ? "today" : seenDays + "d ago"}`);
-  if (ad.ad_number) tert.push(escapeHTML(ad.ad_number));
-  if (tert.length) {
-    meta.push(`<span class="meta-tert">${tert.join(" · ")}</span>`);
+  const dateBits = [];
+  if (ad.publication_date) dateBits.push(`posted ${escapeHTML(formatDate(ad.publication_date))}`);
+  if (seenDays != null) dateBits.push(`checked ${seenDays === 0 ? "today" : seenDays + "d ago"}`);
+  if (ad.ad_number) dateBits.push(`ad #${escapeHTML(ad.ad_number)}`);
+  if (dateBits.length) {
+    flags.push(`<span class="card-flag dim">${dateBits.join(" · ")}</span>`);
   }
 
   // Large deadline column: "66 / DAYS / 30 Jun 2026" or "rolling" or "—".
@@ -1594,19 +1657,20 @@ function renderAd(ad) {
   return `
     <article class="listing tier-${tier}" data-jobid="${escapeAttr(ad.id)}">
       <div class="tier-bar"></div>
-      <div class="row-main">
-        <div class="row-title-line">
-          <h3 class="row-title">${titleHTML}</h3>
-          ${hssBadgeHTML}
+      <div class="card-body">
+        <div class="card-headline">
+          <h3 class="card-discipline">${escapeHTML(heading)}</h3>
+          <p class="card-rank">${escapeHTML(rankLine)}</p>
+          <p class="card-inst">${escapeHTML(instCity)}${cityPart}</p>
+          ${flags.length ? `<div class="card-flags">${flags.join('')}</div>` : ""}
         </div>
-        <div class="row-meta">${meta.join('')}</div>
+        <div class="card-deadline">${deadlineHTML}</div>
+        <div class="card-actions">
+          <button type="button" class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
+        </div>
       </div>
-      <div class="row-deadline">${deadlineHTML}</div>
-      <div class="row-actions">
-        <button type="button" class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
-      </div>
-      ${areasHTML ? `<div class="row-areas">${escapeHTML(cleanedExcerpt).slice(0, 500)}${cleanedExcerpt.length > 500 ? "…" : ""}</div>` : ""}
       ${reservPillsHTML}
+      ${areasHTML ? `<div class="row-areas">${escapeHTML(cleanedExcerpt).slice(0, 500)}${cleanedExcerpt.length > 500 ? "…" : ""}</div>` : ""}
       ${trapsHTML}
       ${applyLinksHTML}
       ${detailsHTML2}
