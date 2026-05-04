@@ -1,9 +1,9 @@
 name: daily-sweep
 
 # Runs the Indian HEI Job Tracker scraper on GitHub-hosted Ubuntu runners,
-# which have unblocked outbound internet (Cowork's sandbox does not — that is
-# why this workflow exists). Produces data/current.json, an archive snapshot
-# dated YYYY-MM-DD, and data/coverage_report.json. Commits back to the repo.
+# which have unblocked outbound internet. Produces docs/data/current.json,
+# an archive snapshot dated YYYY-MM-DD under docs/data/archive/, and
+# docs/data/coverage_report.json. Commits back to the repo.
 #
 # Schedule: 03:30 IST (22:00 UTC, previous day). Adjust 'cron' if you want
 # earlier / later. Also runs on push to main (safety / sanity check) and on
@@ -22,11 +22,11 @@ on:
     branches: [main]
     paths:
       - "scraper/**"
-      - "data/institutions_registry.json"
+      - "docs/data/institutions_registry.json"
       - ".github/workflows/daily-sweep.yml"
 
 permissions:
-  contents: write  # commit data/ back to the repo
+  contents: write  # commit docs/data/ back to the repo
 
 concurrency:
   group: daily-sweep
@@ -58,11 +58,13 @@ jobs:
         id: scrape
         working-directory: ${{ github.workspace }}
         run: |
-          mkdir -p data/archive
+          mkdir -p docs/data/archive
           LIMIT_ARG=""
           if [[ -n "${{ github.event.inputs.limit }}" ]]; then
             LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
           fi
+          # scraper/run.py defaults --out to docs/data so the SPA on
+          # GitHub Pages picks it up directly; no copy step needed.
           python scraper/run.py $LIMIT_ARG | tee sweep-summary.txt
           echo "--- scrape summary ---"
           cat sweep-summary.txt
@@ -82,12 +84,12 @@ jobs:
         run: |
           git config user.name "india-hei-tracker-bot"
           git config user.email "solanki.aakash@gmail.com"
-          git add -A data/ || true
+          git add -A docs/data/ || true
           if git diff --cached --quiet; then
             echo "no data changes to commit"
             exit 0
           fi
-          COUNT=$(python -c "import json; print(json.load(open('data/current.json')).get('ad_count', 0))" 2>/dev/null || echo "?")
+          COUNT=$(python -c "import json; print(json.load(open('docs/data/current.json')).get('ad_count', 0))" 2>/dev/null || echo "?")
           git commit -m "daily sweep: $(date -u +%Y-%m-%d) · ${COUNT} records" || true
           git push || true
 
@@ -98,6 +100,6 @@ jobs:
           name: sweep-log-${{ github.run_id }}
           path: |
             sweep-summary.txt
-            data/coverage_report.json
+            docs/data/coverage_report.json
           retention-days: 14
           if-no-files-found: ignore
