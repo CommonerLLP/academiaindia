@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-03T19:39:43.149571+00:00",
+  "generated_at": "2026-05-04T23:06:27.851660+00:00",
   "institutions_attempted": 63,
   "institutions_succeeded": 51,
   "institutions_with_ads": 46,
@@ -16,18 +16,18 @@
     {
       "institution_id": "iit-bombay",
       "parser": "iit_rolling",
-      "fetch_status": "ok",
+      "fetch_status": "stale-archive",
       "http_status": 200,
       "ads_found": 31,
-      "note": ""
+      "note": "carried forward 31 previous listing(s)"
     },
     {
       "institution_id": "iit-madras",
       "parser": "iit_rolling",
-      "fetch_status": "ok",
+      "fetch_status": "stale-archive",
       "http_status": 200,
       "ads_found": 18,
-      "note": ""
+      "note": "carried forward 18 previous listing(s)"
     },
     {
       "institution_id": "iit-kanpur",
@@ -40,10 +40,10 @@
     {
       "institution_id": "iit-delhi",
       "parser": "iit_rolling",
-      "fetch_status": "ok",
+      "fetch_status": "stale-archive",
       "http_status": 200,
       "ads_found": 24,
-      "note": ""
+      "note": "carried forward 24 previous listing(s)"
     },
     {
       "institution_id": "iit-guwahati",
@@ -51,7 +51,7 @@
       "fetch_status": "ok",
       "http_status": 200,
       "ads_found": 2,
-      "note": "robots override"
+      "note": ""
     },
     {
       "institution_id": "iit-roorkee",
@@ -131,7 +131,7 @@
       "fetch_status": "network-error",
       "http_status": null,
       "ads_found": 0,
-      "note": "HTTPSConnectionPool(host='www.iitbhilai.ac.in', port=443): Max retries exceeded with url: /index.php/recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+      "note": "HTTPSConnectionPool(host='www.iitbhilai.ac.in', port=443): Max retries exceeded with url: /index.php/recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1016)')))"
     },
     {
       "institution_id": "iit-goa",
@@ -139,7 +139,7 @@
       "fetch_status": "network-error",
       "http_status": null,
       "ads_found": 0,
-      "note": "HTTPSConnectionPool(host='www.iitgoa.ac.in', port=443): Max retries exceeded with url: /index.php/recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+      "note": "HTTPSConnectionPool(host='www.iitgoa.ac.in', port=443): Max retries exceeded with url: /index.php/recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1016)')))"
     },
     {
       "institution_id": "iit-jammu",
@@ -179,7 +179,7 @@
       "fetch_status": "network-error",
       "http_status": null,
       "ads_found": 0,
-      "note": "HTTPSConnectionPool(host='www.iitism.ac.in', port=443): Max retries exceeded with url: /recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+      "note": "HTTPSConnectionPool(host='www.iitism.ac.in', port=443): Max retries exceeded with url: /recruitment (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1016)')))"
     },
     {
       "institution_id": "iit-varanasi-bhu",
@@ -251,7 +251,7 @@
       "fetch_status": "network-error",
       "http_status": null,
       "ads_found": 0,
-      "note": "HTTPSConnectionPool(host='www.iimrohtak.ac.in', port=443): Max retries exceeded with url: /careers (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+      "note": "HTTPSConnectionPool(host='www.iimrohtak.ac.in', port=443): Max retries exceeded with url: /careers (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1016)')))"
     },
     {
       "institution_id": "iim-ranchi",
@@ -315,7 +315,7 @@
       "fetch_status": "network-error",
       "http_status": null,
       "ads_found": 0,
-      "note": "HTTPSConnectionPool(host='www.iimnagpur.ac.in', port=443): Max retries exceeded with url: /careers (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+      "note": "HTTPSConnectionPool(host='www.iimnagpur.ac.in', port=443): Max retries exceeded with url: /careers (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1016)')))"
     },
     {
       "institution_id": "iim-sambalpur",
@@ -371,7 +371,7 @@
       "fetch_status": "network-error",
       "http_status": null,
       "ads_found": 0,
-      "note": "HTTPSConnectionPool(host='www.iiserpune.ac.in', port=443): Max retries exceeded with url: /jobs (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1081)')))"
+      "note": "HTTPSConnectionPool(host='www.iiserpune.ac.in', port=443): Max retries exceeded with url: /jobs (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1016)')))"
     },
     {
       "institution_id": "iiser-kolkata",
@@ -419,7 +419,7 @@
       "fetch_status": "network-error",
       "http_status": null,
       "ads_found": 0,
-      "note": "HTTPSConnectionPool(host='www.iiserbpr.ac.in', port=443): Max retries exceeded with url: /jobs (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))"
+      "note": "HTTPSConnectionPool(host='www.iiserbpr.ac.in', port=443): Max retries exceeded with url: /jobs (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1016)')))"
     },
     {
       "institution_id": "iiit-bangalore",
@@ -481,7 +481,7 @@
       "institution_id": "ahmedabad-university",
       "parser": "private_university",
       "fetch_status": "ok",
-      "http_status": 200,
+      "http_status": 403,
       "ads_found": 1,
       "note": "robots override"
     },
