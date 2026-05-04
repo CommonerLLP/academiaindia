@@ -2016,19 +2016,53 @@ function wireEvents() {
   // in tab switching. The theme-toggle is also a <button> inside nav.tabs but
   // has no data-tab — without this guard, clicking it would hide every panel
   // because `btn.dataset.tab` is undefined and no panel name matches.
+  // Switch to the named tab — used both by user clicks and by hash routing.
+  // Returns true if `name` matched a real tab. The hash is updated only
+  // when the caller asks (so initial-load activation doesn't push history).
+  function activateTab(name, { writeHash = false } = {}) {
+    const btn = document.querySelector(`nav.tabs button[data-tab="${name}"]`);
+    if (!btn) return false;
+    document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    for (const n of ["listings","saved","map","vacancies","resources","coverage"]) {
+      const panel = document.getElementById(n + "-tab");
+      if (panel) panel.style.display = (name === n) ? "" : "none";
+    }
+    if (name === "map") { initMap(); render(); }
+    if (name === "saved") renderSaved();
+    if (name === "vacancies") renderVacancies();
+    if (name === "resources") renderResources();
+    if (writeHash) {
+      // Use replaceState for the default tab and pushState for everything
+      // else so the back button takes you out of the deep-link, not back
+      // through every tab you've clicked.
+      const hash = name === "listings" ? "" : `#${name}`;
+      const url = location.pathname + location.search + hash;
+      history.pushState({ tab: name }, "", url);
+    }
+    return true;
+  }
+
   document.querySelectorAll("nav.tabs button[data-tab]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      for (const name of ["listings","saved","map","vacancies","resources","coverage"]) {
-        document.getElementById(name + "-tab").style.display = (btn.dataset.tab === name) ? "" : "none";
-      }
-      if (btn.dataset.tab === "map") { initMap(); render(); }
-      if (btn.dataset.tab === "saved") renderSaved();
-      if (btn.dataset.tab === "vacancies") renderVacancies();
-      if (btn.dataset.tab === "resources") renderResources();
-    });
+    btn.addEventListener("click", () => activateTab(btn.dataset.tab, { writeHash: true }));
   });
+
+  // Hash routing: deep links (#vacancies, #resources, #map, #saved) survive
+  // refresh, share, and the browser's back/forward buttons. `listings` is
+  // the default and uses no hash. Unknown hashes (e.g. #coverage when
+  // location.hash is a marketing anchor) are ignored.
+  const VALID_TAB_HASHES = new Set(["listings","saved","map","vacancies","resources"]);
+  function activateFromHash() {
+    const h = location.hash.replace(/^#/, "");
+    if (h === "coverage") return; // handled separately at load time
+    const name = VALID_TAB_HASHES.has(h) ? h : "listings";
+    activateTab(name, { writeHash: false });
+  }
+  // Run once on first wire-up (covers reload-into-#vacancies) and then on
+  // every back/forward navigation.
+  activateFromHash();
+  window.addEventListener("hashchange", activateFromHash);
+  window.addEventListener("popstate", activateFromHash);
 
   // In-page links that jump to a specific tab. Used by the vacancy-gap
   // banner ("See the breakdown by category →") and any other anchor with
