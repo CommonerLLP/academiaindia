@@ -495,6 +495,89 @@ function cardDiscipline(ad) {
   return "Faculty position";
 }
 
+// Parse the messy raw-text excerpt into structured cues a candidate can
+// scan. Indian academic ads have a recognisable shape — most of them
+// open with a paragraph that names sub-areas / specialisations,
+// methods preferences, and a disciplinary frame, followed by long
+// boilerplate about "specialisation must be clearly evidenced through
+// research and publications in the relevant area." We extract the high-
+// signal pieces and drop the boilerplate.
+//
+// Always returns `{ areas, methods, approach }` (values are null when
+// not extractable). The card renderer surfaces each piece — even when
+// missing — with explicit "Not specified by the department" labelling
+// so a reader scrolling through 30 cards SEES the pattern of
+// institutional silence rather than having it hidden by absence. Cf.
+// the same logic on the reservation row ("composite recruitment, per-
+// post breakdown not disclosed"): naming the absence is the political
+// point.
+function extractCardCues(text) {
+  const cues = { areas: null, methods: null, approach: null };
+  if (!text || text.length < 30) return cues;
+
+  // --- Sub-areas list -------------------------------------------------
+  // Patterns: "in (the )?area(s) of X, Y, Z…" / "specialisation in X, Y"
+  // The trailing lookahead stops the capture at a sentence end, a
+  // semicolon, or a "with …" clause that introduces methods.
+  const areaPatterns = [
+    /(?:in|across)\s+(?:the\s+)?(?:area|areas|fields?|domains?|specializations?|specialisations?|topics?)\s+of\s+([^.]{8,400}?)(?=\s*(?:\.|;|\(with\s|with\s+a\s+|$))/i,
+    /(?:research\s+(?:areas?|interests?))\s*[:\-–]\s*([^.]{8,400}?)(?=\s*(?:\.|;|$))/i,
+    /(?:specialization|specialisation|expertise)\s+in\s+([^.]{8,400}?)(?=\s*(?:\.|;|with\s+a\s+|$))/i,
+  ];
+  for (const re of areaPatterns) {
+    const m = text.match(re);
+    if (m) {
+      const areas = m[1]
+        .replace(/\([^)]*\)/g, ' ')                     // strip parentheticals
+        .replace(/-\s+/g, '-')                          // "multi- species" -> "multi-species"
+        .replace(/\s+/g, ' ')                           // collapse double spaces
+        .split(/\s*,\s*|\s*;\s*|\s+(?:and|or|&)\s+/)    // split on , ; and or &
+        .map(s => s.trim().replace(/[.,;:]+$/, ''))
+        .filter(s => {
+          if (!s || s.length < 2 || s.length > 60) return false;
+          // Drop low-content phrases that come from awkward source text
+          // like "in any one or more of the relevant discipline, …" —
+          // splitting "one or more of relevant discipline" yields "one"
+          // and "more of relevant discipline", neither of which is an
+          // actual research area. (Length >= 2 keeps real acronyms
+          // like "AI" while the connective-word filter keeps out "or",
+          // "of", "to", etc.)
+          if (/^(?:the|a|an|one|two|three|few|many|more|other|any|some|all|various|relevant|candidate|applicant)\b/i.test(s)) return false;
+          if (/\b(?:relevant\s+discipline|candidate|applicant|the\s+area)s?\b/i.test(s)) return false;
+          // Require at least one alphabetic character
+          if (!/[a-zA-Z]/.test(s)) return false;
+          return true;
+        });
+      if (areas.length >= 2 && areas.length <= 20) {
+        cues.areas = areas;
+        break;
+      }
+    }
+  }
+
+  // --- Methods preference ---------------------------------------------
+  // "with a strong focus on quantitative research"
+  // "either ethnographic or quantitative methods"
+  // "grounding in mixed methods"
+  let m = text.match(/(?:with\s+a\s+)?(?:strong\s+)?focus(?:ed|ing)?\s+on\s+([\w\s,/-]{5,80}?)\s+(?:research|methods?|approach)/i);
+  if (m) {
+    cues.methods = m[1].trim().replace(/\s+/g, ' ');
+  } else {
+    m = text.match(/grounding\s+in\s+(?:either\s+)?([\w\s,/-]{5,80}?)\s+methods?/i);
+    if (m) cues.methods = m[1].trim().replace(/\s+/g, ' ');
+  }
+
+  // --- Disciplinary approach ------------------------------------------
+  // "sociological/anthropological approach" / "humanistic approach"
+  m = text.match(/\b((?:sociolog\w+|anthropolog\w+|historic\w+|philosoph\w+|cultur\w+|economic\w*|political\w*|geographic\w*|humanist\w+|critical|interdisciplinary|comparative)(?:\s*\/\s*\w+\w+)?)\s+approach/i);
+  if (m) cues.approach = m[1];
+
+  // Note: we ALWAYS return the cues object even if every field is null.
+  // The renderer surfaces each row explicitly so missing values are
+  // labelled "Not specified by the department" rather than hidden.
+  return cues;
+}
+
 // "Rank · Contract" line. For Visiting the contract is implied so we
 // just say "Visiting Faculty"; otherwise the line is "<Rank> · <Contract>".
 function cardRankLine(ad) {
@@ -1502,9 +1585,42 @@ function renderAd(ad) {
   // dropdown, which appends "iCal Google Outlook Outlook.com Yahoo" to
   // every listing). The cleanup is conservative — only known patterns.
   const cleanedExcerpt = sanitizeExcerpt(ad.raw_text_excerpt || "");
-  const areasHTML = cleanedExcerpt
-    ? `<div class="areas">${escapeHTML(cleanedExcerpt).slice(0, 500)}${cleanedExcerpt.length > 500 ? "…" : ""}</div>`
-    : "";
+  // The cover-letter scan: a candidate reads this section to decide
+  // three things — (1) do my projects fit the sub-areas they're hiring
+  // in, (2) do my methods match what they want, (3) does my disciplinary
+  // self-presentation map onto theirs. We extract and label these three
+  // explicitly. When the recruiting department has not specified one of
+  // them, we say so — the absence is named, not hidden. Across many
+  // cards this surfaces a pattern: most departments do not enunciate
+  // their requirements clearly, leaving candidates to guess. That
+  // pattern IS the political point of this view; it should be visible.
+  const cues = extractCardCues(cleanedExcerpt);
+  const NS_TIP = "The recruiting department did not enunciate this in the advertisement. Candidates have to guess.";
+  const empty = `<span class="card-cue-empty" title="${NS_TIP}">Not specified by the department</span>`;
+  const areasValue = cues.areas
+    ? `<span class="card-cue-tags">${cues.areas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>`
+    : empty;
+  const methodsValue = cues.methods
+    ? `<span class="card-cue-value">${escapeHTML(cues.methods)}</span>`
+    : empty;
+  const approachValue = cues.approach
+    ? `<span class="card-cue-value">${escapeHTML(cues.approach)}</span>`
+    : empty;
+  const areasHTML = `
+    <div class="card-cues">
+      <div class="card-cue card-cue-areas${cues.areas ? "" : " is-empty"}">
+        <span class="card-cue-label">Research areas</span>
+        ${areasValue}
+      </div>
+      <div class="card-cue card-cue-methods${cues.methods ? "" : " is-empty"}">
+        <span class="card-cue-label">Methods</span>
+        ${methodsValue}
+      </div>
+      <div class="card-cue card-cue-approach${cues.approach ? "" : " is-empty"}">
+        <span class="card-cue-label">Approach</span>
+        ${approachValue}
+      </div>
+    </div>`;
 
   // Collapsible details — short label, button-ish
   const hasDetails = ad.unit_eligibility || ad.publications_required || ad.general_eligibility || ad.reservation_note || ad.process_note || ad.contact || ad._source_note;
@@ -1610,17 +1726,25 @@ function renderAd(ad) {
   // on every card is boilerplate noise, not information.
   const _adText = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
   const isSRD = /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(_adText);
+  // Each reservation-state row shows a label + an info icon. The
+  // long explanation that used to render inline now lives in a hover
+  // tooltip (title=) on the row + an aria-describedby element for AT.
+  // This keeps the political content present on every card without
+  // dumping a full paragraph into the candidate's scan path.
   let reservPillsHTML = "";
   if (catBits.length) {
     reservPillsHTML = `<div class="row-reserv"><span class="reserv-label">Reserved seats</span>${
       catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")
     }</div>`;
   } else if (isSRD) {
-    reservPillsHTML = `<div class="row-reserv reserv-srd"><span class="reserv-label good">✓ Special Recruitment Drive</span><span class="reserv-missing-msg">This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.</span></div>`;
+    const tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
+    reservPillsHTML = `<div class="row-reserv reserv-srd" title="${escapeAttr(tip)}"><span class="reserv-label good">✓ Special Recruitment Drive</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
   } else if (isCompositeAd) {
-    reservPillsHTML = `<div class="row-reserv reserv-missing"><span class="reserv-label warn">⚠ Composite recruitment</span><span class="reserv-missing-msg">Multi-post cadre-level call. Per-post reservation breakdown not disclosed in this advertisement.</span></div>`;
+    const tip = "Multi-post cadre-level call. Per-post reservation breakdown not disclosed in this advertisement.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing" title="${escapeAttr(tip)}"><span class="reserv-label warn">⚠ Composite recruitment</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
   } else {
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label">Single-position recruitment</span><span class="reserv-missing-msg">Reservation operates at the institute's cadre roster, not at the individual-ad level. Whether this position falls to UR/SC/ST/OBC/EWS/PwBD depends on the institute's roster point — not visible in the ad.</span></div>`;
+    const tip = "Reservation operates at the institute's cadre roster, not at the individual-ad level. Whether this position falls to UR/SC/ST/OBC/EWS/PwBD depends on the institute's roster point — not visible in the ad.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost" title="${escapeAttr(tip)}"><span class="reserv-label">Single-position recruitment</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
   }
   // Private universities: not bound by the CEI(RTC) Act, 2019 nor by the
   // Article 15(5) admissions-side reservation extension — TMA Pai (2002) and
@@ -1632,7 +1756,8 @@ function renderAd(ad) {
   const _instForReserv = INSTITUTIONS[ad.institution_id] || {};
   const isPrivate = (_instForReserv.type || "").toLowerCase().includes("private");
   if (isPrivate && !catBits.length) {
-    reservPillsHTML = `<div class="row-reserv reserv-missing private-univ"><span class="reserv-label warn">⚠ Affirmative action: unknown</span><span class="reserv-missing-msg">This institution has not voluntarily adopted the CEI(RTC) Act, 2019 framework. Whether any affirmative-action policy applies in faculty hiring is unknown — the institution does not publish category-wise hiring data.</span></div>`;
+    const tip = "This institution has not voluntarily adopted the CEI(RTC) Act, 2019 framework. Whether any affirmative-action policy applies in faculty hiring is unknown — the institution does not publish category-wise hiring data.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing private-univ" title="${escapeAttr(tip)}"><span class="reserv-label warn">⚠ Affirmative action: unknown</span><span class="reserv-info" aria-hidden="true">ⓘ</span></div>`;
   }
   // Hiring-language traps — surface known exclusion phrases that the ad
   // contains, so candidates can see the structural barriers up front.
@@ -1686,7 +1811,7 @@ function renderAd(ad) {
         </div>
       </div>
       ${reservPillsHTML}
-      ${areasHTML ? `<div class="row-areas">${escapeHTML(cleanedExcerpt).slice(0, 500)}${cleanedExcerpt.length > 500 ? "…" : ""}</div>` : ""}
+      ${areasHTML}
       ${trapsHTML}
       ${applyLinksHTML}
       ${detailsHTML2}
