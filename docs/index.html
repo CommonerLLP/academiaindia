@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -118,7 +118,10 @@
   a { color: var(--accent); }
 
   /* Custom focus ring (WCAG 2.4.7). Browser default is 1px and easy to miss. */
-  *:focus { outline: none; }
+  /* WCAG 2.4.7: every focusable element gets a visible indicator. We rely on
+     :focus-visible (keyboard-only) instead of :focus (also fires on mouse
+     click); the previous global `*:focus { outline: none }` was suppressing
+     the fallback for browsers without :focus-visible support. Removed. */
   *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
   /* Form controls already have border-radius; keep the offset. */
   input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 1px; }
@@ -295,9 +298,15 @@
 
   nav.tabs { background: var(--panel); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 4px; align-items: stretch; }
   nav.tabs .tabs-spacer { flex: 1; }
-  nav.tabs .tabs-right { flex: 1; display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
+  /* The tablist is the WAI-ARIA semantic container for the five tabs; visually
+     it stretches across the post-spacer area so `tab-saved` can be pushed to
+     the right edge inside the tablist (preserving the prior layout where Saved
+     was clustered with the theme-toggle on the right). */
+  nav.tabs .tablist { flex: 1; display: flex; gap: 4px; align-items: stretch; min-width: 0; }
+  nav.tabs .tablist .tab-saved { margin-left: auto; }
   nav.tabs button { background: transparent; border: none; padding: 14px 18px; font: inherit; font-size: 15px; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; font-weight: 600; }
-  nav.tabs button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+  nav.tabs button.active,
+  nav.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
   nav.tabs .tab-count { color: var(--muted); font-weight: 400; margin-left: 6px; font-variant-numeric: tabular-nums; }
   /* WCAG 2.5.5: 44x44 tap area. Visual button stays compact via inner pseudo-disc. */
   nav.tabs .theme-toggle { background: transparent; border: none; cursor: pointer; color: var(--muted); padding: 0; align-self: center; transition: color .15s; font-size: 14px; line-height: 1; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; position: relative; }
@@ -327,7 +336,10 @@
     align-items: center; justify-content: center; position: sticky; top: 0; z-index: 30;
   }
   .filter-strip .strip-label { font-size: 12px; color: var(--muted); margin-right: 4px; font-weight: 500; }
-  .filter-strip .quick-chip { background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, border-color .15s, color .15s; font-weight: 600; }
+  /* WCAG 2.5.5: 44 px minimum tap area. The visual chip stays compact via
+     padding; the min-height pads the focusable rect to the AA target without
+     visibly inflating the pill. */
+  .filter-strip .quick-chip { background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; min-height: 44px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, border-color .15s, color .15s; font-weight: 600; }
   .filter-strip .quick-chip:hover { background: var(--chip-bg); }
   .filter-strip .quick-chip .quick-chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .15s; }
   /* Reserved-posts chip pressed state uses Ambedkarite cobalt — affirmative
@@ -338,7 +350,7 @@
   .filter-dd { position: relative; }
   .filter-dd > .filter-trigger {
     background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 12px; font: inherit; font-size: 13px; color: var(--ink);
+    padding: 7px 12px; min-height: 44px; font: inherit; font-size: 13px; color: var(--ink);
     cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
     transition: border-color .15s, background .15s;
   }
@@ -708,7 +720,9 @@
 
   /* Actions column — currently just the save star. */
   .listing .row-actions { display: flex; flex-direction: column; gap: 4px; align-items: center; }
-  .listing .star { background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 16px; color: var(--muted); border-radius: 8px; min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+  /* WCAG 2.5.5 AA: 44x44 minimum tap area (was 36x36 — visual unchanged, the
+     padding box just expands to meet the AA target). */
+  .listing .star { background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 16px; color: var(--muted); border-radius: 8px; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
   .listing .star:hover { background: var(--chip-bg); color: var(--accent); }
   .listing .star.on { color: var(--warn); }
 
@@ -735,7 +749,10 @@
                scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     nav.tabs::-webkit-scrollbar { display: none; }
     nav.tabs .tabs-spacer { display: none; }
-    nav.tabs .tabs-right { flex: none; }
+    /* Mobile: tablist contracts to its content so all 5 tabs scroll naturally;
+       Saved doesn't get pushed to the right edge (would force theme-toggle off-screen). */
+    nav.tabs .tablist { flex: 0 0 auto; gap: 0; }
+    nav.tabs .tablist .tab-saved { margin-left: 0; }
     nav.tabs button { padding: 12px 12px; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
     nav.tabs .theme-toggle { min-width: 40px; min-height: 40px; }
 
@@ -1253,19 +1270,24 @@
      the tab bar. The legacy `#search` hidden input still lives inside that
      strip for any code path that reads its value. -->
 
-<nav class="tabs" id="tabs">
+<nav class="tabs" id="tabs" aria-label="Site sections">
   <span class="tabs-spacer" aria-hidden="true"></span>
-  <button class="active" data-tab="listings">Listings <span class="tab-count" id="count-listings"></span></button>
-  <button data-tab="map">Map</button>
-  <button data-tab="vacancies">Vacancies</button>
-  <button data-tab="resources">Resources</button>
-  <span class="tabs-right">
-    <button data-tab="saved">Saved <span class="tab-count" id="count-saved"></span></button>
-    <!-- Coverage is an internal monitoring dashboard — kept reachable via the
-         URL hash `#coverage` for maintainers, but removed from public nav so
-         end users aren't confused by parser-status noise. -->
-    <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">☾</button>
-  </span>
+  <!-- WAI-ARIA tablist pattern: all five tabs are siblings inside one
+       role="tablist" container. The "Saved" tab is pushed to the right via
+       `.tab-saved { margin-left: auto }` so the visual placement matches the
+       prior layout without scattering tabs across multiple DOM containers
+       (which would have required `aria-owns` to keep the tablist intact). -->
+  <div class="tablist" role="tablist" aria-label="Sections">
+    <button role="tab" type="button" id="tab-listings"  aria-selected="true"  aria-controls="listings-tab"  tabindex="0"  class="active" data-tab="listings">Listings <span class="tab-count" id="count-listings"></span></button>
+    <button role="tab" type="button" id="tab-map"       aria-selected="false" aria-controls="map-tab"       tabindex="-1" data-tab="map">Map</button>
+    <button role="tab" type="button" id="tab-vacancies" aria-selected="false" aria-controls="vacancies-tab" tabindex="-1" data-tab="vacancies">Vacancies</button>
+    <button role="tab" type="button" id="tab-resources" aria-selected="false" aria-controls="resources-tab" tabindex="-1" data-tab="resources">Resources</button>
+    <button role="tab" type="button" id="tab-saved"     aria-selected="false" aria-controls="saved-tab"     tabindex="-1" class="tab-saved" data-tab="saved">Saved <span class="tab-count" id="count-saved"></span></button>
+  </div>
+  <!-- Coverage is an internal monitoring dashboard — kept reachable via the
+       URL hash `#coverage` for maintainers, but removed from public nav so
+       end users aren't confused by parser-status noise. -->
+  <button class="theme-toggle" type="button" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">☾</button>
 </nav>
 
 <!-- ============================================================
@@ -1293,45 +1315,46 @@
   </button>
 
   <div class="filter-dd" data-key="field">
-    <button class="filter-trigger" type="button">Discipline <span class="sel-pill" id="selcnt-hss" hidden></span><span class="chev">▾</span></button>
-    <div class="popover">
+    <button class="filter-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="popover-field">Discipline <span class="sel-pill" id="selcnt-hss" hidden></span><span class="chev">▾</span></button>
+    <div class="popover" id="popover-field" role="group" aria-label="Discipline filter options">
       <div id="filter-hss" class="filter-group scrollable"></div>
       <div class="popover-foot"><button type="button" data-clear="filter-hss">Clear</button></div>
     </div>
   </div>
 
   <div class="filter-dd" data-key="quality">
-    <button class="filter-trigger" type="button">Subject area <span class="sel-pill" id="selcnt-quality" hidden></span><span class="chev">▾</span></button>
-    <div class="popover">
+    <button class="filter-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="popover-quality">Subject area <span class="sel-pill" id="selcnt-quality" hidden></span><span class="chev">▾</span></button>
+    <div class="popover" id="popover-quality" role="group" aria-label="Subject area filter options">
       <div id="filter-quality" class="filter-group"></div>
       <div class="popover-foot"><button type="button" data-clear="filter-quality">Clear</button></div>
     </div>
   </div>
 
   <div class="filter-dd" data-key="posgroup">
-    <button class="filter-trigger" type="button">Position <span class="sel-pill" id="selcnt-posgroup" hidden></span><span class="chev">▾</span></button>
-    <div class="popover">
+    <button class="filter-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="popover-posgroup">Position <span class="sel-pill" id="selcnt-posgroup" hidden></span><span class="chev">▾</span></button>
+    <div class="popover" id="popover-posgroup" role="group" aria-label="Position filter options">
       <div id="filter-posgroup" class="filter-group">
         <label><input type="checkbox" value="faculty" /><span class="grow">Assistant Professor</span><span class="cnt" id="cnt-faculty"></span></label>
         <label><input type="checkbox" value="associate" /><span class="grow">Associate Professor</span><span class="cnt" id="cnt-associate"></span></label>
         <label><input type="checkbox" value="full" /><span class="grow">Professor (Full)</span><span class="cnt" id="cnt-full"></span></label>
         <label><input type="checkbox" value="research" /><span class="grow">Postdoc / Research Fellow</span><span class="cnt" id="cnt-research"></span></label>
+        <label><input type="checkbox" value="visiting" /><span class="grow">Visiting Faculty</span><span class="cnt" id="cnt-visiting"></span></label>
       </div>
       <div class="popover-foot"><button type="button" data-clear="filter-posgroup">Clear</button></div>
     </div>
   </div>
 
   <div class="filter-dd" data-key="type">
-    <button class="filter-trigger" type="button">Institution type <span class="sel-pill" id="selcnt-type" hidden></span><span class="chev">▾</span></button>
-    <div class="popover">
+    <button class="filter-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="popover-type">Institution type <span class="sel-pill" id="selcnt-type" hidden></span><span class="chev">▾</span></button>
+    <div class="popover" id="popover-type" role="group" aria-label="Institution type filter options">
       <div id="filter-type" class="filter-group"></div>
       <div class="popover-foot"><button type="button" data-clear="filter-type">Clear</button></div>
     </div>
   </div>
 
   <div class="filter-dd" data-key="state">
-    <button class="filter-trigger" type="button">Location <span class="sel-pill" id="selcnt-state" hidden></span><span class="chev">▾</span></button>
-    <div class="popover">
+    <button class="filter-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="popover-state">Location <span class="sel-pill" id="selcnt-state" hidden></span><span class="chev">▾</span></button>
+    <div class="popover" id="popover-state" role="group" aria-label="Location filter options">
       <div id="filter-state" class="filter-group scrollable"></div>
       <div class="popover-foot"><button type="button" data-clear="filter-state">Clear</button></div>
     </div>
@@ -1340,7 +1363,7 @@
 
 <main>
   <section id="feed">
-    <div id="listings-tab">
+    <div id="listings-tab" role="tabpanel" aria-labelledby="tab-listings" tabindex="0">
       <h2 class="sr-only">Listings</h2>
 
       <!-- Headline anchored in the most recent partial disclosures the
@@ -1382,23 +1405,23 @@
       <div class="banner" role="note" id="verify-banner">
         <span class="warn-ico">⚠</span>
         <div>Deadlines are parsed heuristically — always click through to the original PDF before applying.</div>
-        <button id="dismiss-banner" title="Dismiss" aria-label="Dismiss">×</button>
+        <button type="button" id="dismiss-banner" title="Dismiss" aria-label="Dismiss">×</button>
       </div>
 
       <div class="feed-list" id="feed-items"></div>
     </div>
 
-    <div id="saved-tab" style="display:none;"><h2 class="sr-only">Saved listings</h2></div>
+    <div id="saved-tab" role="tabpanel" aria-labelledby="tab-saved" tabindex="0" style="display:none;"><h2 class="sr-only">Saved listings</h2></div>
 
-    <div id="map-tab" style="display:none;">
+    <div id="map-tab" role="tabpanel" aria-labelledby="tab-map" tabindex="0" style="display:none;">
       <h2 class="sr-only">Institution map</h2>
       <div id="map-container"></div>
       <div class="map-legend" id="map-legend"></div>
     </div>
 
-    <div id="vacancies-tab" style="display:none;"><h2 class="sr-only">Vacancy data</h2></div>
+    <div id="vacancies-tab" role="tabpanel" aria-labelledby="tab-vacancies" tabindex="0" style="display:none;"><h2 class="sr-only">Vacancy data</h2></div>
 
-    <div id="resources-tab" style="display:none;"><h2 class="sr-only">Resources for candidates</h2></div>
+    <div id="resources-tab" role="tabpanel" aria-labelledby="tab-resources" tabindex="0" style="display:none;"><h2 class="sr-only">Resources for candidates</h2></div>
 
     <div id="coverage-tab" style="display:none;">
       <h2 class="sr-only">Scraper coverage</h2>
@@ -1872,6 +1895,15 @@ function isResearchMatch(ad) {
   return ad.post_type === "Research" || ad.post_type === "Scientific" ||
          /postdoc|post[- ]doc|research\s+fellow/.test(t);
 }
+// Visiting faculty is a distinct labour category — semester-bound, contractual,
+// no tenure track. The other predicates already exclude "visiting" from the
+// generic-Faculty branch, so this is additive, not overlapping. Keeps Visiting
+// Faculty ads from silently mixing into the Asst/Assoc/Full counts and gives
+// candidates an explicit toggle for them.
+function isVisitingMatch(ad) {
+  if (ad.post_type === "Visiting") return true;
+  return /\bvisiting\s+(faculty|professor|fellow|scholar|lecturer)\b/.test(_t(ad));
+}
 // Backwards-compatible alias used by quick-chip handlers and any older code.
 const isFacultyMatch = isAsstProfMatch;
 
@@ -2022,7 +2054,7 @@ function populateFilters() {
   const search = document.getElementById("search");
   if (search) search.value = "";
   const typeCounts = {}, stateCounts = {}, fieldCounts = {}, qualityCounts = { hss: 0, "non-hss": 0, other: 0 };
-  let facultyTotal = 0, associateTotal = 0, fullTotal = 0, researchTotal = 0;
+  let facultyTotal = 0, associateTotal = 0, fullTotal = 0, researchTotal = 0, visitingTotal = 0;
   for (const ad of ADS) {
     const inst = INSTITUTIONS[ad.institution_id] || {};
     if (inst.type) typeCounts[inst.type] = (typeCounts[inst.type] || 0) + 1;
@@ -2033,6 +2065,7 @@ function populateFilters() {
     if (isAssocProfMatch(ad)) associateTotal++;
     if (isFullProfMatch(ad)) fullTotal++;
     if (isResearchMatch(ad)) researchTotal++;
+    if (isVisitingMatch(ad)) visitingTotal++;
   }
 
   const orderedFields = [
@@ -2078,6 +2111,7 @@ function populateFilters() {
   document.getElementById("cnt-associate").textContent = associateTotal;
   document.getElementById("cnt-full").textContent = fullTotal;
   document.getElementById("cnt-research").textContent = researchTotal;
+  document.getElementById("cnt-visiting").textContent = visitingTotal;
 
   renderCheckboxes("filter-state",
     Object.keys(stateCounts).sort().map(s => ({ value: s, label: s, count: stateCounts[s] }))
@@ -2184,8 +2218,14 @@ function wireEvents() {
   // ---- Filter-strip popover open/close ---------------------------------
   // Click the trigger to toggle. Click outside to close. ESC closes too.
   // One open at a time so popovers don't overlap.
+  // Each open/close also flips `aria-expanded` on the trigger so AT users
+  // know the popover state matches what sighted users see.
   const closeAllDropdowns = () => {
-    document.querySelectorAll(".filter-dd.open").forEach(d => d.classList.remove("open"));
+    document.querySelectorAll(".filter-dd.open").forEach(d => {
+      d.classList.remove("open");
+      const trigger = d.querySelector(".filter-trigger");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    });
   };
   document.querySelectorAll(".filter-dd .filter-trigger").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -2193,7 +2233,10 @@ function wireEvents() {
       const dd = btn.closest(".filter-dd");
       const wasOpen = dd.classList.contains("open");
       closeAllDropdowns();
-      if (!wasOpen) dd.classList.add("open");
+      if (!wasOpen) {
+        dd.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+      }
     });
   });
   document.addEventListener("click", (e) => {
@@ -2257,11 +2300,20 @@ function wireEvents() {
   // Switch to the named tab — used both by user clicks and by hash routing.
   // Returns true if `name` matched a real tab. The hash is updated only
   // when the caller asks (so initial-load activation doesn't push history).
-  function activateTab(name, { writeHash = false } = {}) {
+  function activateTab(name, { writeHash = false, focusTab = false } = {}) {
     const btn = document.querySelector(`nav.tabs button[data-tab="${name}"]`);
     if (!btn) return false;
-    document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    // Flip the visual class AND the WAI-ARIA state in lockstep. aria-selected
+    // is what screen readers announce as the "selected" indicator; tabindex
+    // implements roving-tabindex (only the active tab is in the Tab order, so
+    // Tab moves out of the tablist instead of stepping through every tab).
+    document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => {
+      const isActive = (b === btn);
+      b.classList.toggle("active", isActive);
+      b.setAttribute("aria-selected", isActive ? "true" : "false");
+      b.setAttribute("tabindex", isActive ? "0" : "-1");
+    });
+    if (focusTab) btn.focus();
     for (const n of ["listings","saved","map","vacancies","resources","coverage"]) {
       const panel = document.getElementById(n + "-tab");
       if (panel) panel.style.display = (name === n) ? "" : "none";
@@ -2284,6 +2336,30 @@ function wireEvents() {
   document.querySelectorAll("nav.tabs button[data-tab]").forEach(btn => {
     btn.addEventListener("click", () => activateTab(btn.dataset.tab, { writeHash: true }));
   });
+
+  // WAI-ARIA tablist arrow-key navigation. Per
+  // https://www.w3.org/WAI/ARIA/apg/patterns/tabs/, ArrowLeft/ArrowRight
+  // moves between tabs (wrapping at the ends), Home jumps to the first tab,
+  // End to the last. Activating a tab via arrow keys focuses AND switches —
+  // the manual-activation pattern is allowed but the automatic-activation
+  // pattern matches the existing click behaviour and feels more natural for
+  // a small tablist where switching panels is cheap.
+  const tablist = document.querySelector("nav.tabs [role=tablist]");
+  if (tablist) {
+    tablist.addEventListener("keydown", (e) => {
+      const tabs = [...tablist.querySelectorAll('button[role="tab"]')];
+      const i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      let next = -1;
+      if (e.key === "ArrowRight") next = (i + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") next = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = tabs.length - 1;
+      if (next < 0) return;
+      e.preventDefault();
+      activateTab(tabs[next].dataset.tab, { writeHash: true, focusTab: true });
+    });
+  }
 
   // Hash routing: deep links (#vacancies, #resources, #map, #saved) survive
   // refresh, share, and the browser's back/forward buttons. `listings` is
@@ -2337,13 +2413,14 @@ function applyFilters(st) {
     if (st.types.size && !st.types.has(inst.type)) return false;
     if (st.states.size && !st.states.has(inst.state)) return false;
     if (st.posGroups.size) {
-      // Inclusive OR across the four checkboxes: ad passes if it matches
+      // Inclusive OR across the rank checkboxes: ad passes if it matches
       // any selected rank.
       const tests = {
         faculty:   () => isAsstProfMatch(ad),
         associate: () => isAssocProfMatch(ad),
         full:      () => isFullProfMatch(ad),
         research:  () => isResearchMatch(ad),
+        visiting:  () => isVisitingMatch(ad),
       };
       let any = false;
       for (const v of st.posGroups) { if (tests[v] && tests[v]()) { any = true; break; } }
@@ -2475,6 +2552,7 @@ function adPassesFilter(ad, st, skipDim) {
       associate: () => isAssocProfMatch(ad),
       full:      () => isFullProfMatch(ad),
       research:  () => isResearchMatch(ad),
+      visiting:  () => isVisitingMatch(ad),
     };
     let any = false;
     for (const v of st.posGroups) { if (tests[v] && tests[v]()) { any = true; break; } }
@@ -2494,7 +2572,7 @@ function updateReactiveCounts(st) {
     quality: { hss: 0, "non-hss": 0, other: 0 },
     type: {},
     state: {},
-    posgroup: { faculty: 0, associate: 0, full: 0, research: 0 },
+    posgroup: { faculty: 0, associate: 0, full: 0, research: 0, visiting: 0 },
   };
   for (const ad of ADS) {
     const inst = INSTITUTIONS[ad.institution_id] || {};
@@ -2509,6 +2587,7 @@ function updateReactiveCounts(st) {
       if (isAssocProfMatch(ad)) counts.posgroup.associate++;
       if (isFullProfMatch(ad))  counts.posgroup.full++;
       if (isResearchMatch(ad))  counts.posgroup.research++;
+      if (isVisitingMatch(ad))  counts.posgroup.visiting++;
     }
   }
   // Update the .cnt spans already rendered by populateFilters, and dim options
@@ -2582,11 +2661,11 @@ function renderActiveFilters(st) {
   c.innerHTML = chips.map(ch => {
     if (ch.kind === "hss-summary") {
       // Summary chip: clicking the label expands; clicking × clears all fields.
-      return `<span class="chip-active chip-summary" data-kind="hss-summary" title="Click to expand"><span class="grow">${escapeHTML(ch.label)} ▾</span><button data-kind="hss-clear" title="Clear all field selections" aria-label="Clear all field selections">×</button></span>`;
+      return `<span class="chip-active chip-summary" data-kind="hss-summary" title="Click to expand"><span class="grow">${escapeHTML(ch.label)} ▾</span><button type="button" data-kind="hss-clear" title="Clear all field selections" aria-label="Clear all field selections">×</button></span>`;
     }
     const removeLabel = `Remove filter: ${ch.label}`;
-    return `<span class="chip-active">${escapeHTML(ch.label)}<button data-kind="${ch.kind}" data-val="${escapeAttr(ch.val)}" title="${escapeAttr(removeLabel)}" aria-label="${escapeAttr(removeLabel)}">×</button></span>`;
-  }).join("") + `<button class="chip-clear" id="clear-filters">Clear all</button>`;
+    return `<span class="chip-active">${escapeHTML(ch.label)}<button type="button" data-kind="${ch.kind}" data-val="${escapeAttr(ch.val)}" title="${escapeAttr(removeLabel)}" aria-label="${escapeAttr(removeLabel)}">×</button></span>`;
+  }).join("") + `<button type="button" class="chip-clear" id="clear-filters">Clear all</button>`;
 
   // Expand-on-click for summary chip (clicking anywhere on chip except the ×).
   c.querySelectorAll(".chip-summary").forEach(chip => {
@@ -2977,7 +3056,7 @@ function renderAd(ad) {
       </div>
       <div class="row-deadline">${deadlineHTML}</div>
       <div class="row-actions">
-        <button class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
+        <button type="button" class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
       </div>
       ${areasHTML ? `<div class="row-areas">${escapeHTML(cleanedExcerpt).slice(0, 500)}${cleanedExcerpt.length > 500 ? "…" : ""}</div>` : ""}
       ${reservPillsHTML}
