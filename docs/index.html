@@ -21,7 +21,13 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500&display=swap" />
+<!-- Typography: switched the display face from Source Serif 4 (the Google
+     Fonts default pairing) to Newsreader by Production Type (Google
+     Fonts, OFL — fully FOSS). Newsreader was designed for screen news
+     consumption; it has stronger editorial register than Source Serif
+     and reads as a publication wordmark, not a docs-site default.
+     Inter and JetBrains Mono retained (both OFL/FOSS). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" />
 <script>
 // Apply theme synchronously before paint so there's no light-mode flash on
 // reload. Source of truth: localStorage["hei.theme"]; falls back to OS pref.
@@ -50,19 +56,27 @@
      right political associations that would muddy the message.
      ============================================================ */
   :root {
-    --bg: #f5f4ef;
-    --panel: #ffffff;
-    --ink: #0f0f12;
-    --muted: #5f5d57;
-    --muted-soft: #8a8780;
-    --accent: #1f3a8a;       /* Ambedkar / BSP cobalt */
-    --accent-deep: #14266b;  /* darker cobalt for hover/pressed */
-    --warn: #a06000;
-    --alarm: #c8102e;        /* Dalit Panther / protest red */
+    /* Palette redesign: moved off the generic civic-tech (cobalt + alarm
+       red on white) palette into a warmer, broadsheet-publication
+       register. Ivory background instead of pure-white, oxblood instead
+       of generic alarm red (more specifically the Dalit Panther
+       saturated red the page already cites in comments), warmer-ink
+       text instead of cool charcoal. The cobalt stays — it's the
+       Ambedkarite anti-caste color of the project — but goes deeper
+       and less bureaucratic-bright. */
+    --bg: #f5f0e6;            /* ivory cream — broadsheet paper */
+    --panel: #ffffff;          /* card surfaces stay white for contrast */
+    --ink: #1a1612;            /* warm near-black, prints feel */
+    --muted: #6b5e50;          /* warm taupe-gray for secondary text */
+    --muted-soft: #a39584;     /* even softer warm gray */
+    --accent: #1a3a5e;         /* newspaper-navy / Ambedkar cobalt, deepened */
+    --accent-deep: #112944;    /* hover / pressed */
+    --warn: #8a5a18;           /* warmer amber */
+    --alarm: #7a1620;          /* oxblood — Dalit Panther saturated red */
     --good: #1b5e20;
-    --border: #d8d6cf;
-    --chip-bg: #ebeae3;
-    --serif: "Source Serif 4", Georgia, serif;
+    --border: #d4cdb8;         /* warmer cream-tan border */
+    --chip-bg: #ebe4d3;        /* warm cream chip background */
+    --serif: "Newsreader", "Source Serif 4", Georgia, serif;
     --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
     color-scheme: light;
   }
@@ -117,17 +131,103 @@
      still has a face but doesn't compete with the headline. */
   /* The 6px red strip is the Bahujan radical-tradition signature
      (Dalit Panthers / protest red). Politically explicit, not subtle. */
-  header.masthead { background: var(--panel); border-top: 6px solid var(--alarm); border-bottom: 1px solid var(--border); padding: 36px 32px 26px; text-align: center; }
-  header.masthead .text-wrap { max-width: 760px; margin: 0 auto; }
-  header.masthead h1 { margin: 0; font-family: var(--serif); font-size: 38px; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
-  header.masthead .subtitle { display: block; color: var(--muted); font-size: 13px; font-style: italic; margin-top: 4px; }
+  /* Masthead — broadsheet wordmark register. Was: 38px h1 + small italic
+     subtitle on white, no anchoring. Now: an issue/date eyebrow, a
+     larger Newsreader wordmark, a serif italic standfirst, with
+     vertical rules above and below to feel like a publication
+     nameplate. The 6px Dalit Panther red strip stays. */
+  header.masthead {
+    background: var(--bg); /* ivory, not white — distinguishes masthead from cards */
+    border-top: 6px solid var(--alarm);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 32px 32px;
+    text-align: center;
+  }
+  header.masthead .text-wrap { max-width: 820px; margin: 0 auto; }
+  header.masthead .nameplate-eyebrow {
+    font-family: var(--sans);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted);
+    margin: 0 0 18px;
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  header.masthead .nameplate-eyebrow::before,
+  header.masthead .nameplate-eyebrow::after {
+    content: ""; width: 32px; height: 1px; background: var(--border);
+  }
+  header.masthead h1 {
+    margin: 0;
+    font-family: var(--serif); font-size: 56px; font-weight: 700;
+    color: var(--accent); letter-spacing: -0.025em; line-height: 1;
+    font-feature-settings: "ss01" 1;  /* Newsreader stylistic alt */
+  }
+  header.masthead .subtitle {
+    display: block; max-width: 580px; margin: 16px auto 0;
+    font-family: var(--serif); font-style: italic;
+    color: var(--ink); font-size: 16px; line-height: 1.55; font-weight: 400;
+  }
+  @media (max-width: 720px) {
+    header.masthead h1 { font-size: 36px; }
+    header.masthead .subtitle { font-size: 14px; }
+    header.masthead .nameplate-eyebrow { font-size: 10px; letter-spacing: 0.14em; }
+  }
   /* "Public-interest service" tag in the footer disclaimer. Cobalt
      to align with the political register; everything else in the
      footer keeps its muted-gray paragraph style. */
   /* The "Public-interest service" tag uses Dalit Panther red — the
      framing is an editorial claim, not a constitutional reference, so
      it earns the protest register rather than cobalt. */
-  footer .disc-tag { color: var(--alarm); font-weight: 700; margin-right: 4px; letter-spacing: 0.01em; text-transform: uppercase; font-size: 11.5px; }
+  /* Footer — was a single small gray paragraph that read as "and one
+     more thing". Now: a real publication colophon — mission statement,
+     credit line, last-updated date, license, contact, repo. */
+  footer.colophon {
+    background: var(--bg);
+    border-top: 6px solid var(--alarm);
+    margin-top: 48px;
+    padding: 48px 32px 56px;
+    color: var(--ink);
+  }
+  footer.colophon .colophon-inner {
+    max-width: 1080px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px;
+  }
+  footer.colophon .colophon-mission h3 {
+    font-family: var(--serif); font-size: 22px; font-weight: 600;
+    color: var(--ink); margin: 0 0 14px; letter-spacing: -0.012em;
+  }
+  footer.colophon .colophon-mission p {
+    font-family: var(--serif); font-size: 15px; line-height: 1.65;
+    color: var(--ink); margin: 0 0 12px; max-width: 60ch;
+  }
+  footer.colophon .colophon-mission p.colophon-verdict {
+    font-style: italic; border-left: 3px solid var(--alarm);
+    padding-left: 14px; margin-top: 18px; color: var(--ink);
+  }
+  footer.colophon dl.colophon-meta { margin: 0; font-family: var(--sans); font-size: 13px; }
+  footer.colophon dl.colophon-meta dt {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--alarm); margin-top: 16px;
+  }
+  footer.colophon dl.colophon-meta dt:first-of-type { margin-top: 0; }
+  footer.colophon dl.colophon-meta dd {
+    margin: 4px 0 0; color: var(--ink); line-height: 1.55;
+  }
+  footer.colophon dl.colophon-meta dd a {
+    color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent);
+  }
+  footer.colophon dl.colophon-meta dd a:hover { background: var(--accent); color: var(--bg); }
+  footer.colophon .colophon-rule { border: none; height: 1px; background: var(--border); margin: 32px 0 18px; }
+  footer.colophon .colophon-tagline {
+    font-family: var(--sans); font-size: 11.5px; color: var(--muted);
+    text-align: center; letter-spacing: 0.04em;
+  }
+  footer.colophon .colophon-tagline .verdict-mark {
+    color: var(--alarm); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  @media (max-width: 720px) {
+    footer.colophon { padding: 32px 16px 40px; }
+    footer.colophon .colophon-inner { grid-template-columns: 1fr; gap: 28px; }
+  }
   header.masthead p { margin: 10px auto 0; color: var(--muted); font-size: 13px; max-width: 720px; line-height: 1.55; }
 
   /* ============================================================
@@ -324,16 +424,58 @@
   /* Vacancy-gap headline banner — sits above filters on the Listings tab.
      Cobalt + red split: cobalt for the "should be" number, red for the gap.
      This is the page's central claim, not decoration. */
-  .vacancy-gap-banner { background: var(--panel); border: 1.5px solid var(--border); border-left: 5px solid var(--alarm); border-radius: 10px; padding: 16px 20px; margin: 0 0 16px; }
-  .vacancy-gap-banner .vgb-headline { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1.45; margin-bottom: 8px; }
-  .vacancy-gap-banner .vgb-num { font-weight: 800; color: var(--alarm); font-size: 22px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; padding: 0 2px; }
+  /* Hero — full-bleed cream-tinted band that introduces the listings.
+     Was: bordered card sitting in the listings flow, competing with
+     the filter strip and the verify-banner. Now: a true editorial hero
+     that lands the central claim before any UI furniture. */
+  .vacancy-gap-banner {
+    /* Full-bleed: viewport-width breakout regardless of `main`'s max-width.
+       The trick — width:100vw + margin-left:calc(-50vw + 50%) — keeps the
+       element centered in its parent while spanning the entire window.
+       Standard pattern in modern editorial design. */
+    background: linear-gradient(180deg, #efe5d0 0%, #f5f0e6 100%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-top: -18px;                /* eat the main top padding */
+    margin-bottom: 32px;
+    padding: 64px 32px 56px;
+    position: relative;
+  }
+  .vacancy-gap-banner::before {
+    /* a thin oxblood rule across the top — masthead-to-hero connection */
+    content: ""; position: absolute; left: 0; right: 0; top: 0;
+    height: 2px; background: var(--alarm);
+  }
+  .vacancy-gap-banner .vgb-inner { max-width: 760px; margin: 0 auto; }
+  .vacancy-gap-banner .vgb-eyebrow {
+    font-family: var(--sans); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--alarm); margin: 0 0 20px;
+  }
+  .vacancy-gap-banner .vgb-headline {
+    font-family: var(--serif); font-size: 34px; font-weight: 600;
+    color: var(--ink); line-height: 1.18; letter-spacing: -0.012em;
+    margin: 0 0 18px;
+  }
+  .vacancy-gap-banner .vgb-num {
+    font-weight: 800; color: var(--alarm); font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em; padding: 0;
+  }
   .vacancy-gap-banner .vgb-num#vgb-ads { color: var(--accent); }
   .vacancy-gap-banner .vgb-vs { color: var(--muted); margin: 0 4px; }
   .vacancy-gap-banner .vgb-detail { font-size: 14px; color: var(--muted); font-weight: 500; }
-  .vacancy-gap-banner .vgb-sub { font-size: 13px; color: var(--ink); line-height: 1.55; }
-  .vacancy-gap-banner .vgb-sub #vgb-ratio { font-weight: 700; color: var(--alarm); }
-  .vacancy-gap-banner .vgb-sub a { color: var(--accent); text-decoration: none; font-weight: 600; }
-  .vacancy-gap-banner .vgb-sub a:hover { text-decoration: underline; }
+  .vacancy-gap-banner .vgb-sub {
+    font-size: 15px; color: var(--ink); line-height: 1.6; max-width: 60ch;
+    font-family: var(--serif); font-style: italic;
+  }
+  .vacancy-gap-banner .vgb-sub #vgb-ratio { font-weight: 700; color: var(--alarm); font-style: normal; }
+  .vacancy-gap-banner .vgb-sub a { color: var(--accent); text-decoration: none; font-weight: 600; font-style: normal; border-bottom: 1px solid var(--accent); }
+  .vacancy-gap-banner .vgb-sub a:hover { background: var(--accent); color: var(--bg); }
+  html[data-theme="dark"] .vacancy-gap-banner {
+    background: linear-gradient(180deg, #1a1c26 0%, #0c0d11 100%);
+  }
   .feed-list { display: flex; flex-direction: column; gap: 10px; }
   /* Load-more button — large, satisfying tap target. Cobalt to align with
      the political register; the chevron suggests progressive expansion. */
@@ -1087,8 +1229,9 @@
 <a class="skip-link" href="#feed">Skip to listings</a>
 <header class="masthead">
   <div class="text-wrap">
+    <p class="nameplate-eyebrow">An investigation · India · 2026</p>
     <h1>Whose University?</h1>
-    <span class="subtitle" style="display:block; color:var(--muted); font-size:13px; font-style:italic; margin-top:6px; max-width:580px; margin-left:auto; margin-right:auto;">A public-interest tracker of faculty positions in India's centrally-funded higher-education institutions, paired with an investigation into who is being kept out of the cadre and how.</span>
+    <p class="subtitle">A public-interest tracker of faculty positions in India's centrally-funded higher-education institutions, paired with an investigation into who is being kept out of the cadre and how.</p>
   </div>
 </header>
 
@@ -1200,13 +1343,16 @@
            (Feb 2026) ≈ 10,637 visible standing vacancies, plus IIT/IIM/NIT/
            IIIT residuals that the Ministry refuses to disclose. -->
       <div class="vacancy-gap-banner" id="vacancy-gap-banner">
-        <div class="vgb-headline">
-          <span class="vgb-num" id="vgb-vacant">10,637</span> known vacancies.
-          <span class="vgb-num" id="vgb-ads">—</span> advertised.
-          <span style="color:var(--alarm); font-weight:800;" id="vgb-ratio">—</span>
-        </div>
-        <div class="vgb-sub">
-          Institutions keep the rest open instead of filling them. <a href="#vacancies" data-tab-link="vacancies">See the breakdown →</a>
+        <div class="vgb-inner">
+          <p class="vgb-eyebrow">The vacancy gap</p>
+          <h2 class="vgb-headline">
+            <span class="vgb-num" id="vgb-vacant">10,637</span> known vacancies.
+            <span class="vgb-num" id="vgb-ads">—</span> advertised.
+            <span id="vgb-ratio">—</span>
+          </h2>
+          <p class="vgb-sub">
+            Institutions keep the rest open instead of filling them. <a href="#vacancies" data-tab-link="vacancies">See the breakdown →</a>
+          </p>
         </div>
       </div>
 
@@ -1259,9 +1405,35 @@
   </section>
 </main>
 
-<footer>
-  <p><strong class="disc-tag">Public-interest service.</strong> Listings are scraped from institutional websites and parsed automatically. Mistakes are possible — extraction errors, stale data, missing posts. <strong>Always verify against the official institutional advertisement and the application portal before applying.</strong> This site does not replace the original notification; it surfaces it. No personal data collected.</p>
-  <p>Source code and contribution guide: see repository.</p>
+<footer class="colophon">
+  <div class="colophon-inner">
+    <div class="colophon-mission">
+      <h3>About this project</h3>
+      <p>An independent, public-interest tracker of faculty positions in India's centrally-funded higher-education institutions, paired with a corpus-driven investigation into how the constitutional reservation regime is being administered in faculty hiring. Built on 741 parliamentary questions, multi-year vacancy disclosures, and an ongoing scrape of institutional advertisements.</p>
+      <p>Listings are scraped from official institutional websites and parsed automatically. Mistakes are possible — extraction errors, stale data, missing posts. Always verify against the official advertisement and application portal before applying. This site does not replace the original notification; it surfaces it.</p>
+      <p class="colophon-verdict">The Constitution is not being violated by accident. It is being administered to that effect.</p>
+    </div>
+    <dl class="colophon-meta">
+      <dt>Last data update</dt>
+      <dd id="colophon-updated">—</dd>
+
+      <dt>Maintenance</dt>
+      <dd>Independent project. No funding. No personal data collected.</dd>
+
+      <dt>Code &amp; data</dt>
+      <dd><a href="https://github.com/freelibraries4all/academiaindia" target="_blank" rel="noopener">github.com/freelibraries4all/academiaindia</a></dd>
+
+      <dt>License</dt>
+      <dd>Code: MIT. Data &amp; corpus: CC&nbsp;BY-SA&nbsp;4.0. Cite as appropriate.</dd>
+
+      <dt>Corrections</dt>
+      <dd>Open an issue on the repo or write to the maintainer.</dd>
+    </dl>
+  </div>
+  <hr class="colophon-rule" />
+  <p class="colophon-tagline">
+    <span class="verdict-mark">Public-interest service</span> · Built in solidarity with Bahujan PhD scholars · whoseuniversity.org
+  </p>
 </footer>
 
 <script>
@@ -1766,6 +1938,16 @@ async function loadData() {
     ADS = current.ads || [];
     COVERAGE = coverage;
     for (const inst of registry) INSTITUTIONS[inst.id] = inst;
+    // Footer colophon — surface the data freshness as a human-readable
+    // date so visitors can judge whether the site is being maintained.
+    const updatedEl = document.getElementById("colophon-updated");
+    if (updatedEl && current.generated_at) {
+      try {
+        const d = new Date(current.generated_at);
+        const fmt = d.toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+        updatedEl.textContent = `${fmt} · ${ADS.length} listings tracked`;
+      } catch { updatedEl.textContent = current.generated_at; }
+    }
   } catch (e) {
     document.getElementById("feed-items").innerHTML = `<div class="banner"><strong>Data unavailable.</strong> Run <code>python scraper/run.py</code> to generate <code>data/current.json</code>.</div>`;
     return;
