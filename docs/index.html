@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Whose University? · faculty vacancy and disclosure regression in centrally-funded Indian HEIs</title>
-<meta name="description" content="A public-interest tracker of faculty positions at India's centrally-funded higher-education institutions, paired with an investigation into how the state administers the constitutional reservation regime in faculty hiring." />
+<title>Whose University? · A public-interest tracker of academic work in India</title>
+<meta name="description" content="A public-interest tracker of academic work in India — faculty, visiting, and postdoctoral positions across central HEIs, IIMs, IITs, AIIMS, and major private universities. Compiled from publicly available recruitment notices for research and reference; verify with the issuing institution before applying." />
 <link rel="canonical" href="https://whoseuniversity.org/" />
 
 <!-- Favicon: SVG scales cleanly at all sizes; oxblood rounded-square, ivory "?" -->
@@ -14,8 +14,8 @@
 <!-- Open Graph + Twitter card metadata for social sharing -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Whose University?" />
-<meta property="og:title" content="Whose University? — what India's state elites are doing to Bahujan PhDs" />
-<meta property="og:description" content="Five years of parliamentary record reveal seven specific things the Indian state is doing to its Bahujan PhD class. Each documented with the chart that proves it." />
+<meta property="og:title" content="Whose University? — A public-interest tracker of academic work in India" />
+<meta property="og:description" content="Faculty, visiting, and postdoctoral positions across central HEIs, IIMs, IITs, AIIMS, and major private universities, paired with a parliamentary-record investigation of vacancy disclosure. Research and reference only — verify with the issuing institution before applying." />
 <meta property="og:url" content="https://whoseuniversity.org/" />
 <meta property="og:locale" content="en_IN" />
 <meta property="og:image" content="https://whoseuniversity.org/og.svg" />
@@ -23,8 +23,8 @@
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Whose University? — public-interest research on India's higher-education institutions" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Whose University? — faculty vacancy and disclosure regression in Indian HEIs" />
-<meta name="twitter:description" content="546 parliamentary questions in five years. 1 MP got the rank-by-category vacancy data. The rest got Mission Mode boilerplate." />
+<meta name="twitter:title" content="Whose University? — A public-interest tracker of academic work in India" />
+<meta name="twitter:description" content="Faculty, visiting, and postdoctoral positions across central HEIs, IIMs, IITs, AIIMS, and major private universities. Compiled from public recruitment notices; verify with the issuing institution before applying." />
 <meta name="twitter:image" content="https://whoseuniversity.org/og.png" />
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -487,6 +487,11 @@
     font-family: var(--serif); font-style: italic;
   }
   .vacancy-gap-banner .vgb-sub #vgb-ratio { font-weight: 700; color: var(--alarm); font-style: normal; }
+  .vacancy-gap-banner .vgb-disclaimer {
+    font-family: var(--sans, "Inter"); font-size: 12px; color: var(--muted);
+    margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.08);
+    line-height: 1.5; max-width: 60ch; font-style: italic;
+  }
   .vacancy-gap-banner .vgb-sub a { color: var(--accent); text-decoration: none; font-weight: 600; font-style: normal; border-bottom: 1px solid var(--accent); }
   .vacancy-gap-banner .vgb-sub a:hover { background: var(--accent); color: var(--bg); }
   html[data-theme="dark"] .vacancy-gap-banner {
@@ -532,6 +537,10 @@
   /* Job-type / contract pills — muted chips. */
   .listing .meta-pill.m-job { background: var(--chip-bg); color: var(--muted); border: 1px solid var(--border); font-weight: 400; }
   .listing .meta-pill.m-job.lowconf { background: #fde2d6; color: #8a3a1a; border-color: #f5c5a8; font-weight: 500; }
+  /* Hand-transcribed entries (no primary-source URL on the institution's
+     own site). Yellow-on-tan to differentiate from rough-parse red, while
+     still flagging "verify before relying on this". */
+  .listing .meta-pill.m-job.manual-stub-pill { background: #fef3c7; color: #78350f; border-color: #fde68a; font-weight: 500; cursor: help; }
   .listing .meta-tert { color: #545049; font-size: 11.5px; padding: 0 2px; }
   html[data-theme="dark"] .listing .meta-tert { color: #b3aea3; }
 
@@ -1276,7 +1285,7 @@
 <header class="masthead">
   <div class="text-wrap">
     <h1>Whose University?</h1>
-    <p class="subtitle">A public-interest tracker of academic work opportunities in India.</p>
+    <p class="subtitle">A public-interest tracker of academic work in India.</p>
   </div>
 </header>
 
@@ -1406,6 +1415,9 @@
           <p class="vgb-sub">
             Institutions keep the rest open instead of filling them. <a href="#vacancies" data-tab-link="vacancies">See the breakdown →</a>
           </p>
+          <p class="vgb-disclaimer">
+            Compiled from public recruitment notices for research and reference. Verify with the issuing institution before applying. Errors possible.
+          </p>
         </div>
       </div>
 
@@ -1462,8 +1474,10 @@
   <div class="colophon-inner">
     <div class="colophon-mission">
       <h3>About this project</h3>
-      <p>An independent, public-interest tracker of faculty positions in India's centrally-funded higher-education institutions, paired with a corpus-driven investigation into how the constitutional reservation regime is being administered in faculty hiring. Built on 741 parliamentary questions, multi-year vacancy disclosures, and an ongoing scrape of institutional advertisements.</p>
-      <p>Listings are scraped from official institutional websites and parsed automatically. Mistakes are possible — extraction errors, stale data, missing posts. Always verify against the official advertisement and application portal before applying. This site does not replace the original notification; it surfaces it.</p>
+      <p>An independent, public-interest tracker of academic work in India — faculty, visiting, and postdoctoral positions across central HEIs, IIMs and IITs, AIIMS, and major private universities. Paired with a corpus-driven investigation, in <em>The Gap</em>, into how the state's vacancy-disclosure regime is being administered. Built on 741 parliamentary questions, multi-year vacancy disclosures, and an ongoing scrape of institutional advertisements.</p>
+      <p><strong>No warranty; verify before applying.</strong> Listings are scraped from official institutional websites, parsed automatically, and occasionally hand-transcribed from circulated recruitment cards. Errors are possible — extraction errors, stale data, missing posts, transcription gaps. Always verify against the official advertisement and application portal before applying. This site does not replace the original notification; it surfaces it.</p>
+      <p><strong>Independence and use at own risk.</strong> The site is not affiliated with, endorsed by, or operated on behalf of any institution listed. The maintainer makes no warranty as to the accuracy, completeness, currency, or availability of any position. Use of this information is at the reader's own risk. The site collects no personal data about visitors; it stores no application records and acts as an index, not an intermediary.</p>
+      <p><strong>Analytical content.</strong> Material in <em>The Gap</em> is the maintainer's research interpretation of publicly available parliamentary records, court orders, and official Ministry communications, all of which are cited in the source bibliography on that page. It is offered as research-and-reference public-interest commentary; it is not legal advice and not an allegation against any individual.</p>
       <p class="colophon-verdict">The Constitution is not being violated by accident. It is being administered to that effect.</p>
     </div>
     <dl class="colophon-meta">
@@ -2958,6 +2972,14 @@ function renderAd(ad) {
   if (ad.number_of_posts) meta.push(`<span class="meta-pill m-job">${ad.number_of_posts} ${ad.number_of_posts === 1 ? "post" : "posts"}</span>`);
   if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) {
     meta.push(`<span class="meta-pill m-job lowconf">⚠ rough parse</span>`);
+  }
+  // Provenance disclaimer pill — surfaces hand-transcribed entries (the ones
+  // where _source_method indicates a manual transcription from a circulated
+  // card rather than a scrape from a primary URL). Reader sees the flag, can
+  // weight the entry accordingly. The full _source_note is in current.json
+  // for anyone reading the data directly.
+  if (ad._manual_stub && /manual transcription/i.test(ad._source_method || "")) {
+    meta.push(`<span class="meta-pill m-job manual-stub-pill" title="Hand-transcribed from a circulated recruitment card; only the application URL is verifiable. Verify with the issuing institution before applying.">⚑ manual entry</span>`);
   }
   // Reservation pills — colour-coded per category. Only render when the
   // schema has actual counts (not null and not all zero); otherwise the
@@ -4833,6 +4855,10 @@ async function renderVacancies() {
 
     <h2 style="font-family:var(--serif); font-size:30px; font-weight:700; color:var(--ink); padding-top:32px; margin:32px 0 8px; letter-spacing:-0.01em; max-width:780px; line-height:1.2;">The Constitution promised 63.5% of these faculty seats to Bahujan candidates. The seats sit vacant. The Ministry has stopped naming them by category.</h2>
     <p class="act-deck" style="font-size:15.5px; max-width:760px; line-height:1.55; margin:0 0 24px;">Five and a half years of parliamentary record show the Indian state doing <strong>seven specific things</strong> to its Bahujan PhD class. Each section below names one of them and shows the chart that proves it. Read straight through. Sources and methodology are at the end of the page.</p>
+    <p class="act-disclaimer" style="font-size:12.5px; max-width:760px; line-height:1.55; margin:0 0 32px; padding:10px 12px; border-left:3px solid var(--border); color:var(--muted); font-style:italic; background:rgba(0,0,0,0.02);">
+      <strong style="font-style:normal; color:var(--ink);">Scope and disclaimer.</strong>
+      The analysis below is restricted to <strong style="font-style:normal;">centrally-funded higher-education institutions</strong> — Central Universities, IIMs, IITs, NITs, IIITs, and the AIIMS network — the institutions subject to the Constitution's reservation mandate under the CEI(RTC) Act, 2019. Private universities are not included in this analytical scope. Material here is the maintainer's research interpretation of publicly available parliamentary records, court orders, and Ministry communications, all cited in the bibliography. It is research-and-reference public-interest commentary, not legal advice and not an allegation against any individual.
+    </p>
 
     ${chart0_volume()}
 
