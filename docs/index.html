@@ -298,12 +298,7 @@
 
   nav.tabs { background: var(--panel); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 4px; align-items: stretch; }
   nav.tabs .tabs-spacer { flex: 1; }
-  /* The tablist is the WAI-ARIA semantic container for the five tabs; visually
-     it stretches across the post-spacer area so `tab-saved` can be pushed to
-     the right edge inside the tablist (preserving the prior layout where Saved
-     was clustered with the theme-toggle on the right). */
-  nav.tabs .tablist { flex: 1; display: flex; gap: 4px; align-items: stretch; min-width: 0; }
-  nav.tabs .tablist .tab-saved { margin-left: auto; }
+  nav.tabs .tabs-right { flex: 1; display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
   nav.tabs button { background: transparent; border: none; padding: 14px 18px; font: inherit; font-size: 15px; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; font-weight: 600; }
   nav.tabs button.active,
   nav.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
@@ -749,10 +744,7 @@
                scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     nav.tabs::-webkit-scrollbar { display: none; }
     nav.tabs .tabs-spacer { display: none; }
-    /* Mobile: tablist contracts to its content so all 5 tabs scroll naturally;
-       Saved doesn't get pushed to the right edge (would force theme-toggle off-screen). */
-    nav.tabs .tablist { flex: 0 0 auto; gap: 0; }
-    nav.tabs .tablist .tab-saved { margin-left: 0; }
+    nav.tabs .tabs-right { flex: none; }
     nav.tabs button { padding: 12px 12px; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
     nav.tabs .theme-toggle { min-width: 40px; min-height: 40px; }
 
@@ -1220,6 +1212,34 @@
   #vacancies-tab .hero-stat-strip .hss-label { font-size: 12px; color: var(--ink); margin-top: 6px; line-height: 1.45; font-weight: 500; }
   #vacancies-tab .hero-stat-strip .hss-source { font-size: 10.5px; color: var(--muted); margin-top: 4px; font-style: italic; }
 
+  /* Reading-first: per-chart inline source/citation strips are hidden in
+     the main flow and re-collected into a single bibliography at the end of
+     the tab (built by renderVacancies after innerHTML is set). The original
+     elements remain in the DOM so the bibliography builder can read them;
+     `display: none` removes them from rendering AND from the AT tree. */
+  #vacancies-tab .chart-source,
+  #vacancies-tab .jbm-source,
+  #vacancies-tab .hero-stat-strip .hss-source { display: none; }
+
+  /* Bibliography block appended by JS at the end of #vacancies-tab. */
+  #vacancies-tab .gap-bibliography { margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--border); }
+  #vacancies-tab .gap-bibliography h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--ink); margin: 0 0 12px; letter-spacing: -0.01em; }
+  #vacancies-tab .gap-bibliography .bib-method { font-size: 14px; color: var(--ink); max-width: 760px; line-height: 1.6; margin: 0 0 20px; font-family: var(--serif); }
+  #vacancies-tab .gap-bibliography ol { font-size: 13px; color: var(--muted); max-width: 760px; line-height: 1.6; padding-left: 22px; margin: 0; font-family: var(--sans, "Inter"); }
+  #vacancies-tab .gap-bibliography ol li { margin-bottom: 10px; }
+  #vacancies-tab .gap-bibliography ol li strong { color: var(--ink); font-weight: 700; }
+
+  /* Mobile chart polish: SVG charts and card paddings shrink to make the
+     actual data area larger on small viewports. */
+  @media (max-width: 640px) {
+    #vacancies-tab svg { max-width: 100%; height: auto; }
+    #vacancies-tab .jbm-card { padding: 16px 12px; border-radius: 8px; }
+    #vacancies-tab .hs-num { font-size: 76px !important; }
+    #vacancies-tab .hero-stat-strip { grid-template-columns: 1fr !important; gap: 12px !important; }
+    #vacancies-tab .act-header .act-title { font-size: 20px; }
+    #vacancies-tab .act-deck { font-size: 15px; line-height: 1.5; }
+  }
+
   /* Section headers tightened */
   #vacancies-tab .act-header { margin: 56px 0 8px; padding-bottom: 12px; border-bottom: 2px solid var(--alarm); display: flex; align-items: baseline; gap: 12px; }
   #vacancies-tab .act-header .act-num { font-family: var(--mono); font-size: 11px; color: var(--alarm); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -1256,7 +1276,7 @@
 <header class="masthead">
   <div class="text-wrap">
     <h1>Whose University?</h1>
-    <p class="subtitle">A public-interest tracker of faculty positions in India's centrally-funded higher-education institutions, paired with an investigation into who is being kept out of the cadre and how.</p>
+    <p class="subtitle">A public-interest tracker of academic work opportunities in India.</p>
   </div>
 </header>
 
@@ -1270,24 +1290,26 @@
      the tab bar. The legacy `#search` hidden input still lives inside that
      strip for any code path that reads its value. -->
 
-<nav class="tabs" id="tabs" aria-label="Site sections">
+<!-- WAI-ARIA tablist pattern: role="tablist" sits on <nav> directly so the
+     visual flex layout (spacer + 4 middle tabs + tabs-right cluster) is
+     untouched. The theme-toggle is a non-tab button that lives inside the
+     tablist DOM-wise; AT announces it as "button, Toggle …" because it has
+     no role="tab", so it is not confused for a tab. Acceptable practical
+     deviation from "only tabs as children" in exchange for not breaking
+     the centred-cluster layout. -->
+<nav class="tabs" id="tabs" role="tablist" aria-label="Sections">
   <span class="tabs-spacer" aria-hidden="true"></span>
-  <!-- WAI-ARIA tablist pattern: all five tabs are siblings inside one
-       role="tablist" container. The "Saved" tab is pushed to the right via
-       `.tab-saved { margin-left: auto }` so the visual placement matches the
-       prior layout without scattering tabs across multiple DOM containers
-       (which would have required `aria-owns` to keep the tablist intact). -->
-  <div class="tablist" role="tablist" aria-label="Sections">
-    <button role="tab" type="button" id="tab-listings"  aria-selected="true"  aria-controls="listings-tab"  tabindex="0"  class="active" data-tab="listings">Listings <span class="tab-count" id="count-listings"></span></button>
-    <button role="tab" type="button" id="tab-map"       aria-selected="false" aria-controls="map-tab"       tabindex="-1" data-tab="map">Map</button>
-    <button role="tab" type="button" id="tab-vacancies" aria-selected="false" aria-controls="vacancies-tab" tabindex="-1" data-tab="vacancies">Vacancies</button>
-    <button role="tab" type="button" id="tab-resources" aria-selected="false" aria-controls="resources-tab" tabindex="-1" data-tab="resources">Resources</button>
-    <button role="tab" type="button" id="tab-saved"     aria-selected="false" aria-controls="saved-tab"     tabindex="-1" class="tab-saved" data-tab="saved">Saved <span class="tab-count" id="count-saved"></span></button>
-  </div>
-  <!-- Coverage is an internal monitoring dashboard — kept reachable via the
-       URL hash `#coverage` for maintainers, but removed from public nav so
-       end users aren't confused by parser-status noise. -->
-  <button class="theme-toggle" type="button" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">☾</button>
+  <button role="tab" type="button" id="tab-listings"  aria-selected="true"  aria-controls="listings-tab"  tabindex="0"  class="active" data-tab="listings">Vacancies <span class="tab-count" id="count-listings"></span></button>
+  <button role="tab" type="button" id="tab-map"       aria-selected="false" aria-controls="map-tab"       tabindex="-1" data-tab="map">Map</button>
+  <button role="tab" type="button" id="tab-vacancies" aria-selected="false" aria-controls="vacancies-tab" tabindex="-1" data-tab="vacancies">The Gap</button>
+  <button role="tab" type="button" id="tab-resources" aria-selected="false" aria-controls="resources-tab" tabindex="-1" data-tab="resources">Resources</button>
+  <span class="tabs-right">
+    <button role="tab" type="button" id="tab-saved" aria-selected="false" aria-controls="saved-tab" tabindex="-1" data-tab="saved">Saved <span class="tab-count" id="count-saved"></span></button>
+    <!-- Coverage is an internal monitoring dashboard — kept reachable via the
+         URL hash `#coverage` for maintainers, but removed from public nav so
+         end users aren't confused by parser-status noise. -->
+    <button class="theme-toggle" type="button" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">☾</button>
+  </span>
 </nav>
 
 <!-- ============================================================
@@ -1364,7 +1386,7 @@
 <main>
   <section id="feed">
     <div id="listings-tab" role="tabpanel" aria-labelledby="tab-listings" tabindex="0">
-      <h2 class="sr-only">Listings</h2>
+      <h2 class="sr-only">Vacancies</h2>
 
       <!-- Headline anchored in the most recent partial disclosures the
            Ministry has been forced to make. The 14,606 all-CHEI aggregate
@@ -2318,6 +2340,15 @@ function wireEvents() {
       const panel = document.getElementById(n + "-tab");
       if (panel) panel.style.display = (name === n) ? "" : "none";
     }
+    // Filter strip is only meaningful on tabs that filter the ad corpus —
+    // Vacancies (the listings feed) and Map. On The Gap, Resources, and
+    // Saved the filters do nothing; showing them adds clutter and implies
+    // they affect those views.
+    const filterStrip = document.getElementById("filter-strip");
+    if (filterStrip) {
+      const filtersApply = (name === "listings" || name === "map");
+      filterStrip.style.display = filtersApply ? "" : "none";
+    }
     if (name === "map") { initMap(); render(); }
     if (name === "saved") renderSaved();
     if (name === "vacancies") renderVacancies();
@@ -2344,7 +2375,7 @@ function wireEvents() {
   // the manual-activation pattern is allowed but the automatic-activation
   // pattern matches the existing click behaviour and feels more natural for
   // a small tablist where switching panels is cheap.
-  const tablist = document.querySelector("nav.tabs [role=tablist]");
+  const tablist = document.querySelector("nav.tabs[role=tablist]");
   if (tablist) {
     tablist.addEventListener("keydown", (e) => {
       const tabs = [...tablist.querySelectorAll('button[role="tab"]')];
@@ -4801,8 +4832,7 @@ async function renderVacancies() {
     ${ledeHtml}
 
     <h2 style="font-family:var(--serif); font-size:30px; font-weight:700; color:var(--ink); padding-top:32px; margin:32px 0 8px; letter-spacing:-0.01em; max-width:780px; line-height:1.2;">The Constitution promised 63.5% of these faculty seats to Bahujan candidates. The seats sit vacant. The Ministry has stopped naming them by category.</h2>
-    <p class="act-deck" style="font-size:15.5px; max-width:760px; line-height:1.55; margin:0 0 8px;">Five and a half years of parliamentary record show the Indian state doing <strong>seven specific things</strong> to its Bahujan PhD class. Each section below names one of them and shows the chart that proves it. Read straight through.</p>
-    <p class="act-deck" style="font-size:13px; color:var(--muted); max-width:760px; line-height:1.5; margin:0 0 8px; font-style:italic;">Corpus: <strong>546 Lok Sabha and Rajya Sabha questions</strong> on faculty vacancy in centrally-funded HEIs, Sep 2020 – Mar 2026. Systematically crawled from elibrary.sansad.in (Lok Sabha; DSpace API) and rsdoc.nic.in (Rajya Sabha) and filtered by Education-ministry tag and topical keyword. 213 LS + 333 RS = 546 unique answers in the analytical window.</p>
+    <p class="act-deck" style="font-size:15.5px; max-width:760px; line-height:1.55; margin:0 0 24px;">Five and a half years of parliamentary record show the Indian state doing <strong>seven specific things</strong> to its Bahujan PhD class. Each section below names one of them and shows the chart that proves it. Read straight through. Sources and methodology are at the end of the page.</p>
 
     ${chart0_volume()}
 
@@ -4889,6 +4919,43 @@ async function renderVacancies() {
       </div>
     </details>
   `;
+
+  // ---- Bibliography: collect every inline .chart-source / .jbm-source /
+  // hero-strip .hss-source after the innerHTML pass, deduplicate by HTML
+  // content, and append a single "Sources & methodology" section at the end
+  // of the tab. The inline elements remain in the DOM (CSS hides them); this
+  // way the bibliography auto-updates when a new chart with a new source is
+  // added — there's no second list to keep in sync.
+  const sourceEls = host.querySelectorAll(".chart-source, .jbm-source, .hero-stat-strip .hss-source");
+  const seen = new Set();
+  const items = [];
+  for (const el of sourceEls) {
+    let html = el.innerHTML.trim();
+    // Strip the leading "<strong>Source:</strong> " / "Sources:" prefix
+    // since the bibliography is itself "Sources" — the prefix is redundant.
+    html = html.replace(/^<strong>Sources?:<\/strong>\s*/i, "").replace(/^Sources?:\s*/i, "");
+    if (!html || seen.has(html)) continue;
+    seen.add(html);
+    items.push(`<li>${html}</li>`);
+  }
+  if (items.length) {
+    const bib = document.createElement("section");
+    bib.className = "gap-bibliography";
+    bib.id = "gap-sources";
+    bib.innerHTML = `
+      <h2>Sources &amp; methodology</h2>
+      <p class="bib-method">
+        <strong>Corpus:</strong> 546 Lok Sabha and Rajya Sabha questions on
+        faculty vacancy in centrally-funded HEIs, Sep 2020 – Mar 2026.
+        Systematically crawled from elibrary.sansad.in (Lok Sabha; DSpace API)
+        and rsdoc.nic.in (Rajya Sabha) and filtered by Education-ministry tag
+        and topical keyword. 213 LS + 333 RS = 546 unique answers in the
+        analytical window.
+      </p>
+      <ol>${items.join("")}</ol>
+    `;
+    host.appendChild(bib);
+  }
 }
 
 // ---------- resources tab ----------
