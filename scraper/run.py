@@ -613,8 +613,8 @@ if __name__ == "__main__":
     base = Path(__file__).resolve().parent.parent
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--registry", default=str(base / "data" / "institutions_registry.json"))
-    ap.add_argument("--out", default=str(base / "data"))
+    ap.add_argument("--registry", default=str(base / "docs" / "data" / "institutions_registry.json"))
+    ap.add_argument("--out", default=str(base / "docs" / "data"))
     ap.add_argument("--cache", default=str(base / ".cache"))
     ap.add_argument("--limit", type=int, default=None)
     args = ap.parse_args()
