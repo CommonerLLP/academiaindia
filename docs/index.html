@@ -486,6 +486,14 @@
   #resources-tab .rti-block { background: rgba(31,58,138,0.04); border: 1px solid rgba(31,58,138,0.18); border-radius: 10px; padding: 18px 22px; margin-bottom: 28px; }
   #resources-tab .rti-block h3 { border-left-color: var(--accent); margin-top: 0; }
   #resources-tab .rti-block .res-block-intro { font-size: 13px; line-height: 1.55; color: var(--ink); margin: 0 0 14px; }
+  #resources-tab .rti-block .rti-subhead { font-family: var(--sans); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin: 22px 0 10px; padding: 0; border: none; }
+  #resources-tab .rti-block .rti-subhead:first-of-type { margin-top: 6px; }
+  #resources-tab .rti-block .rti-subnote { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin: 0 0 12px; font-style: italic; }
+  #resources-tab .rti-block .indian-link-list { list-style: none; padding: 0; margin: 0 0 4px; display: flex; flex-direction: column; gap: 6px; }
+  #resources-tab .rti-block .indian-link-list li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  #resources-tab .rti-block .indian-link-list li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 13.5px; }
+  #resources-tab .rti-block .indian-link-list li a:hover { text-decoration: underline; }
+  #resources-tab .rti-block .indian-link-list li .res-note { font-size: 12px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
   #resources-tab .rti-grid { display: grid; gap: 10px; }
   #resources-tab .rti-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   #resources-tab .rti-card summary { padding: 12px 16px; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 14px; color: var(--ink); }
@@ -4944,15 +4952,19 @@ function renderResources() {
         </div>`).join("")}
     </div>`;
 
-  // RTI templates block — moved to the bottom (was at the top). The
-  // editorial argument: candidates' first move should be to apply
-  // (including abroad); RTI is the accountability tool that follows
-  // when an application encounters institutional opacity, not the
-  // first thing a Bahujan PhD should be asked to do.
-  const rtiBlock = `
+  // Combined Indian-institutions block — practical-infrastructure
+  // links and RTI templates are conceptually the same thing (both
+  // serve the candidate applying within India). Rendered as one
+  // unified block with two subsections under a single heading.
+  const indianBlockData = RESOURCES_BLOCKS[0];
+  const indianBlock = `
     <div class="res-block rti-block">
-      <h3>RTI templates — when the government won't disclose, you generate the data</h3>
-      <p class="res-block-intro">Four ready-to-paste Right to Information Act requests covering the most common institutional opacity patterns. Replace bracketed placeholders, send to the Public Information Officer of the relevant institution. Costs ₹10 per RTI; institutions are obligated to respond within 30 days.</p>
+      <h3>If you're applying to Indian institutions</h3>
+      <p class="res-block-intro">Practical infrastructure for Indian-institution applications — certificate authorities, parliamentary-question search, the statutory bodies that handle reservation-violation complaints — paired with ready-to-paste RTI templates for the data the institutions don't publish. The two are one toolkit: links above, templates below.</p>
+      <h4 class="rti-subhead">Practical infrastructure</h4>
+      <ul class="indian-link-list">${indianBlockData.items.map(renderItem).join("")}</ul>
+      <h4 class="rti-subhead">RTI templates — when the government won't disclose, you generate the data</h4>
+      <p class="rti-subnote">Four ready-to-paste Right to Information Act requests covering the most common institutional opacity patterns. Replace bracketed placeholders, send to the Public Information Officer of the relevant institution. Costs ₹10 per RTI; institutions are obligated to respond within 30 days.</p>
       <div class="rti-grid">
         ${RTI_TEMPLATES.map((t, i) => `
           <details class="rti-card">
@@ -4973,27 +4985,22 @@ function renderResources() {
       </div>
     </div>`;
 
-  // Render the Indian-applications block followed by the RTI templates
-  // as one conceptual unit (both serve the candidate applying within
-  // India), then render the remaining blocks. This keeps the RTI
-  // templates positioned with their natural audience instead of
-  // floating at the very bottom of the page.
+  // Render remaining (non-Indian-applications) blocks after the unified
+  // Indian-institutions block.
   const renderBlock = (b) => `
     <div class="res-block">
       <h3>${escapeHTML(b.title)}</h3>
       <ul>${b.items.map(renderItem).join("")}</ul>
     </div>`;
-  const indianApplyBlock = RESOURCES_BLOCKS.length ? renderBlock(RESOURCES_BLOCKS[0]) : "";
   const remainingBlocks = RESOURCES_BLOCKS.slice(1).map(renderBlock).join("");
 
   host.innerHTML = `
     <div class="res-intro">
       <h2>Resources for candidates</h2>
-      <p>Tools and references for Bahujan PhD scholars navigating the Indian academic job market — and the international fellowship circuit that runs alongside it. The page leads with postdoctoral routes abroad because, on the evidence of the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a>, applying within India alone is not a strategy. Indian-institution infrastructure (including RTI templates) and broader networks follow.</p>
+      <p>Tools and references for Bahujan PhD scholars navigating the Indian academic job market — and the international fellowship circuit that runs alongside it. The page leads with postdoctoral routes abroad because, on the evidence of the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a>, applying within India alone is not a strategy. Indian-institution infrastructure and broader networks follow.</p>
     </div>
     ${postdocBlock}
-    ${indianApplyBlock}
-    ${rtiBlock}
+    ${indianBlock}
     ${remainingBlocks}
   `;
 
