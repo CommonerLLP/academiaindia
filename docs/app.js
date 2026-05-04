@@ -1520,20 +1520,33 @@ function renderAd(ad) {
       ${ad.contact ? `<div class="detail-block"><span class="k">Contact</span><div class="v">${escapeHTML(ad.contact)}</div></div>` : ""}
     </details>` : "";
 
-  // ---- Card layout (discipline-first) ---------------------------------
-  // Three tight lines lead the card, in the order a candidate scans:
-  //   1. DISCIPLINE   (primary scan target — am I qualified?)
-  //   2. RANK · CONTRACT  (career-stage match — Asst/Assoc/Full · Permanent/Contract/Visiting)
-  //   3. INSTITUTION, CITY  (the institutional + geographic constraint)
-  // The reservation row, deadline, and actions follow. The institution's
-  // own ad title (e.g., "Faculty Positions in History") is no longer the
-  // headline — it appeared institutional-marketing-shaped and duplicated
-  // information already in the discipline + rank pills below.
+  // ---- Card layout (institution-first) --------------------------------
+  // Two-line headline scanned in <2 seconds:
+  //   1. INSTITUTION · CITY   (primary scan target — the candidate's
+  //      identity-of-employer, and the geographic constraint)
+  //   2. DISCIPLINE · RANK · CONTRACT
+  //
+  // Institution wins primacy because the filter strip already covers
+  // discipline / position / contract / location-state — so within any
+  // pre-filtered list, the institution name is the only thing left
+  // that differentiates one card from another. (We don't currently have
+  // a precise institution-name filter; until we do, the card itself has
+  // to make the institution scannable.) The discipline + rank + contract
+  // remain visible as a subhead so an unfiltered scroll is still useful.
 
-  const heading = cardDiscipline(ad);
+  const instName = inst.short_name || inst.name || "(institution unknown)";
+  // City as a parenthetical disambiguator — essential for multi-campus
+  // institutions where the same name covers multiple cities. Azim Premji
+  // University has campuses in Bengaluru, Bhopal, and Ranchi; AIIMS runs
+  // 20+ branded sites; BITS Pilani has Pilani / Goa / Hyderabad / Dubai.
+  // Without (City), a candidate cannot tell which campus a listing is for.
+  // We always show it (not styled as optional metadata) when the registry
+  // has the city; some redundancy with names that already include a city
+  // (e.g., "IIT Bombay (Mumbai)") is the lesser evil — clarity over
+  // brevity for an audience that includes international applicants.
+  const cityPart = inst.city ? ` <span class="card-campus">(${escapeHTML(inst.city)})</span>` : "";
+  const discipline = cardDiscipline(ad);
   const rankLine = cardRankLine(ad);
-  const instCity = inst.short_name || inst.name || "(institution unknown)";
-  const cityPart = inst.city ? `, ${escapeHTML(inst.city)}` : "";
   // A small flag-row for non-blocking but worth-knowing signals: low parse
   // confidence, hand-transcribed entry, posts count, posted/checked dates.
   const flags = [];
@@ -1659,9 +1672,12 @@ function renderAd(ad) {
       <div class="tier-bar"></div>
       <div class="card-body">
         <div class="card-headline">
-          <h3 class="card-discipline">${escapeHTML(heading)}</h3>
-          <p class="card-rank">${escapeHTML(rankLine)}</p>
-          <p class="card-inst">${escapeHTML(instCity)}${cityPart}</p>
+          <h3 class="card-institution">${escapeHTML(instName)}${cityPart}</h3>
+          <p class="card-subhead">
+            <span class="card-discipline">${escapeHTML(discipline)}</span>
+            <span class="card-sep">·</span>
+            <span class="card-rank">${escapeHTML(rankLine)}</span>
+          </p>
           ${flags.length ? `<div class="card-flags">${flags.join('')}</div>` : ""}
         </div>
         <div class="card-deadline">${deadlineHTML}</div>

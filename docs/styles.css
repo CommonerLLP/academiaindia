@@ -556,20 +556,38 @@
     align-items: start;
   }
   .listing .card-headline { min-width: 0; }
-  .listing .card-discipline {
+  /* Headline = institution + parenthetical campus city. The institution
+     is the candidate's primary scan target (the filter strip already
+     handles discipline / position / contract / location-state). The
+     campus city is rendered in muted weight to read as parenthetical
+     disambiguator without competing with the institution name. */
+  .listing .card-institution {
     margin: 0;
     font-family: var(--serif); font-size: 22px; font-weight: 700;
     line-height: 1.2; color: var(--ink); letter-spacing: -0.014em;
   }
-  .listing .card-rank {
-    margin: 4px 0 0;
-    font-family: var(--serif); font-size: 16px; font-weight: 500;
-    font-style: italic; color: var(--alarm); line-height: 1.4;
+  .listing .card-institution .card-campus {
+    font-family: var(--serif); font-weight: 500;
+    color: var(--muted); letter-spacing: 0;
   }
-  .listing .card-inst {
-    margin: 6px 0 0;
-    font-family: var(--sans); font-size: 14px; color: var(--ink);
-    line-height: 1.4;
+  /* Subhead carries the discipline + rank + contract in one line. The
+     discipline is the secondary scan target — bolder weight inside the
+     subhead, with the separator and rank in lighter weight. Italic
+     register matches the publication aesthetic without competing with
+     the headline. */
+  .listing .card-subhead {
+    margin: 5px 0 0;
+    font-family: var(--serif); font-size: 16px; line-height: 1.4;
+    color: var(--ink); font-style: italic;
+  }
+  .listing .card-subhead .card-discipline {
+    color: var(--alarm); font-weight: 600; font-style: normal;
+  }
+  .listing .card-subhead .card-sep {
+    color: var(--muted); margin: 0 6px; font-style: normal;
+  }
+  .listing .card-subhead .card-rank {
+    color: var(--ink); font-weight: 500;
   }
   /* Flag row: posts count + provenance flags + dates. Quiet, secondary. */
   .listing .card-flags {
@@ -594,9 +612,8 @@
     .listing { padding: 14px 16px 14px 18px; }
     .listing .card-body { grid-template-columns: 1fr auto; gap: 12px; }
     .listing .card-actions { display: none; }
-    .listing .card-discipline { font-size: 18px; }
-    .listing .card-rank { font-size: 14.5px; }
-    .listing .card-inst { font-size: 13px; }
+    .listing .card-institution { font-size: 18px; }
+    .listing .card-subhead { font-size: 14px; }
     .listing .card-deadline { min-width: 72px; }
   }
   /* Backwards-compat selectors so existing CSS for deadline / star /
