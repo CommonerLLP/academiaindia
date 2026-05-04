@@ -441,6 +441,27 @@
   #resources-tab .res-block li .ext { font-size: 11px; color: var(--muted); margin-left: 2px; }
   #resources-tab .res-block li .res-name { font-weight: 600; font-size: 14px; color: var(--ink); }
   #resources-tab .res-block li .res-note { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
+  /* Postdoc-abroad block — distinct register from the rest of the
+     Resources tab: a longer political introduction, sub-grouped lists
+     so candidates can navigate by program type rather than scrolling
+     through one flat list of 25 fellowships. */
+  #resources-tab .postdoc-block { background: rgba(180,30,40,0.025); border: 1px solid rgba(180,30,40,0.18); border-radius: 10px; padding: 20px 22px; margin-bottom: 32px; }
+  #resources-tab .postdoc-block h3 { border-left-color: var(--alarm); margin-top: 0; }
+  #resources-tab .postdoc-block .res-block-intro { font-size: 13.5px; line-height: 1.65; color: var(--ink); margin: 0 0 16px; max-width: 76ch; }
+  #resources-tab .postdoc-block .res-block-intro p { margin: 0 0 10px; }
+  #resources-tab .postdoc-block .res-block-intro p:last-child { margin-bottom: 0; }
+  #resources-tab .postdoc-block .res-block-intro em { color: var(--alarm); font-style: normal; font-weight: 600; }
+  #resources-tab .postdoc-subgroup { margin-top: 16px; }
+  #resources-tab .postdoc-subgroup h4 { font-family: var(--sans); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin: 0 0 10px; padding: 0; border: none; }
+  #resources-tab .postdoc-subgroup ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; grid-template-columns: 1fr; }
+  #resources-tab .postdoc-subgroup li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  #resources-tab .postdoc-subgroup li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 13.5px; }
+  #resources-tab .postdoc-subgroup li a:hover { text-decoration: underline; }
+  #resources-tab .postdoc-subgroup li .res-note { font-size: 12px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
+  #resources-tab .postdoc-subgroup li .ext { font-size: 11px; color: var(--muted); margin-left: 2px; }
+  @media (min-width: 720px) {
+    #resources-tab .postdoc-subgroup ul { grid-template-columns: 1fr 1fr; }
+  }
   /* RTI templates block — distinct visual register from the link-list
      blocks: this is action infrastructure, not reading. */
   #resources-tab .rti-block { background: rgba(31,58,138,0.04); border: 1px solid rgba(31,58,138,0.18); border-radius: 10px; padding: 18px 22px; margin-bottom: 28px; }
@@ -4696,6 +4717,83 @@ Yours sincerely,
   },
 ];
 
+// Postdoctoral fellowships abroad. Kept as a separate constant from
+// RESOURCES_BLOCKS because the rendering is different (sub-grouped, with a
+// long political introduction) and the editorial weight is different — this
+// is the page's strategic recommendation, not a list of links.
+//
+// The intro deliberately refuses to romanticise the move abroad as an
+// escape from caste. The Cisco caste-discrimination case (Doe v. Cisco
+// Systems, California Civil Rights Dept., 2020), California's SB 403 (2023),
+// and the addition of caste as a protected category at Brandeis, Cal State,
+// and Brown are evidence of caste reproducing inside US academic and tech
+// labour markets, not its absence (Bhattacharya 2024; Soundararajan 2022).
+// "Pedigree-from-elite-Indian-undergrad" preferences in US R1 hiring
+// (Subramanian 2019) are the same merit-as-caste filter operating one
+// tier up. The strategic case for applying is real; the political case
+// is mixed — the page presents both.
+const POSTDOC_ABROAD = {
+  title: "Postdoctoral fellowships abroad — strategic, not romantic",
+  cls: "postdoc-block",
+  intro: `
+    <p>These programs sit outside the Indian state's reservation regime — and outside its administered failure to implement it. They cannot replace structural reform of central HEI hiring, but for a Bahujan PhD facing the Indian academic job market documented in the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a> — 10,637 known vacancies processed into 335 advertised positions over five years — the pragmatic move is to build the international record that lets you set your terms when you return, or stay abroad on those terms.</p>
+    <p><em>Be clear-eyed.</em> These programs have their own pedigree filters. The "PhD-from-top-Indian-institution" preference is the same elite-undergraduate gatekeeping operating one tier up (Subramanian 2019). Recommendation letters are the chokepoint, and the savarna network that controls letter-writing in India travels with the candidate. The diaspora South Asian studies field has its own caste hierarchy: the Cisco caste-discrimination case (2020), California's SB 403 (2023), and the addition of caste as a protected category at Brandeis, Brown, and the Cal State system are evidence of caste reproducing inside US academic labour markets, not its absence (Bhattacharya 2024; Soundararajan 2022).</p>
+    <p>Apply widely. Most of these are fully funded for two to three years. Several explicitly support scholars from underrepresented backgrounds — find that language in the call and cite it in your statement. Deadlines below; verify on the program's own page before submitting.</p>`,
+  subgroups: [
+    {
+      title: "Society of Fellows / humanities & SSH postdocs (US)",
+      items: [
+        { name: "Harvard Society of Fellows (Junior Fellows)", url: "https://socfell.fas.harvard.edu/", note: "3-year, no teaching obligation, all disciplines including SSH and lab sciences. Letters-of-recommendation-driven; pedigree-sensitive." },
+        { name: "Princeton Society of Fellows in the Liberal Arts", url: "https://sf.princeton.edu/", note: "3-year, light teaching, humanities and humanistic social sciences. Reads applicants in cohorts; statement of purpose carries unusual weight." },
+        { name: "Columbia Society of Fellows in the Humanities", url: "https://societyoffellows.columbia.edu/", note: "3-year, teach one course/semester in the Core Curriculum, generous research budget. Humanities-focused; SSH at the qualitative end fits." },
+        { name: "Michigan Society of Fellows", url: "https://societyoffellows.umich.edu/", note: "3-year, half-time teaching, all disciplines. Has historically had stronger non-elite-pedigree intake than HSP/Princeton." },
+        { name: "Chicago Society of Fellows / Harper-Schmidt (Collegiate Asst Profs)", url: "https://socsci.uchicago.edu/society-fellows", note: "4-year, teach in the Core. Slightly different model — full-time teaching faculty position with research time, not a pure postdoc." },
+        { name: "Cornell Society for the Humanities", url: "https://societyhumanities.cornell.edu/", note: "1-year focus-themed fellowship; the annual theme determines the cohort. Lighter commitment, useful as a bridge year." },
+        { name: "Penn Wolf Humanities Center Postdoctoral Fellows", url: "https://wolfhumanities.upenn.edu/postdoctoral-fellowships", note: "1-year theme-based humanities fellowship at Penn. Smaller cohort, themed (recent: 'Migration', 'Choice', 'Breath')." },
+        { name: "Dartmouth Society of Fellows", url: "https://societyoffellows.dartmouth.edu/", note: "3-year, mixed teaching/research, all disciplines. Less pedigree-locked than Ivy SoFs in published cohort histories." },
+        { name: "Stanford Humanities Center fellowships", url: "https://shc.stanford.edu/", note: "External-faculty plus residential postdoc tracks. The Mellon Fellowship of Scholars in the Humanities is the relevant postdoc line." },
+      ],
+    },
+    {
+      title: "Area-studies postdocs — South Asia–relevant",
+      items: [
+        { name: "CASI — Center for the Advanced Study of India (UPenn)", url: "https://casi.sas.upenn.edu/", note: "Penn's South Asia centre. Postdoctoral fellows; Kapur and Mehta have run substantive critique programmes here. Apply if your work is on contemporary India political economy or social policy." },
+        { name: "Harvard Mittal South Asia Institute", url: "https://mittalsouthasiainstitute.harvard.edu/", note: "Postdoc programmes vary year to year; check the Fellowships page. Strong on contemporary India, public-policy adjacent." },
+        { name: "Harvard Academy for International and Area Studies", url: "https://academy.wcfia.harvard.edu/", note: "2-year postdoc, area-studies and international affairs. Politics, IR, sociology, anthro of non-US regions including South Asia." },
+        { name: "Yale South Asian Studies Council postdoctoral associate", url: "https://southasia.macmillan.yale.edu/", note: "Annual postdoc; competition usually announced late autumn. Yale's Whitney Humanities and the Edward J. and Dorothy Clarke Kempf Memorial Fund also support South Asia work." },
+        { name: "Princeton — PIIRS, South Asian Studies, Niehaus", url: "https://piirs.princeton.edu/", note: "PIIRS Postdoctoral Research Associate position runs annually, area- and theme-specific. Check the South Asian Studies Program and the Liechtenstein Institute on Self-Determination as well." },
+        { name: "Princeton — Niehaus Center for Globalization & Governance", url: "https://niehaus.princeton.edu/", note: "Postdoctoral research associate in international political economy / globalisation governance. Highly competitive but explicit interest in non-US scholars." },
+        { name: "Brown India Initiative / Watson Institute", url: "https://watson.brown.edu/southasia/", note: "Postdoctoral fellow in Contemporary South Asia at the Watson Institute; SSH-leaning, policy-adjacent. The India Initiative has run focused India-research postdocs." },
+        { name: "Chicago — Committee on Southern Asian Studies (COSAS)", url: "https://southasia.uchicago.edu/", note: "South Asia language and area training centre. Postdoctoral teaching fellowships in South Asian languages and area studies are advertised through COSAS and the Humanities Division." },
+        { name: "Columbia South Asia Institute", url: "https://southasia.columbia.edu/", note: "Postdoc and visiting-scholar programmes through SAI; check also the Saltzman Institute of War & Peace and the Institute for Comparative Literature & Society for crossover positions." },
+        { name: "NYU — fellowships directory (anthropology, SSH-wide)", url: "https://as.nyu.edu/departments/anthropology/graduate/fellowship-directory/postdoctoral-fellowships.html", note: "NYU Anthropology's curated catalogue of postdoctoral fellowships across programmes globally. Useful as an aggregator beyond what's listed here." },
+      ],
+    },
+    {
+      title: "Government & national programmes",
+      items: [
+        { name: "SSHRC Postdoctoral Fellowships (Canada)", url: "https://www.sshrc-crsh.gc.ca/funding-financement/programs-programmes/postdoctoral-postdoctorale-eng.aspx", note: "C$45,000/year for 2 years; SSH-specific. Open to non-Canadian citizens for postdocs at Canadian universities. Substantial cohort each year, less pedigree-skewed than US SoFs." },
+        { name: "Banting Postdoctoral Fellowships (Canada)", url: "https://banting.fellowships-bourses.gc.ca/en/home-accueil.html", note: "C$70,000/year for 2 years; the prestige tier of Canadian postdocs. Fewer slots, very competitive; nominated through host institution." },
+        { name: "JSPS Postdoctoral Fellowship — Standard (Japan)", url: "https://www.jsps.go.jp/english/e-ipd/", note: "12–24 months in Japan with full stipend, travel, settling-in allowance. Open to all disciplines; recommendation from a Japanese host required. JSPS Short-Term is also useful as a 1–12 month bridge." },
+        { name: "Marie Skłodowska-Curie Postdoctoral Fellowships (EU)", url: "https://marie-sklodowska-curie-actions.ec.europa.eu/actions/postdoctoral-fellowships", note: "European Postdoctoral Fellowships (12–24 months) and Global Fellowships (24–36 months, with outgoing phase). All disciplines; non-EU PhDs eligible. Annual call, usually April–September." },
+        { name: "Newton International Fellowships (UK)", url: "https://royalsociety.org/grants/newton-international-fellowships/", note: "2-year UK postdoc for non-UK PhDs; jointly administered by the Royal Society, British Academy, and Royal Academy of Engineering. SSH covered through the British Academy stream." },
+        { name: "British Academy Postdoctoral Fellowships", url: "https://www.thebritishacademy.ac.uk/funding/postdoctoral-fellowships/", note: "3-year SSH postdoc at a UK institution. Highly competitive; usually requires a UK PhD or equivalent residency — verify eligibility for non-UK PhDs each call." },
+        { name: "Humboldt Research Fellowship (Germany)", url: "https://www.humboldt-foundation.de/en/apply/sponsorship-programmes/humboldt-research-fellowship", note: "6–24 months at a German host institution; rolling deadlines, all disciplines. The Humboldt Foundation has explicitly supported scholars from the Global South." },
+        { name: "DAAD postdoctoral programmes (Germany)", url: "https://www.daad.de/en/study-and-research-in-germany/scholarships/", note: "Multiple postdoc tracks; the Postdoctoral Researchers International Mobility Experience (PRIME) and country-specific calls are the relevant entry points for Indian PhDs." },
+      ],
+    },
+    {
+      title: "Discipline-spanning humanities & social science",
+      items: [
+        { name: "ACLS — American Council of Learned Societies", url: "https://www.acls.org/", note: "Multiple postdoc programmes including the Emerging Voices Fellowship (focused on scholars from groups underrepresented in academia) and the Mellon/ACLS Scholars & Society. Some require US institutional affiliation; verify per call." },
+        { name: "Wenner-Gren Foundation postdoctoral grants (anthropology)", url: "https://wennergren.org/", note: "Hunt Postdoctoral Fellowship for write-up; Engaged Anthropology Grant for follow-up dissemination. Anthropology-specific; explicitly international applicant pool." },
+        { name: "SSRC International Dissertation Research Fellowship → postdoc bridges", url: "https://www.ssrc.org/", note: "SSRC's IDRF is mostly pre-doctoral, but the Council runs several postdoctoral and bridge fellowships (Mellon-Mays, Abe Fellowship Program for Japan-related work). Follow announcements." },
+        { name: "Mellon Foundation — Sawyer Seminars and partner postdocs", url: "https://www.mellon.org/grant-programs", note: "Mellon-funded postdocs are usually administered through host universities (Chicago, Princeton, Cornell etc.) rather than Mellon directly. Search 'Mellon postdoctoral' on department pages." },
+      ],
+    },
+  ],
+};
+
 const RESOURCES_BLOCKS = [
   {
     title: "If you're applying — practical infrastructure",
@@ -4737,6 +4835,38 @@ const RESOURCES_BLOCKS = [
 
 function renderResources() {
   const host = document.getElementById("resources-tab");
+
+  // Helper: render a single list item the same way for both flat and
+  // sub-grouped block schemas.
+  const renderItem = (i) => `
+    <li>
+      ${i.url && i.url !== "#"
+        ? `<a href="${escapeAttr(i.url)}" target="_blank" rel="noopener">${escapeHTML(i.name)} <span class="ext">↗</span></a>`
+        : `<span class="res-name">${escapeHTML(i.name)}</span>`}
+      <div class="res-note">${escapeHTML(i.note)}</div>
+    </li>`;
+
+  // Postdocs-abroad block — sub-grouped, with raw HTML in the intro
+  // (controlled, hand-authored — not user input — so the manual <p> and
+  // <a> tags are intentional). Renders first because the page's editorial
+  // recommendation to Bahujan PhDs is explicitly to apply abroad rather
+  // than wait for the Indian state to administer the constitution.
+  const postdocBlock = `
+    <div class="res-block ${escapeAttr(POSTDOC_ABROAD.cls)}">
+      <h3>${escapeHTML(POSTDOC_ABROAD.title)}</h3>
+      <div class="res-block-intro">${POSTDOC_ABROAD.intro}</div>
+      ${POSTDOC_ABROAD.subgroups.map(g => `
+        <div class="postdoc-subgroup">
+          <h4>${escapeHTML(g.title)}</h4>
+          <ul>${g.items.map(renderItem).join("")}</ul>
+        </div>`).join("")}
+    </div>`;
+
+  // RTI templates block — moved to the bottom (was at the top). The
+  // editorial argument: candidates' first move should be to apply
+  // (including abroad); RTI is the accountability tool that follows
+  // when an application encounters institutional opacity, not the
+  // first thing a Bahujan PhD should be asked to do.
   const rtiBlock = `
     <div class="res-block rti-block">
       <h3>RTI templates — when the government won't disclose, you generate the data</h3>
@@ -4764,21 +4894,17 @@ function renderResources() {
   const blocks = RESOURCES_BLOCKS.map(b => `
     <div class="res-block">
       <h3>${escapeHTML(b.title)}</h3>
-      <ul>${b.items.map(i => `
-        <li>
-          ${i.url && i.url !== "#"
-            ? `<a href="${escapeAttr(i.url)}" target="_blank" rel="noopener">${escapeHTML(i.name)} <span class="ext">↗</span></a>`
-            : `<span class="res-name">${escapeHTML(i.name)}</span>`}
-          <div class="res-note">${escapeHTML(i.note)}</div>
-        </li>`).join("")}</ul>
+      <ul>${b.items.map(renderItem).join("")}</ul>
     </div>`).join("");
+
   host.innerHTML = `
     <div class="res-intro">
       <h2>Resources for candidates</h2>
-      <p>Tools and references for faculty applicants — particularly Bahujan candidates navigating reservation, document requirements, and institutional accountability. Start with the RTI templates below if you need data the institution hasn't published.</p>
+      <p>Tools and references for Bahujan PhD scholars navigating the Indian academic job market — and the international fellowship circuit that runs alongside it. The page leads with postdoctoral routes abroad because, on the evidence of the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a>, applying within India alone is not a strategy. RTI templates and Indian institutional infrastructure follow further down.</p>
     </div>
-    ${rtiBlock}
+    ${postdocBlock}
     ${blocks}
+    ${rtiBlock}
   `;
 
   // Wire copy-to-clipboard for each template.
