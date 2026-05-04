@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-05-03T19:39:43.149571+00:00",
-  "ad_count": 335,
+  "ad_count": 336,
   "ads": [
     {
       "id": "c0ff5498ce89e4c8",
@@ -10001,6 +10001,36 @@
       "_private_university": true,
       "_source_method": "public-interest override",
       "_source_note": "Public-interest vacancy transparency override: official public recruitment source included so advertised opportunities do not disappear from the tracker."
+    },
+    {
+      "id": "948ef6b6c01c36a0",
+      "institution_id": "ashoka-university",
+      "ad_number": null,
+      "title": "Visiting Faculty Positions (Open Rank, 2026–2027)",
+      "department": "Sociology & Anthropology",
+      "discipline": null,
+      "post_type": "Visiting",
+      "contract_status": "Contractual",
+      "category_breakdown": null,
+      "number_of_posts": null,
+      "pay_scale": null,
+      "publication_date": "2026-05-01",
+      "closing_date": "2026-06-01",
+      "original_url": "https://apply.interfolio.com/185751",
+      "snapshot_fetched_at": "2026-05-04T00:00:00+00:00",
+      "parse_confidence": 0.4,
+      "raw_text_excerpt": "Ashoka University, Department of Sociology & Anthropology — Visiting Faculty Positions (Open Rank | 2026–2027). Sonipat, Haryana. Open: 1 May 2026. Deadline: 1 Jun 2026 (11:59 PM ET). Semesters: Monsoon (25 Aug – 13 Dec 2026), Spring (19 Jan – 9 May 2027). Apply for one or both semesters. Preferred areas: STS, Gender & Sexuality, Caste, Legal Anthropology, Medical Anthropology. Qualifications: PhD; strong teaching; active research. Responsibilities: Teach 2 courses/semester; engage in academic activities. Apply with: Cover Letter, CV, Syllabi, Teaching Statement.",
+      "apply_url": "https://apply.interfolio.com/185751",
+      "info_url": "https://apply.interfolio.com/185751",
+      "annexure_pdf_url": null,
+      "publications_required": null,
+      "unit_eligibility": "PhD; strong teaching; active research; 2 courses/semester",
+      "_pdf_parsed": false,
+      "_manual_stub": true,
+      "_rolling_stub": false,
+      "_source_method": "manual transcription from circulated card",
+      "_source_note": "Hand-transcribed from a Sociology & Anthropology recruitment card circulated outside Ashoka's career page. The Interfolio application URL (apply.interfolio.com/185751) is the only verifiable artefact — no primary-source URL on ashoka.edu.in was located at the time of entry. parse_confidence is set to 0.4 to flag this provenance gap to downstream readers. Visiting Faculty is a contractual, semester-bound labour category distinct from the structural-vacancy analysis the rest of the site is built on; surfaced under the dedicated Visiting Faculty filter.",
+      "_private_university": true
     }
   ]
 }
