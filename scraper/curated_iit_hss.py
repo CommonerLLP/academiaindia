@@ -239,12 +239,17 @@ SOURCE_PDFS = {
 
 
 def stable_id(*parts: str) -> str:
-    import hashlib
-    m = hashlib.sha256()
-    for p in parts:
-        m.update(p.encode("utf-8"))
-        m.update(b"\x00")
-    return m.hexdigest()[:16]
+    """Delegate to the canonical implementation in `ad_factory.stable_id`.
+
+    Was: a private duplicate that crashed on `None` parts (used `p.encode(...)`
+    directly while every other definition in the repo handles None via
+    `(p or "").encode(...)`). Since `ad_number`, `department`, `discipline`
+    are all nullable in the schema, that bug was a latent crash in the
+    curated parser. Fixed by importing the canonical version so there is
+    exactly one definition.
+    """
+    from ad_factory import stable_id as _canonical
+    return _canonical(*parts)
 
 
 def build_ad(rec: dict, fetched_at: str) -> dict:

@@ -127,6 +127,25 @@ def fetch(
     domain = urlparse(url).netloc
     fetched_at = datetime.now(timezone.utc)
 
+    # SSRF guard — same policy surface as PDF downloads (`url_safety.is_safe_url`).
+    # Refuses non-http(s), unresolvable, and private/loopback/link-local/reserved
+    # hosts. Without this, an institutional landing page that 30x-redirects to
+    # `http://localhost:port/...` would have us probing internal services.
+    # Imported lazily to keep the module load cheap when callers stub `fetch()`
+    # in tests.
+    from url_safety import is_safe_url
+    if not is_safe_url(url):
+        return FetchResult(
+            status="unsafe-url",
+            http_status=None,
+            url=url,
+            final_url=None,
+            text=None,
+            content_type=None,
+            fetched_at=fetched_at,
+            error="URL rejected by SSRF guard (non-http(s) scheme or private IP)",
+        )
+
     if respect_robots:
         rp = _get_robot_parser(domain)
         try:
