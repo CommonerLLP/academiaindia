@@ -1,0 +1,1230 @@
+  /* ============================================================
+     BAHUJAN POLITICAL PALETTE
+     ------------------------------------------------------------
+     --accent      Ambedkarite/BSP cobalt — primary anti-caste color
+                   (Buddhist 'nila'; deeper than the academic blue
+                   the previous palette used)
+     --alarm       Dalit Panther / Maoist red — protest/militancy
+                   signaling. Used for warnings AND for the thin
+                   signature line at the top of the masthead
+     --ink         Near-black, more assertive than the previous warm
+                   #1a1a1a; reads as Panthers/dignity register
+     --bg          Clean off-white. Avoids the academic-cream affect
+                   of the prior design without being harsh white
+     Saffron/orange is deliberately absent — it carries Hindutva-
+     right political associations that would muddy the message.
+     ============================================================ */
+  :root {
+    /* Palette redesign: moved off the generic civic-tech (cobalt + alarm
+       red on white) palette into a warmer, broadsheet-publication
+       register. Ivory background instead of pure-white, oxblood instead
+       of generic alarm red (more specifically the Dalit Panther
+       saturated red the page already cites in comments), warmer-ink
+       text instead of cool charcoal. The cobalt stays — it's the
+       Ambedkarite anti-caste color of the project — but goes deeper
+       and less bureaucratic-bright. */
+    --bg: #f5f0e6;            /* ivory cream — broadsheet paper */
+    --panel: #ffffff;          /* card surfaces stay white for contrast */
+    --ink: #1a1612;            /* warm near-black, prints feel */
+    --muted: #6b5e50;          /* warm taupe-gray for secondary text */
+    --muted-soft: #a39584;     /* even softer warm gray */
+    --accent: #1a3a5e;         /* newspaper-navy / Ambedkar cobalt, deepened */
+    --accent-deep: #112944;    /* hover / pressed */
+    --warn: #8a5a18;           /* warmer amber */
+    --alarm: #7a1620;          /* oxblood — Dalit Panther saturated red */
+    --good: #1b5e20;
+    --border: #d4cdb8;         /* warmer cream-tan border */
+    --chip-bg: #ebe4d3;        /* warm cream chip background */
+    --serif: "Newsreader", "Source Serif 4", Georgia, serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  html[data-theme="dark"] {
+    --bg: #0c0d11;
+    --panel: #161821;
+    --ink: #f0eee6;
+    --muted: #9a958a;
+    --muted-soft: #6f6c64;
+    --accent: #6c95e8;        /* lifted cobalt for dark-bg contrast */
+    --accent-deep: #95b3f0;
+    --warn: #d99957;
+    --alarm: #ef5350;
+    --good: #6fcf8a;
+    --border: #2d2f3a;
+    --chip-bg: #1d1f29;
+    color-scheme: dark;
+  }
+  /* Adjust signal-color tints for dark backgrounds */
+  html[data-theme="dark"] .listing.tier-critical .deadline-pill { background: rgba(236,106,106,0.12); color: #f08585; }
+  html[data-theme="dark"] .listing.tier-soon     .deadline-pill { background: rgba(224,160,96,0.12); color: #e8b478; }
+  html[data-theme="dark"] .listing.tier-ok       .deadline-pill { background: rgba(111,207,138,0.12); color: #88dd9d; }
+  /* Add a soft border in dark mode — at 0.15 alpha the chip otherwise reads
+     as flat against the panel on lower-contrast displays (WCAG 1.4.11 NTC). */
+  html[data-theme="dark"] .listing .inst-line .hss-flag { background: rgba(224,160,96,0.15); color: #e8b478; border: 1px solid rgba(224,160,96,0.4); }
+  html[data-theme="dark"] .banner { background: #2a2820; border-color: #3d3a25; color: #d6c79b; }
+  html[data-theme="dark"] .banner button { color: #d6c79b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; font: 15px/1.55 "Inter", system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); }
+  a { color: var(--accent); }
+
+  /* Custom focus ring (WCAG 2.4.7). Browser default is 1px and easy to miss. */
+  /* WCAG 2.4.7: every focusable element gets a visible indicator. We rely on
+     :focus-visible (keyboard-only) instead of :focus (also fires on mouse
+     click); the previous global `*:focus { outline: none }` was suppressing
+     the fallback for browsers without :focus-visible support. Removed. */
+  *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  /* Form controls already have border-radius; keep the offset. */
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 1px; }
+
+  /* Skip-to-content link (WCAG 2.4.1). Hidden until focused. */
+  .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--panel); padding: 10px 14px; font-weight: 600; text-decoration: none; border-radius: 0 0 6px 0; z-index: 1000; }
+  .skip-link:focus { left: 0; }
+
+  /* Visually-hidden, screen-reader-accessible (WCAG 1.3.1). Used for section
+     H2s that name each tab panel without visually duplicating the tab label. */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+  /* Smooth theme transitions (WCAG 3.2.1 — predictable on focus / no jarring flash). */
+  body, aside, header.masthead, nav.tabs, .listing, .banner, footer { transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease; }
+
+  /* Center-aligned masthead (Phase-2). Title sits on its own line, subtitle
+     beneath it, then the lede paragraph — all max-width 720 px and centred.
+     Portrait moved to a small centred figure below the lede so the page
+     still has a face but doesn't compete with the headline. */
+  /* The 6px red strip is the Bahujan radical-tradition signature
+     (Dalit Panthers / protest red). Politically explicit, not subtle. */
+  /* Masthead — broadsheet wordmark register. Was: 38px h1 + small italic
+     subtitle on white, no anchoring. Now: an issue/date eyebrow, a
+     larger Newsreader wordmark, a serif italic standfirst, with
+     vertical rules above and below to feel like a publication
+     nameplate. The 6px Dalit Panther red strip stays. */
+  header.masthead {
+    background: var(--bg); /* ivory, not white — distinguishes masthead from cards */
+    border-top: 6px solid var(--alarm);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 32px 32px;
+    text-align: center;
+  }
+  header.masthead .text-wrap { max-width: 820px; margin: 0 auto; }
+  header.masthead .nameplate-eyebrow {
+    font-family: var(--sans);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted);
+    margin: 0 0 18px;
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  header.masthead .nameplate-eyebrow::before,
+  header.masthead .nameplate-eyebrow::after {
+    content: ""; width: 32px; height: 1px; background: var(--border);
+  }
+  header.masthead h1 {
+    margin: 0;
+    font-family: var(--serif); font-size: 56px; font-weight: 700;
+    color: var(--accent); letter-spacing: -0.025em; line-height: 1;
+    font-feature-settings: "ss01" 1;  /* Newsreader stylistic alt */
+  }
+  header.masthead .subtitle {
+    display: block; max-width: 580px; margin: 16px auto 0;
+    font-family: var(--serif); font-style: italic;
+    color: var(--ink); font-size: 16px; line-height: 1.55; font-weight: 400;
+  }
+  @media (max-width: 720px) {
+    header.masthead h1 { font-size: 36px; }
+    header.masthead .subtitle { font-size: 14px; }
+    header.masthead .nameplate-eyebrow { font-size: 10px; letter-spacing: 0.14em; }
+  }
+  /* "Public-interest service" tag in the footer disclaimer. Cobalt
+     to align with the political register; everything else in the
+     footer keeps its muted-gray paragraph style. */
+  /* The "Public-interest service" tag uses Dalit Panther red — the
+     framing is an editorial claim, not a constitutional reference, so
+     it earns the protest register rather than cobalt. */
+  /* Footer — was a single small gray paragraph that read as "and one
+     more thing". Now: a real publication colophon — mission statement,
+     credit line, last-updated date, license, contact, repo. */
+  footer.colophon {
+    background: var(--bg);
+    border-top: 6px solid var(--alarm);
+    margin-top: 48px;
+    padding: 48px 32px 56px;
+    color: var(--ink);
+  }
+  footer.colophon .colophon-inner {
+    max-width: 1080px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px;
+  }
+  footer.colophon .colophon-mission h3 {
+    font-family: var(--serif); font-size: 22px; font-weight: 600;
+    color: var(--ink); margin: 0 0 14px; letter-spacing: -0.012em;
+  }
+  footer.colophon .colophon-mission p {
+    font-family: var(--serif); font-size: 15px; line-height: 1.65;
+    color: var(--ink); margin: 0 0 12px; max-width: 60ch;
+  }
+  footer.colophon .colophon-mission p.colophon-verdict {
+    font-style: italic; border-left: 3px solid var(--alarm);
+    padding-left: 14px; margin-top: 18px; color: var(--ink);
+  }
+  footer.colophon dl.colophon-meta { margin: 0; font-family: var(--sans); font-size: 13px; }
+  footer.colophon dl.colophon-meta dt {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--alarm); margin-top: 16px;
+  }
+  footer.colophon dl.colophon-meta dt:first-of-type { margin-top: 0; }
+  footer.colophon dl.colophon-meta dd {
+    margin: 4px 0 0; color: var(--ink); line-height: 1.55;
+  }
+  footer.colophon dl.colophon-meta dd a {
+    color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent);
+  }
+  footer.colophon dl.colophon-meta dd a:hover { background: var(--accent); color: var(--bg); }
+  footer.colophon .colophon-rule { border: none; height: 1px; background: var(--border); margin: 32px 0 18px; }
+  footer.colophon .colophon-tagline {
+    font-family: var(--sans); font-size: 11.5px; color: var(--muted);
+    text-align: center; letter-spacing: 0.04em;
+  }
+  footer.colophon .colophon-tagline .verdict-mark {
+    color: var(--alarm); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  @media (max-width: 720px) {
+    footer.colophon { padding: 32px 16px 40px; }
+    footer.colophon .colophon-inner { grid-template-columns: 1fr; gap: 28px; }
+  }
+  header.masthead p { margin: 10px auto 0; color: var(--muted); font-size: 13px; max-width: 720px; line-height: 1.55; }
+
+  /* ============================================================
+     HERO (Phase-2 redesign): a single search input + 4 quick-filter
+     chips, sitting directly under the masthead. Replaces the previous
+     sidebar-only search affordance. The motto is "minimum to scan,
+     maximum to act on" — one keystroke and a click should be enough
+     to narrow 300 ads to ~10.
+     ============================================================ */
+  .hero-search { background: var(--panel); border-bottom: 1px solid var(--border); padding: 18px 32px 22px; }
+  .hero-search-inner { max-width: 1100px; margin: 0 auto; }
+  .hero-search-box {
+    display: flex; align-items: stretch; gap: 0;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+    overflow: hidden;
+  }
+  .hero-search-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(31, 78, 121, 0.15), 0 1px 2px rgba(15,23,42,0.04);
+  }
+  .hero-search-box .search-cell {
+    display: flex; align-items: center; gap: 10px;
+    flex: 1; padding: 0 16px; min-height: 48px;
+  }
+  .hero-search-box .search-cell .search-ico {
+    color: var(--muted); font-size: 16px; flex-shrink: 0;
+  }
+  .hero-search-box input {
+    flex: 1; min-width: 0;
+    border: none; outline: none; background: transparent;
+    font: inherit; font-size: 14px; color: var(--ink); padding: 0;
+  }
+  .hero-search-box input::placeholder { color: var(--muted-soft); }
+  .hero-search-box .clear-btn {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--muted); font-size: 16px; padding: 4px 8px;
+    border-radius: 6px; flex-shrink: 0;
+  }
+  .hero-search-box .clear-btn:hover { background: var(--chip-bg); color: var(--ink); }
+  .hero-search-box .clear-btn[hidden] { display: none; }
+
+  .hero-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; align-items: center; }
+  .hero-chips .chips-label { font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .hero-chips .quick-chip {
+    background: var(--panel); border: 1px solid var(--border);
+    color: var(--ink); padding: 6px 12px; border-radius: 16px;
+    font: inherit; font-size: 12px; font-weight: 500; cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .hero-chips .quick-chip:hover { border-color: var(--accent); color: var(--accent); }
+  /* "On" state: a quick-chip that's currently driving the filter set. */
+  .hero-chips .quick-chip.on {
+    background: var(--accent); border-color: var(--accent); color: var(--panel);
+  }
+
+  nav.tabs { background: var(--panel); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 4px; align-items: stretch; }
+  nav.tabs .tabs-spacer { flex: 1; }
+  nav.tabs .tabs-right { flex: 1; display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
+  nav.tabs button { background: transparent; border: none; padding: 14px 18px; font: inherit; font-size: 15px; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; font-weight: 600; }
+  nav.tabs button.active,
+  nav.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+  nav.tabs .tab-count { color: var(--muted); font-weight: 400; margin-left: 6px; font-variant-numeric: tabular-nums; }
+  /* WCAG 2.5.5: 44x44 tap area. Visual button stays compact via inner pseudo-disc. */
+  nav.tabs .theme-toggle { background: transparent; border: none; cursor: pointer; color: var(--muted); padding: 0; align-self: center; transition: color .15s; font-size: 14px; line-height: 1; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  nav.tabs .theme-toggle::before { content: ""; position: absolute; left: 50%; top: 50%; width: 32px; height: 32px; transform: translate(-50%, -50%); border: 1px solid var(--border); border-radius: 18px; transition: border-color .15s, background .15s; pointer-events: none; }
+  nav.tabs .theme-toggle:hover { color: var(--accent); }
+  nav.tabs .theme-toggle:hover::before { border-color: var(--accent); }
+
+  /* Single-column layout. The filter strip + tab bar span full width above,
+     but `main` is centred at a comfortable reading width — long listing
+     rows stretching edge-to-edge on a wide monitor are unscannable. 1080 px
+     is roughly the width at which the deadline column, meta line, and
+     title still read in one eye-sweep without the eye having to traverse
+     half a screen. */
+  main { padding: 18px 24px 40px; max-width: 1080px; margin: 0 auto; }
+
+  /* ============================================================
+     HORIZONTAL FILTER STRIP
+     A row of click-to-open dropdowns. Each trigger button shows the
+     filter name + the count of selections under it (when any). The
+     popover that drops down contains the same checkbox markup the
+     old sidebar used — IDs preserved so existing JS keeps working.
+     One dropdown open at a time; click-outside closes.
+     ============================================================ */
+  .filter-strip {
+    background: var(--panel); border-bottom: 1px solid var(--border);
+    padding: 10px 32px; display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center; justify-content: center; position: sticky; top: 0; z-index: 30;
+  }
+  .filter-strip .strip-label { font-size: 12px; color: var(--muted); margin-right: 4px; font-weight: 500; }
+  /* WCAG 2.5.5: 44 px minimum tap area. The visual chip stays compact via
+     padding; the min-height pads the focusable rect to the AA target without
+     visibly inflating the pill. */
+  .filter-strip .quick-chip { background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; min-height: 44px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, border-color .15s, color .15s; font-weight: 600; }
+  .filter-strip .quick-chip:hover { background: var(--chip-bg); }
+  .filter-strip .quick-chip .quick-chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .15s; }
+  /* Reserved-posts chip pressed state uses Ambedkarite cobalt — affirmative
+     action gets its actual political color, not a generic 'go' green. */
+  .filter-strip .quick-chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .filter-strip .quick-chip[aria-pressed="true"] .quick-chip-dot { background: #fff; }
+  .filter-strip .quick-chip[aria-pressed="true"] .sel-pill { background: rgba(255,255,255,0.25); color: #fff; }
+  .filter-dd { position: relative; }
+  .filter-dd > .filter-trigger {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 12px; min-height: 44px; font: inherit; font-size: 13px; color: var(--ink);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: border-color .15s, background .15s;
+  }
+  .filter-dd > .filter-trigger:hover { border-color: var(--accent); }
+  .filter-dd.has-active > .filter-trigger { border-color: var(--accent); background: var(--chip-bg); }
+  .filter-dd > .filter-trigger .sel-pill {
+    font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 10px;
+    background: var(--accent); color: var(--panel); margin-left: 2px;
+  }
+  .filter-dd > .filter-trigger .chev { color: var(--muted); font-size: 10px; }
+  .filter-dd > .popover {
+    position: absolute; top: calc(100% + 6px); left: 0;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+    padding: 12px; min-width: 240px; max-width: 320px;
+    z-index: 40; display: none;
+  }
+  .filter-dd.open > .popover { display: block; }
+  .filter-dd > .popover .filter-group { display: flex; flex-direction: column; gap: 2px; }
+  .filter-dd > .popover .filter-group.scrollable { max-height: 280px; overflow-y: auto; }
+  /* Small helper: a "Clear" link inside each popover. */
+  .filter-dd > .popover .popover-foot { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px 0; margin-top: 8px; border-top: 1px solid var(--border); font-size: 12px; }
+  .filter-dd > .popover .popover-foot button { background: transparent; border: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; padding: 4px 6px; border-radius: 4px; }
+  .filter-dd > .popover .popover-foot button:hover { color: var(--accent); background: var(--chip-bg); }
+  /* Reuse the existing label / cnt styling from the old sidebar. */
+  .filter-strip .filter-group label { display: flex; align-items: center; gap: 8px; padding: 6px 4px; cursor: pointer; font-size: 13px; border-radius: 4px; }
+  .filter-strip .filter-group label:hover { background: var(--chip-bg); }
+  .filter-strip .filter-group label .grow { flex: 1; }
+  .filter-strip .filter-group label .cnt { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 720px) {
+    .filter-strip { padding: 8px 14px; gap: 6px; }
+    .filter-dd > .popover { left: -4px; right: auto; min-width: calc(100vw - 28px); }
+  }
+
+  aside { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; overscroll-behavior: contain; }
+  aside .search-wrap { padding: 16px 16px 12px; border-bottom: 1px solid var(--border); }
+  aside label.upper { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; display: block; margin-bottom: 6px; }
+  aside .search-box { position: relative; }
+  aside .search-box input { width: 100%; padding: 9px 12px 9px 32px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--ink); font: inherit; font-size: 13px; outline: none; }
+  aside .search-box .search-ico { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; }
+
+  .filter-section { border-bottom: 1px solid var(--border); }
+  .filter-section:last-of-type { border-bottom: none; }
+  .filter-section > button.filter-head { width: 100%; background: transparent; border: none; cursor: pointer; padding: 12px 16px; font: inherit; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink); font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .filter-section .filter-head .sel-count { color: var(--accent); font-weight: 700; margin-left: 6px; }
+  .filter-section .filter-head .chev { font-size: 10px; transition: transform 0.15s; }
+  .filter-section.open .filter-head .chev { transform: rotate(90deg); }
+  .filter-section .filter-body { padding: 0 16px 12px; display: none; }
+  .filter-section.open .filter-body { display: block; }
+  .filter-group label { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; font-size: 13px; }
+  .filter-group input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; margin: 0; }
+  .filter-group label .grow { flex: 1; }
+  .filter-group label .cnt { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .filter-group.scrollable, .filter-group .scrollable { max-height: 220px; overflow-y: auto; }
+
+  section#feed { min-width: 0; }
+
+  .chipbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; align-items: center; }
+  .chipbar .chip-active { background: var(--chip-bg); color: var(--ink); padding: 3px 9px; border-radius: 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); }
+  /* Active-filter chip × — keep visual glyph small, but expose a 24px tap area
+     via padding. Full 44x44 would visibly inflate the chip; 24x24 is the
+     minimum target size in WCAG 2.5.8 (AAA, but a reasonable compromise here). */
+  .chipbar .chip-active button { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px 8px; margin: -6px -6px -6px 0; font-size: 14px; line-height: 1; min-width: 24px; min-height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; }
+  .chipbar .chip-active button:hover { color: var(--ink); background: var(--border); }
+  .chipbar .chip-summary { cursor: pointer; background: var(--accent); color: var(--panel); border-color: var(--accent); }
+  .chipbar .chip-summary button { color: var(--panel); opacity: 0.85; }
+  .chipbar .chip-summary:hover { opacity: 0.9; }
+  .chipbar .chip-clear { background: transparent; border: none; color: var(--accent); font: inherit; font-size: 12px; cursor: pointer; padding: 3px 6px; text-decoration: underline; }
+
+  .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 13px; }
+  .summary-row .emph { color: var(--ink); font-weight: 600; }
+  .summary-row .active-mark { margin-left: 8px; color: var(--accent); }
+  .summary-row .sort-wrap { display: flex; align-items: center; gap: 8px; }
+  .summary-row select { border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 13px; background: var(--panel); color: var(--ink); cursor: pointer; }
+
+  /* Disclaimer banner — quieter, single line, dismissible */
+  .banner { background: #fff7e8; border: 1px solid #e6ca8a; color: #6b4a10; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; display: flex; gap: 8px; align-items: center; }
+  .banner .warn-ico { font-size: 14px; line-height: 1; }
+  /* WCAG 2.5.5: 44x44 tap target. Padding expands the hitbox; glyph stays small. */
+  .banner button { margin-left: auto; background: transparent; border: none; color: #6b4a10; cursor: pointer; font-size: 16px; line-height: 1; padding: 14px 14px; opacity: 0.6; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .banner button:hover { opacity: 1; }
+
+  /* ============================================================
+     COMPACT ROW LAYOUT (Phase-1 redesign, May 2026).
+     Replaces the previous 3-band card. Per ad:
+       [tier-bar 4px] [main content] [large deadline column] [actions]
+     Same `.listing` class kept so existing JS selectors work; the visual is
+     row-style. The motto is "minimalism with maximum impact" — every
+     pixel here was bargained for.
+     ============================================================ */
+  /* Vacancy-gap headline banner — sits above filters on the Listings tab.
+     Cobalt + red split: cobalt for the "should be" number, red for the gap.
+     This is the page's central claim, not decoration. */
+  /* Hero — full-bleed cream-tinted band that introduces the listings.
+     Was: bordered card sitting in the listings flow, competing with
+     the filter strip and the verify-banner. Now: a true editorial hero
+     that lands the central claim before any UI furniture. */
+  .vacancy-gap-banner {
+    /* Full-bleed: viewport-width breakout regardless of `main`'s max-width.
+       The trick — width:100vw + margin-left:calc(-50vw + 50%) — keeps the
+       element centered in its parent while spanning the entire window.
+       Standard pattern in modern editorial design. */
+    background: linear-gradient(180deg, #efe5d0 0%, #f5f0e6 100%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-top: -18px;                /* eat the main top padding */
+    margin-bottom: 32px;
+    padding: 64px 32px 56px;
+    position: relative;
+  }
+  .vacancy-gap-banner::before {
+    /* a thin oxblood rule across the top — masthead-to-hero connection */
+    content: ""; position: absolute; left: 0; right: 0; top: 0;
+    height: 2px; background: var(--alarm);
+  }
+  .vacancy-gap-banner .vgb-inner { max-width: 760px; margin: 0 auto; }
+  .vacancy-gap-banner .vgb-eyebrow {
+    font-family: var(--sans); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--alarm); margin: 0 0 20px;
+  }
+  .vacancy-gap-banner .vgb-headline {
+    font-family: var(--serif); font-size: 34px; font-weight: 600;
+    color: var(--ink); line-height: 1.18; letter-spacing: -0.012em;
+    margin: 0 0 18px;
+  }
+  .vacancy-gap-banner .vgb-num {
+    font-weight: 800; color: var(--alarm); font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em; padding: 0;
+  }
+  .vacancy-gap-banner .vgb-num#vgb-ads { color: var(--accent); }
+  .vacancy-gap-banner .vgb-vs { color: var(--muted); margin: 0 4px; }
+  .vacancy-gap-banner .vgb-detail { font-size: 14px; color: var(--muted); font-weight: 500; }
+  .vacancy-gap-banner .vgb-sub {
+    font-size: 15px; color: var(--ink); line-height: 1.6; max-width: 60ch;
+    font-family: var(--serif); font-style: italic;
+  }
+  .vacancy-gap-banner .vgb-sub #vgb-ratio { font-weight: 700; color: var(--alarm); font-style: normal; }
+  .vacancy-gap-banner .vgb-disclaimer {
+    font-family: var(--sans, "Inter"); font-size: 12px; color: var(--muted);
+    margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.08);
+    line-height: 1.5; max-width: 60ch; font-style: italic;
+  }
+  .vacancy-gap-banner .vgb-sub a { color: var(--accent); text-decoration: none; font-weight: 600; font-style: normal; border-bottom: 1px solid var(--accent); }
+  .vacancy-gap-banner .vgb-sub a:hover { background: var(--accent); color: var(--bg); }
+  html[data-theme="dark"] .vacancy-gap-banner {
+    background: linear-gradient(180deg, #1a1c26 0%, #0c0d11 100%);
+  }
+  .feed-list { display: flex; flex-direction: column; gap: 10px; }
+  /* Load-more button — large, satisfying tap target. Cobalt to align with
+     the political register; the chevron suggests progressive expansion. */
+  .load-more { display: block; width: 100%; margin: 14px 0 0; padding: 18px 24px; background: var(--panel); border: 2px solid var(--accent); border-radius: 10px; color: var(--accent); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s, color .15s; text-align: center; letter-spacing: 0.01em; }
+  .load-more:hover { background: var(--accent); color: #fff; }
+  .load-more:hover .lm-sub { color: rgba(255,255,255,0.85); }
+  .load-more .lm-sub { display: inline; color: var(--muted); font-weight: 500; margin-left: 6px; }
+  .load-more-done { text-align: center; padding: 14px; font-size: 13px; color: var(--muted); font-style: italic; margin-top: 14px; border-top: 1px dashed var(--border); }
+  .listing {
+    background: var(--panel); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 16px 20px;
+    display: grid; grid-template-columns: 5px 1fr auto auto;
+    gap: 18px; align-items: center;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    position: relative;
+  }
+  .listing:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(31,58,138,0.10); }
+  /* Tier bar: 5-px coloured strip on the left. Saturated colour reads as
+     a deliberate UI element with political weight, not a soft accent. */
+  .listing .tier-bar { align-self: stretch; border-radius: 4px; background: var(--border); }
+  .listing.tier-critical .tier-bar { background: var(--alarm); }
+  .listing.tier-soon     .tier-bar { background: var(--warn); }
+  .listing.tier-ok       .tier-bar { background: var(--good); }
+
+  .listing .row-main { min-width: 0; }
+  .listing .row-title-line { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+  .listing .row-title { margin: 0; font-family: var(--serif); font-size: 18px; font-weight: 700; line-height: 1.3; color: var(--ink); letter-spacing: -0.012em; }
+  .listing .row-title .field-spec { color: var(--muted); font-weight: 500; }
+  .listing .hss-badge { display: inline-flex; align-items: center; font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #6b3fa0); color: white; text-transform: uppercase; }
+
+  /* Meta-line: institution / department / job-type / reservation pills */
+  .listing .row-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
+  .listing .meta-pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 14px; font-weight: 500; line-height: 1.4; }
+  /* Institution pill — soft accent, the strongest secondary identifier after the title. */
+  .listing .meta-pill.m-inst { background: var(--chip-bg); color: var(--accent); border: 1px solid var(--border); }
+  /* Department pill — outlined neutral. */
+  .listing .meta-pill.m-dept { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+  /* Job-type / contract pills — muted chips. */
+  .listing .meta-pill.m-job { background: var(--chip-bg); color: var(--muted); border: 1px solid var(--border); font-weight: 400; }
+  .listing .meta-pill.m-job.lowconf { background: #fde2d6; color: #8a3a1a; border-color: #f5c5a8; font-weight: 500; }
+  /* Hand-transcribed entries (no primary-source URL on the institution's
+     own site). Yellow-on-tan to differentiate from rough-parse red, while
+     still flagging "verify before relying on this". */
+  .listing .meta-pill.m-job.manual-stub-pill { background: #fef3c7; color: #78350f; border-color: #fde68a; font-weight: 500; cursor: help; }
+  .listing .meta-tert { color: #545049; font-size: 11.5px; padding: 0 2px; }
+  html[data-theme="dark"] .listing .meta-tert { color: #b3aea3; }
+
+  /* Reservation pills — colour-coded per category so a quick glance shows
+     which seats are SC/ST/OBC/EWS/PwBD. Counts are appended where parsed. */
+  .listing .reserv-group { display: inline-flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+  .listing .reserv-pill { font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; padding: 2px 5px; border-radius: 4px; line-height: 1.2; border: 1px solid; }
+  .listing .reserv-pill.r-UR  { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+  .listing .reserv-pill.r-SC  { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .listing .reserv-pill.r-ST  { background: #ddd6fe; color: #5b21b6; border-color: #c4b5fd; }
+  .listing .reserv-pill.r-OBC { background: #ccfbf1; color: #115e59; border-color: #99f6e4; }
+  .listing .reserv-pill.r-EWS { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+  .listing .reserv-pill.r-PwBD { background: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
+  html[data-theme="dark"] .listing .reserv-pill { filter: brightness(0.9) saturate(0.85); }
+
+  /* Inline reservation strip — surfaces the per-institution policy
+     (SC/ST/OBC/EWS/PwBD percentages) directly under the meta line, not
+     buried in the details disclosure. Each category is colour-coded with
+     the same palette as the per-position pills. */
+  .listing .row-reserv { display: flex; flex-wrap: wrap; gap: 5px 6px; align-items: center; margin: 8px 0 0; grid-column: 2 / span 3; }
+  .listing .row-reserv .reserv-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .listing .row-reserv.reserv-missing { background: #fdf2f2; border: 1px solid #f5c5c5; border-left: 3px solid var(--alarm); border-radius: 6px; padding: 6px 10px; }
+  .listing .row-reserv .reserv-label.warn { color: var(--alarm); }
+  .listing .row-reserv .reserv-missing-msg { font-size: 11.5px; color: #6b2020; line-height: 1.4; }
+  .listing .row-reserv.reserv-missing.private-univ { background: #fbe8d2; border-color: #e0a76a; border-left-color: #b85a1c; }
+  .listing .row-reserv.reserv-missing.private-univ .reserv-label.warn { color: #8a3a0a; }
+  .listing .row-reserv.reserv-missing.private-univ .reserv-missing-msg { color: #5a2a0a; }
+  .listing .row-reserv.reserv-missing.reserv-silent { background: var(--chip-bg); border: 1px dashed var(--border); border-left: 3px solid var(--muted); }
+  .listing .row-reserv.reserv-missing.reserv-silent .reserv-label.warn { color: var(--muted); }
+  .listing .row-reserv.reserv-missing.reserv-silent .reserv-missing-msg { color: var(--ink); }
+  .listing .row-reserv.reserv-policy { background: var(--chip-bg); border-radius: 6px; padding: 6px 10px; }
+  .listing .reserv-pill.policy { opacity: 0.78; font-weight: 500; }
+  .listing .reserv-caveat { font-size: 11px; color: var(--muted); font-style: italic; margin-left: 6px; flex-basis: 100%; line-height: 1.4; padding-top: 2px; }
+  .listing .reserv-policy-text { font-size: 12px; color: var(--ink); font-family: var(--mono); }
+  /* SRD callout in cobalt — Special Recruitment Drives are an
+     anti-caste affirmative measure; the visual register honors that. */
+  .listing .row-reserv.reserv-srd { background: rgba(31,58,138,0.06); border: 1px solid rgba(31,58,138,0.3); border-left: 3px solid var(--accent); border-radius: 6px; padding: 6px 10px; }
+  .listing .row-reserv.reserv-srd .reserv-label.good { color: var(--accent); font-weight: 700; }
+  .listing .row-reserv.reserv-srd .reserv-missing-msg { color: var(--accent-deep); }
+  .listing .row-reserv.reserv-missing.reserv-singlepost { background: var(--chip-bg); border: 1px dashed var(--border); border-left: 3px solid var(--muted); }
+  .listing .row-reserv.reserv-missing.reserv-singlepost .reserv-label { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.06em; }
+  /* Hiring-language traps */
+  .listing .row-traps { grid-column: 2 / span 3; margin: 8px 0 0; background: #fff8e7; border: 1px solid #f0d98e; border-left: 3px solid #d49a2a; border-radius: 6px; padding: 0; }
+  .listing .row-traps summary { padding: 8px 12px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: #5c4a1a; list-style: none; display: flex; align-items: center; gap: 8px; }
+  .listing .row-traps summary::-webkit-details-marker { display: none; }
+  .listing .row-traps summary:hover { background: rgba(212, 154, 42, 0.08); }
+  .listing .row-traps .traps-icon { color: #b88a2e; font-size: 14px; }
+  .listing .row-traps .traps-hint { color: var(--muted); font-weight: 400; font-size: 11.5px; font-style: italic; margin-left: auto; }
+  .listing .row-traps[open] summary { border-bottom: 1px solid #f0d98e; }
+  .listing .row-traps .traps-body { padding: 8px 12px 10px; }
+  .listing .row-traps .trap { margin: 8px 0; }
+  .listing .row-traps .trap:first-child { margin-top: 0; }
+  .listing .row-traps .trap-label { font-size: 12.5px; font-weight: 700; color: #5c4a1a; margin-bottom: 2px; }
+  .listing .row-traps .trap-why { font-size: 12px; color: #3d3108; line-height: 1.5; }
+  /* Resources tab */
+  #resources-tab { max-width: 980px; }
+  #resources-tab .res-intro h2 { font-family: var(--serif); font-weight: 600; font-size: 22px; margin: 8px 0 8px; }
+  #resources-tab .res-intro p { font-size: 14px; color: var(--ink); line-height: 1.6; max-width: 70ch; margin-bottom: 24px; }
+  #resources-tab .res-block { margin-bottom: 28px; }
+  #resources-tab .res-block h3 { font-family: var(--serif); font-weight: 700; font-size: 17px; margin: 0 0 12px; padding: 4px 0 8px 12px; border-left: 4px solid var(--alarm); border-bottom: 1px solid var(--border); }
+  #resources-tab .res-block ul { list-style: none; padding: 0; margin: 0; }
+  #resources-tab .res-block li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; }
+  #resources-tab .res-block li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; }
+  #resources-tab .res-block li a:hover { text-decoration: underline; }
+  #resources-tab .res-block li .ext { font-size: 11px; color: var(--muted); margin-left: 2px; }
+  #resources-tab .res-block li .res-name { font-weight: 600; font-size: 14px; color: var(--ink); }
+  #resources-tab .res-block li .res-note { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
+  /* Postdoc-abroad block — distinct register from the rest of the
+     Resources tab: a longer political introduction, sub-grouped lists
+     so candidates can navigate by program type rather than scrolling
+     through one flat list of 25 fellowships. */
+  #resources-tab .postdoc-block { background: rgba(180,30,40,0.025); border: 1px solid rgba(180,30,40,0.18); border-radius: 10px; padding: 20px 22px; margin-bottom: 32px; }
+  #resources-tab .postdoc-block h3 { border-left-color: var(--alarm); margin-top: 0; }
+  #resources-tab .postdoc-block .res-block-intro { font-size: 13.5px; line-height: 1.65; color: var(--ink); margin: 0 0 16px; max-width: 76ch; }
+  #resources-tab .postdoc-block .res-block-intro p { margin: 0 0 10px; }
+  #resources-tab .postdoc-block .res-block-intro p:last-child { margin-bottom: 0; }
+  #resources-tab .postdoc-block .res-block-intro em { color: var(--alarm); font-style: normal; font-weight: 600; }
+  #resources-tab .postdoc-subgroup { margin-top: 16px; }
+  #resources-tab .postdoc-subgroup h4 { font-family: var(--sans); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin: 0 0 10px; padding: 0; border: none; }
+  #resources-tab .postdoc-subgroup ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  #resources-tab .postdoc-subgroup li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+  #resources-tab .postdoc-subgroup li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; }
+  #resources-tab .postdoc-subgroup li a:hover { text-decoration: underline; }
+  #resources-tab .postdoc-subgroup li .res-note { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-top: 6px; }
+  #resources-tab .postdoc-subgroup li .ext { font-size: 11px; color: var(--muted); margin-left: 2px; }
+  /* Eligibility chip — surfaces citizenship/residency restrictions per
+     fellowship so an Indian-PhD applicant doesn't waste hours on a
+     program that excludes them at the door. Three visual registers:
+     open (green), caveat (amber), restricted (red). */
+  #resources-tab .elig { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 6px; vertical-align: middle; letter-spacing: 0.02em; line-height: 1.3; white-space: nowrap; }
+  #resources-tab .elig.elig-open { background: rgba(46,125,50,0.10); color: #2e7d32; border: 1px solid rgba(46,125,50,0.30); }
+  #resources-tab .elig.elig-caveat { background: rgba(180,120,30,0.10); color: #8a5a10; border: 1px solid rgba(180,120,30,0.35); }
+  #resources-tab .elig.elig-restricted { background: rgba(180,30,40,0.10); color: var(--alarm); border: 1px solid rgba(180,30,40,0.35); }
+  #resources-tab .elig.elig-varies { background: var(--chip-bg); color: var(--muted); border: 1px solid var(--border); }
+  html[data-theme="dark"] #resources-tab .elig.elig-open { background: rgba(111,207,138,0.10); color: #88dd9d; border-color: rgba(111,207,138,0.35); }
+  html[data-theme="dark"] #resources-tab .elig.elig-caveat { background: rgba(232,180,120,0.10); color: #e8b478; border-color: rgba(232,180,120,0.35); }
+  html[data-theme="dark"] #resources-tab .elig.elig-restricted { background: rgba(240,133,133,0.10); color: #f08585; border-color: rgba(240,133,133,0.35); }
+  /* Region chip — neutral register, sits alongside eligibility but
+     visually quieter so eligibility remains the dominant signal. The
+     region is informational ("where would I be"); eligibility is
+     gating ("can I even apply"). Six values: US, Canada, UK, EU,
+     Japan, Multi. */
+  #resources-tab .region { display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; letter-spacing: 0.04em; line-height: 1.3; white-space: nowrap; background: var(--chip-bg); color: var(--accent); border: 1px solid rgba(31,58,138,0.25); text-transform: uppercase; }
+  html[data-theme="dark"] #resources-tab .region { background: rgba(91,141,217,0.10); color: #9ab8e6; border-color: rgba(91,141,217,0.30); }
+  /* Eligibility legend at the top of the postdoc block. */
+  #resources-tab .elig-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 14px; padding: 10px 12px; background: var(--bg); border: 1px dashed var(--border); border-radius: 8px; font-size: 11.5px; color: var(--muted); align-items: center; }
+  #resources-tab .elig-legend .leg-label { font-weight: 600; color: var(--ink); margin-right: 4px; }
+  /* RTI templates block — distinct visual register from the link-list
+     blocks: this is action infrastructure, not reading. */
+  #resources-tab .rti-block { background: rgba(31,58,138,0.04); border: 1px solid rgba(31,58,138,0.18); border-radius: 10px; padding: 18px 22px; margin-bottom: 28px; }
+  #resources-tab .rti-block h3 { border-left-color: var(--accent); margin-top: 0; }
+  #resources-tab .rti-block .res-block-intro { font-size: 13px; line-height: 1.55; color: var(--ink); margin: 0 0 14px; }
+  #resources-tab .rti-block .rti-subhead { font-family: var(--sans); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin: 22px 0 10px; padding: 0; border: none; }
+  #resources-tab .rti-block .rti-subhead:first-of-type { margin-top: 6px; }
+  #resources-tab .rti-block .rti-subnote { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin: 0 0 12px; font-style: italic; }
+  #resources-tab .rti-block .indian-link-list { list-style: none; padding: 0; margin: 0 0 4px; display: flex; flex-direction: column; gap: 6px; }
+  #resources-tab .rti-block .indian-link-list li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  #resources-tab .rti-block .indian-link-list li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 13.5px; }
+  #resources-tab .rti-block .indian-link-list li a:hover { text-decoration: underline; }
+  #resources-tab .rti-block .indian-link-list li .res-note { font-size: 12px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
+  #resources-tab .rti-grid { display: grid; gap: 10px; }
+  #resources-tab .rti-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  #resources-tab .rti-card summary { padding: 12px 16px; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 14px; color: var(--ink); }
+  #resources-tab .rti-card summary::-webkit-details-marker { display: none; }
+  #resources-tab .rti-card summary:hover { background: var(--chip-bg); }
+  #resources-tab .rti-card[open] summary { border-bottom: 1px solid var(--border); background: var(--chip-bg); }
+  #resources-tab .rti-card .rti-expand { font-size: 12px; color: var(--accent); font-weight: 500; white-space: nowrap; }
+  #resources-tab .rti-card[open] .rti-expand { color: var(--muted); }
+  #resources-tab .rti-card[open] .rti-expand::before { content: "hide template ▴"; }
+  #resources-tab .rti-card[open] .rti-expand { font-size: 0; }
+  #resources-tab .rti-card[open] .rti-expand::before { font-size: 12px; }
+  #resources-tab .rti-card .rti-body { padding: 12px 16px 14px; }
+  #resources-tab .rti-card .rti-scenario { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin: 0 0 10px; font-style: italic; }
+  #resources-tab .rti-card .rti-target { font-size: 12.5px; color: var(--ink); margin-bottom: 8px; }
+  #resources-tab .rti-card .rti-text { width: 100%; min-height: 240px; padding: 12px; font-family: var(--mono); font-size: 12px; line-height: 1.55; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; resize: vertical; box-sizing: border-box; }
+  #resources-tab .rti-card .rti-actions { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  #resources-tab .rti-card .rti-copy { padding: 8px 16px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  #resources-tab .rti-card .rti-copy:hover { background: var(--accent-deep); }
+  #resources-tab .rti-card .rti-copy.copied { background: var(--good); }
+  #resources-tab .rti-card .rti-online { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+  #resources-tab .rti-card .rti-online:hover { text-decoration: underline; }
+
+  /* Always-visible action strip: PDF + Apply portal + Listing page +
+     Annexure links sitting under the meta line. The user shouldn't have to
+     expand a disclosure just to find out where to apply. */
+  .listing .row-actions-inline { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 8px 0 0; font-size: 12.5px; grid-column: 2 / span 3; }
+  .listing .row-actions-inline a { color: var(--accent); font-weight: 500; text-decoration: none; }
+  .listing .row-actions-inline a:hover { text-decoration: underline; }
+
+  /* Areas excerpt: small body text below the meta line. Collapsible details
+     sit immediately after, so the row stays compact at rest. */
+  .listing .row-areas { font-size: 12.5px; color: var(--ink); margin: 8px 0 0; line-height: 1.5; grid-column: 2 / span 3; }
+  .listing .row-areas .k { display: none; }
+  .listing .details { font-size: 12.5px; color: var(--ink); margin: 6px 0 0; grid-column: 2 / span 3; }
+  .listing .details > summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 4px 0; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
+  .listing .details > summary:hover { color: var(--accent); }
+  .listing .details[open] > summary { color: var(--accent); }
+  .listing .detail-block { margin-top: 6px; padding: 6px 0; }
+  .listing .detail-block .k { color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px; font-weight: 600; display: block; margin-bottom: 3px; }
+  .listing .detail-block .v { line-height: 1.55; }
+
+  /* Action links live in the details disclosure for compactness; only the
+     Original-PDF link is promoted to the always-visible action column. */
+  .listing .details .action-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 12.5px; }
+  .listing .details .action-links a { color: var(--accent); font-weight: 500; text-decoration: none; }
+  .listing .details .action-links a:hover { text-decoration: underline; }
+
+  /* Large deadline column — the big "66 / DAYS / 30 Jun 2026" stack on
+     the right of each row. Tier-coloured. Replaces the previous pill. */
+  .listing .row-deadline { text-align: right; flex-shrink: 0; min-width: 96px; }
+  .listing .deadline-num { font-size: 22px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--muted); }
+  /* Critical-tier deadlines (≤7 days) get heavier weight and a stronger
+     red — the protest register applied to the moment that actually
+     matters: "this closes soon, act on it." */
+  .listing.tier-critical .deadline-num { color: var(--alarm); font-weight: 800; font-size: 24px; }
+  .listing.tier-soon     .deadline-num { color: #8a5403; }
+  .listing.tier-ok       .deadline-num { color: var(--good); }
+  .listing .deadline-num.small { font-size: 12px; font-weight: 500; color: var(--muted); }
+  .listing .deadline-unit { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-top: 3px; }
+  .listing .deadline-date { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+
+  /* Actions column — currently just the save star. */
+  .listing .row-actions { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  /* WCAG 2.5.5 AA: 44x44 minimum tap area (was 36x36 — visual unchanged, the
+     padding box just expands to meet the AA target). */
+  .listing .star { background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 16px; color: var(--muted); border-radius: 8px; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .listing .star:hover { background: var(--chip-bg); color: var(--accent); }
+  .listing .star.on { color: var(--warn); }
+
+  /* ============================================================
+     MOBILE — comprehensive overhaul (May 2026).
+     The desktop layout assumes ~1080 px reading width with edge
+     padding of 32 px. On phones every one of those numbers is wrong:
+     the masthead steals 200 px before the content starts, the tab
+     bar wraps onto two lines, the filter strip fills the screen with
+     a single dropdown, and the listing card's 4-column grid breaks
+     into an unreadable shape. This block fixes all of that.
+     ============================================================ */
+  @media (max-width: 720px) {
+    /* Masthead — keep the political register but stop eating a fifth
+       of the viewport on a 6-inch phone. */
+    header.masthead { padding: 20px 14px 14px; border-top-width: 4px; }
+    header.masthead h1 { font-size: 28px; letter-spacing: -0.015em; }
+    header.masthead .subtitle { font-size: 12.5px; line-height: 1.5; max-width: 100%; }
+
+    /* Tab bar — horizontally scrollable instead of wrapping onto a
+       second row. The flex spacers that center the bar on desktop
+       are pointless here and force the right-side group off-screen. */
+    nav.tabs { padding: 0 8px; overflow-x: auto; gap: 0;
+               scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    nav.tabs::-webkit-scrollbar { display: none; }
+    nav.tabs .tabs-spacer { display: none; }
+    nav.tabs .tabs-right { flex: none; }
+    nav.tabs button { padding: 12px 12px; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
+    nav.tabs .theme-toggle { min-width: 40px; min-height: 40px; }
+
+    /* Main container — tighter side padding so cards have room to breathe. */
+    main { padding: 14px 12px 32px; }
+
+    /* Filter strip — left-justify and collapse the "Filter:" label.
+       On a phone, dropdown buttons need every horizontal pixel. */
+    .filter-strip { padding: 8px 10px; gap: 6px; justify-content: flex-start; }
+    .filter-strip .strip-label { display: none; }
+    .filter-dd > .filter-trigger { padding: 6px 10px; font-size: 12.5px; }
+    .filter-strip .quick-chip { padding: 6px 10px; font-size: 12px; }
+    .filter-dd > .popover { left: -4px; right: auto; min-width: calc(100vw - 28px); max-width: calc(100vw - 28px); }
+
+    /* Vacancy-gap banner — the headline still needs to land hard, but
+       the desktop sizing breaks under 360 px. */
+    .vacancy-gap-banner { padding: 12px 14px; border-left-width: 4px; }
+    .vacancy-gap-banner .vgb-headline { font-size: 15.5px; line-height: 1.5; }
+    .vacancy-gap-banner .vgb-num { font-size: 19px; padding: 0 1px; }
+    .vacancy-gap-banner .vgb-sub { font-size: 12.5px; }
+
+    /* Listing card — collapse to 3 columns (tier-bar | content | deadline),
+       drop the actions column entirely. The row-meta pills wrap naturally. */
+    .listing { grid-template-columns: 4px 1fr auto; gap: 12px; padding: 12px 14px; }
+    .listing .row-actions { display: none; }
+    .listing .row-title { font-size: 14.5px; }
+    .listing .row-meta { font-size: 11.5px; gap: 4px 5px; }
+    .listing .meta-pill { padding: 2px 7px; font-size: 11px; }
+    .listing .deadline-num { font-size: 18px; }
+    .listing .row-deadline { min-width: 72px; }
+
+    /* Summary row + sort dropdown — sort goes full-width on phone. */
+    .summary-row { font-size: 12.5px; align-items: stretch; }
+    .summary-row .sort-wrap { justify-content: flex-end; }
+
+    /* Banner (deadline-warning + data-unavailable) — tighter type. */
+    .banner { font-size: 11.5px; padding: 8px 10px; }
+
+    /* Footer — keep readable, stop eating screen with 32 px side padding. */
+    footer { padding: 18px 14px !important; font-size: 11.5px; }
+  }
+
+  /* Sub-360 px (older / smaller phones in landscape with browser chrome).
+     Collapse the deadline column as a final fallback so the title isn't
+     squeezed into a 60 px ribbon. */
+  @media (max-width: 420px) {
+    .listing { grid-template-columns: 4px 1fr; }
+    .listing .row-deadline { grid-column: 2; text-align: left; min-width: 0; margin-top: 6px; }
+    .listing .row-deadline .deadline-num { font-size: 14px; display: inline; margin-right: 6px; font-weight: 700; color: var(--alarm); }
+    .listing .row-deadline .deadline-pill { font-size: 11px; }
+    header.masthead h1 { font-size: 24px; }
+    nav.tabs button { padding: 11px 9px; font-size: 13px; }
+  }
+
+  .empty-state { padding: 60px 20px; text-align: center; color: var(--muted); font-size: 14px; }
+  .empty-state .big { font-size: 40px; margin-bottom: 10px; }
+
+  /* Map */
+  #map-container { height: 620px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .map-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; font-size: 12px; }
+  .map-legend-item { display: flex; align-items: center; gap: 5px; }
+  .map-legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .leaflet-popup-content { font-size: 13px; line-height: 1.5; min-width: 180px; }
+  .leaflet-popup-content strong { color: var(--accent); }
+  .popup-hss { color: var(--warn); font-weight: 600; margin-top: 4px; }
+  .popup-link { color: var(--accent); text-decoration: none; font-size: 12px; }
+
+  /* Coverage */
+  #coverage-summary .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  #coverage-summary .kpi { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  #coverage-summary .kpi .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+  #coverage-summary .kpi .val { font-family: var(--serif); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  #coverage-tab table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  #coverage-tab th, #coverage-tab td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  #coverage-tab th { background: var(--chip-bg); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .status-ok { color: var(--good); }
+  .status-err { color: var(--alarm); }
+  .status-no { color: var(--muted); }
+
+  /* Vacancy data */
+  #vacancies-tab { max-width: 980px; }
+  /* H3 section headers on Vacancies tab carry a red left bar — these
+     are arguments, not just navigation, and the visual register says so. */
+  #vacancies-tab h3 { font-family: var(--serif); font-weight: 700; font-size: 19px; margin: 24px 0 10px; padding: 4px 0 4px 14px; border-left: 4px solid var(--alarm); }
+  #vacancies-tab .vac-intro { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  #vacancies-tab .vac-footnote { background: #fff8e7; border: 1px solid #f0d98e; border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: #5c4a1a; line-height: 1.55; margin: 14px 0 22px; }
+  #vacancies-tab .vac-footnote strong { color: #3d3108; }
+  #vacancies-tab .vac-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); margin-bottom: 18px; }
+  #vacancies-tab .vac-table-scroll::-webkit-scrollbar { height: 8px; }
+  #vacancies-tab .vac-table-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  #vacancies-tab table.vac { width: 100%; min-width: 920px; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+  #vacancies-tab table.vac th, #vacancies-tab table.vac td { text-align: right; padding: 7px 9px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  #vacancies-tab table.vac td:first-child, #vacancies-tab table.vac th:first-child { position: sticky; left: 0; background: var(--panel); z-index: 1; box-shadow: 1px 0 0 var(--border); }
+  #vacancies-tab table.vac th:first-child { background: var(--chip-bg); }
+  #vacancies-tab table.vac th:first-child, #vacancies-tab table.vac td:first-child { text-align: left; }
+  #vacancies-tab table.vac th { background: var(--chip-bg); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  #vacancies-tab table.vac .ews-marker { font-size: 10px; color: #a6802a; margin-left: 3px; cursor: help; }
+  #vacancies-tab table.vac .refused { color: var(--muted); font-style: italic; font-size: 12px; }
+  #vacancies-tab .vac-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin-bottom: 14px; }
+  #vacancies-tab .vac-card .vac-hdr { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  #vacancies-tab .vac-card h4 { font-family: var(--serif); font-weight: 600; font-size: 16px; margin: 0; }
+  #vacancies-tab .vac-card h4 .grain-tag { font-family: var(--sans); font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--chip-bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; margin-left: 8px; vertical-align: middle; }
+  #vacancies-tab .vac-card .vac-meta { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  #vacancies-tab .vac-card .vac-src { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  #vacancies-tab .vac-card .vac-src a { color: var(--accent); text-decoration: none; }
+  #vacancies-tab .vac-card .vac-notes { font-size: 12px; color: var(--muted); margin-top: 8px; font-style: italic; line-height: 1.5; }
+  #vacancies-tab .disclosure-warning { background: #fdf2f2; border: 1px solid #f5c5c5; border-left: 3px solid #c44; border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #6b2020; line-height: 1.6; margin: 18px 0; }
+
+  /* Inequality educational viz */
+  #vacancies-tab .ineq-section { margin: 28px 0; }
+  #vacancies-tab .ineq-section h3 { margin-top: 0; }
+  #vacancies-tab .ineq-lede { font-family: var(--serif); font-size: 17px; line-height: 1.55; color: var(--ink); margin: 4px 0 18px; }
+  #vacancies-tab .ineq-lede strong { color: var(--alarm); font-weight: 700; }
+  #vacancies-tab .viz-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 18px; }
+  #vacancies-tab .viz-card .viz-hdr { font-family: var(--serif); font-weight: 600; font-size: 15px; margin: 0 0 4px; }
+  #vacancies-tab .viz-card .viz-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  #vacancies-tab .viz-card .viz-source { font-size: 11px; color: var(--muted); margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+  #vacancies-tab .viz-card .viz-source a { color: var(--accent); text-decoration: none; }
+  /* Vacancy-rate horizontal bar chart */
+  #vacancies-tab .vrbar-row { display: grid; grid-template-columns: 56px 1fr 64px; align-items: center; gap: 10px; margin: 6px 0; font-size: 13px; }
+  #vacancies-tab .vrbar-cat { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #vacancies-tab .vrbar-track { position: relative; height: 22px; background: var(--chip-bg); border-radius: 4px; overflow: hidden; }
+  #vacancies-tab .vrbar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+  #vacancies-tab .vrbar-fill.cat-GEN { background: linear-gradient(90deg, #5b8bbf, #4a7aa8); }
+  #vacancies-tab .vrbar-fill.cat-SC  { background: linear-gradient(90deg, #c97a4a, #b46438); }
+  #vacancies-tab .vrbar-fill.cat-ST  { background: linear-gradient(90deg, #c44, #a32626); }
+  #vacancies-tab .vrbar-fill.cat-OBC { background: linear-gradient(90deg, #d4a347, #b88a2e); }
+  #vacancies-tab .vrbar-baseline { position: absolute; top: -2px; bottom: -2px; width: 1.5px; background: var(--ink); opacity: 0.4; pointer-events: none; }
+  #vacancies-tab .vrbar-baseline-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; padding-left: 66px; font-style: italic; }
+  #vacancies-tab .vrbar-pct { text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; color: var(--ink); font-weight: 600; }
+  #vacancies-tab .vrbar-pct .raw { display: block; font-size: 10.5px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+  /* Realisation index: dot-on-rail */
+  #vacancies-tab .real-row { display: grid; grid-template-columns: 90px 1fr 50px; align-items: center; gap: 12px; margin: 10px 0; font-size: 13px; }
+  #vacancies-tab .real-cat { font-weight: 600; }
+  #vacancies-tab .real-rail { position: relative; height: 8px; background: var(--chip-bg); border-radius: 4px; }
+  #vacancies-tab .real-mark { position: absolute; top: -3px; bottom: -3px; width: 14px; border-radius: 7px; transition: left 0.4s ease; }
+  #vacancies-tab .real-target-line { position: absolute; top: -6px; bottom: -6px; left: 100%; width: 2px; background: var(--ink); opacity: 0.5; transform: translateX(-1px); }
+  #vacancies-tab .real-target-lbl { position: absolute; top: -22px; right: -22px; font-size: 10px; color: var(--muted); white-space: nowrap; font-style: italic; }
+  #vacancies-tab .real-val { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  #vacancies-tab .real-val.under { color: var(--alarm); }
+  /* Two-column layout for paired snapshots */
+  #vacancies-tab .ineq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { #vacancies-tab .ineq-grid { grid-template-columns: 1fr; } }
+  /* Prose explainer blocks */
+  #vacancies-tab .explain-block { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin-bottom: 14px; }
+  #vacancies-tab .explain-block h4 { font-family: var(--serif); font-weight: 600; font-size: 15px; margin: 0 0 12px; color: var(--ink); }
+  #vacancies-tab .explain-block p { font-size: 13.5px; line-height: 1.6; color: var(--ink); margin: 12px 0 0; }
+  #vacancies-tab .explain-block p:last-child { margin-bottom: 0; }
+  #vacancies-tab .explain-block .caption { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-top: 12px; font-style: italic; }
+  #vacancies-tab .explain-block .cite { font-size: 11.5px; color: var(--muted); }
+
+  /* Concept diagram (sanctioned = in-pos + vacant; what we cannot see) */
+  #vacancies-tab .concept-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 720px) { #vacancies-tab .concept-grid { grid-template-columns: 1fr; } }
+  #vacancies-tab .concept-bar { font-size: 12px; }
+  #vacancies-tab .concept-bar .lbl { color: var(--muted); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.05em; }
+  #vacancies-tab .concept-bar .stack { display: flex; height: 32px; border-radius: 5px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 4px; }
+  #vacancies-tab .concept-bar .seg-inp { background: #4a7aa8; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+  #vacancies-tab .concept-bar .seg-vac { background: #c97a4a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+  #vacancies-tab .concept-bar .stack-key { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+  #vacancies-tab .concept-blind { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  #vacancies-tab .concept-blind .blind { background: var(--chip-bg); border: 1px dashed var(--border); border-radius: 4px; padding: 8px 10px; font-size: 11.5px; color: var(--ink); line-height: 1.4; }
+  #vacancies-tab .concept-blind .blind strong { display: block; color: var(--alarm); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+
+  /* Timeline (13-point roster) */
+  #vacancies-tab .timeline { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; padding: 8px 0 0; margin-top: 4px; }
+  @media (max-width: 720px) { #vacancies-tab .timeline { grid-template-columns: repeat(2, 1fr); gap: 16px 0; } }
+  #vacancies-tab .timeline::before { content: ""; position: absolute; top: 18px; left: 16%; right: 16%; height: 2px; background: var(--border); }
+  #vacancies-tab .timeline-node { padding: 0 14px; position: relative; }
+  #vacancies-tab .timeline-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); margin: 12px auto 14px; position: relative; z-index: 1; box-shadow: 0 0 0 4px var(--panel); }
+  #vacancies-tab .timeline-node.harm .timeline-dot { background: var(--alarm); }
+  #vacancies-tab .timeline-date { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 4px; font-weight: 600; }
+  #vacancies-tab .timeline-title { font-weight: 600; font-size: 12.5px; text-align: center; margin-bottom: 4px; color: var(--ink); }
+  #vacancies-tab .timeline-body { font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.45; }
+
+  /* Side-by-side stacked bars (EWS redistribution) */
+  #vacancies-tab .ews-bars { display: grid; gap: 14px; margin-top: 4px; }
+  #vacancies-tab .ews-row { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: center; }
+  #vacancies-tab .ews-row .ews-label { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  #vacancies-tab .ews-row .ews-label .yr { display: block; font-size: 10px; font-weight: 400; margin-top: 1px; }
+  #vacancies-tab .ews-stack { display: flex; height: 30px; border-radius: 5px; overflow: hidden; border: 1px solid var(--border); }
+  #vacancies-tab .ews-seg { display: flex; align-items: center; justify-content: center; font-size: 10.5px; color: white; font-weight: 700; min-width: 0; }
+  #vacancies-tab .seg-GEN  { background: #6b8aab; }
+  #vacancies-tab .seg-EWS  { background: #2a4a6e; border-left: 2px solid #fff3; }
+  #vacancies-tab .seg-OBC  { background: #b88a2e; }
+  #vacancies-tab .seg-SC   { background: #b46438; }
+  #vacancies-tab .seg-ST   { background: #a32626; }
+  #vacancies-tab .ews-callout { font-size: 11.5px; color: var(--alarm); margin-top: 4px; padding: 6px 10px; background: #fdf2f2; border-left: 3px solid var(--alarm); border-radius: 0 4px 4px 0; line-height: 1.5; }
+
+  /* Gap chart (PwBD) */
+  #vacancies-tab .gap-chart { display: grid; gap: 8px; max-width: 540px; margin-top: 4px; }
+  #vacancies-tab .gap-row { display: grid; grid-template-columns: 110px 1fr 80px; gap: 10px; align-items: center; }
+  #vacancies-tab .gap-label { font-size: 12px; font-weight: 600; }
+  #vacancies-tab .gap-track { position: relative; height: 22px; background: var(--chip-bg); border-radius: 4px; }
+  #vacancies-tab .gap-fill-mandate { background: linear-gradient(90deg, #6b8aab, #4a7aa8); height: 100%; border-radius: 4px; }
+  #vacancies-tab .gap-fill-actual { background: linear-gradient(90deg, #c44, #a32626); height: 100%; border-radius: 4px; }
+  #vacancies-tab .gap-pct { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; text-align: right; }
+  #vacancies-tab .gap-pct.under { color: var(--alarm); }
+
+  /* Contract schematic */
+  #vacancies-tab .contract-schema { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 4px; }
+  #vacancies-tab .contract-col { padding: 14px 16px; }
+  #vacancies-tab .contract-col.protected { background: rgba(74, 122, 168, 0.08); border-right: 1px solid var(--border); }
+  #vacancies-tab .contract-col.exempt { background: rgba(196, 68, 68, 0.06); }
+  #vacancies-tab .contract-col h5 { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px; font-weight: 700; }
+  #vacancies-tab .contract-col.protected h5 { color: #4a7aa8; }
+  #vacancies-tab .contract-col.exempt h5 { color: var(--alarm); }
+  #vacancies-tab .contract-col .body { font-size: 12px; color: var(--ink); line-height: 1.5; margin-bottom: 8px; }
+  #vacancies-tab .contract-col .meta { font-size: 11px; color: var(--muted); font-style: italic; }
+  #vacancies-tab .contract-arrow { text-align: center; font-size: 12px; color: var(--alarm); margin: 8px 0; padding: 6px 10px; background: var(--chip-bg); border-radius: 4px; }
+  /* References */
+  #vacancies-tab .references { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); }
+  #vacancies-tab .references h3 { font-family: var(--serif); font-weight: 600; font-size: 15px; margin: 0 0 12px; }
+  #vacancies-tab .references ul { list-style: none; padding: 0; margin: 0; }
+  #vacancies-tab .references li { font-size: 12.5px; line-height: 1.55; color: var(--muted); margin-bottom: 8px; padding-left: 1.5em; text-indent: -1.5em; }
+  #vacancies-tab .references li em { font-style: italic; }
+  /* No-disclosure snapshot card — visually distinct from data cards.
+     Striped/dashed styling makes the absence legible as the finding it is. */
+  #vacancies-tab .vac-card-nodata { border: 1.5px dashed var(--alarm); background: rgba(200,16,46,0.04); }
+  #vacancies-tab .vac-card-nodata h4 { color: var(--alarm); }
+  #vacancies-tab .vac-card-nodata .vac-meta { color: var(--alarm); font-weight: 700; }
+  #vacancies-tab .vac-card-nodata .nodata-body { font-size: 13.5px; line-height: 1.6; color: var(--ink); padding: 8px 0 4px; }
+
+  /* ============================================================
+     LS-corpus visualisations (added when the 25 Lok Sabha PDFs
+     were analysed). All sit inside .viz-card so they inherit the
+     same panel styling as the existing inequality blocks.
+     ============================================================ */
+
+  /* Time series: vacancy stays roughly flat 2024–2025 (CU) */
+  #vacancies-tab .timeseries { display: grid; grid-template-columns: 60px 1fr; gap: 8px; }
+  #vacancies-tab .ts-y-axis { font-size: 10px; color: var(--muted); display: flex; flex-direction: column; justify-content: space-between; padding: 6px 0 18px; text-align: right; font-variant-numeric: tabular-nums; }
+  #vacancies-tab .ts-plot { position: relative; height: 200px; border-bottom: 1.5px solid var(--border); border-left: 1.5px solid var(--border); padding: 4px 0; }
+  #vacancies-tab .ts-grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--border); opacity: 0.5; pointer-events: none; }
+  #vacancies-tab .ts-bar { position: absolute; bottom: 0; width: 70px; background: linear-gradient(180deg, var(--accent), var(--accent-deep)); border-radius: 3px 3px 0 0; transition: height 0.4s ease; box-shadow: 0 -1px 0 rgba(255,255,255,0.2) inset; }
+  #vacancies-tab .ts-bar.disclosure-loss { background: linear-gradient(180deg, #6f6c64, #4a4842); }
+  #vacancies-tab .ts-bar-label { position: absolute; top: -22px; left: 0; right: 0; text-align: center; font-size: 11.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #vacancies-tab .ts-x-axis { position: absolute; bottom: -22px; left: 0; right: 0; display: flex; justify-content: space-around; font-size: 10.5px; color: var(--muted); }
+  #vacancies-tab .ts-x-tick { width: 70px; text-align: center; }
+
+  /* Mission Mode realisation: horizontal bars, mandate line, achieved fill */
+  #vacancies-tab .mm-row { display: grid; grid-template-columns: 70px 1fr 78px; align-items: center; gap: 12px; margin: 10px 0; }
+  #vacancies-tab .mm-cat { font-weight: 700; font-size: 13px; }
+  #vacancies-tab .mm-track { position: relative; height: 26px; background: var(--chip-bg); border-radius: 4px; overflow: visible; }
+  #vacancies-tab .mm-fill-mandate { position: absolute; top: 0; bottom: 0; left: 0; background: rgba(31,58,138,0.12); border-right: 2px dashed var(--accent); border-radius: 4px 0 0 4px; }
+  #vacancies-tab .mm-fill-actual { position: absolute; top: 3px; bottom: 3px; left: 0; background: linear-gradient(90deg, var(--accent), var(--accent-deep)); border-radius: 3px; }
+  #vacancies-tab .mm-fill-actual.under { background: linear-gradient(90deg, #c97a4a, #b46438); }
+  #vacancies-tab .mm-fill-actual.severe { background: linear-gradient(90deg, var(--alarm), #931020); }
+  #vacancies-tab .mm-fill-actual.over { background: linear-gradient(90deg, #6c6c6c, #444); }
+  #vacancies-tab .mm-mandate-label { position: absolute; top: -16px; font-size: 10px; color: var(--accent); font-weight: 700; transform: translateX(-50%); white-space: nowrap; }
+  #vacancies-tab .mm-pct { text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 700; }
+  #vacancies-tab .mm-pct .mm-real { display: block; font-size: 10.5px; font-weight: 600; margin-top: 1px; }
+  #vacancies-tab .mm-pct .mm-real.under { color: var(--warn); }
+  #vacancies-tab .mm-pct .mm-real.severe { color: var(--alarm); }
+  #vacancies-tab .mm-pct .mm-real.over { color: var(--muted); }
+
+  /* Disclosure-regression matrix */
+  #vacancies-tab .dr-table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; margin-top: 4px; }
+  #vacancies-tab .dr-table th, #vacancies-tab .dr-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+  #vacancies-tab .dr-table th { background: var(--chip-bg); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  #vacancies-tab .dr-table td.dr-cell { text-align: center; font-weight: 700; }
+  #vacancies-tab .dr-table td.dr-y { background: rgba(31,58,138,0.10); color: var(--accent); }
+  #vacancies-tab .dr-table td.dr-n { background: rgba(200,16,46,0.10); color: var(--alarm); }
+  #vacancies-tab .dr-table td.dr-p { background: rgba(160,96,0,0.10); color: var(--warn); }
+  #vacancies-tab .dr-q { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* AIIMS table — sortable feel without the JS sort */
+  #vacancies-tab .aiims-table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  #vacancies-tab .aiims-table th, #vacancies-tab .aiims-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: right; }
+  #vacancies-tab .aiims-table th:first-child, #vacancies-tab .aiims-table td:first-child { text-align: left; }
+  #vacancies-tab .aiims-table th { background: var(--chip-bg); font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  #vacancies-tab .aiims-table tr.severe td { background: rgba(200,16,46,0.06); }
+  #vacancies-tab .aiims-table tr.severe td:first-child { color: var(--alarm); font-weight: 700; }
+  #vacancies-tab .aiims-table .vrate { font-weight: 700; }
+  #vacancies-tab .aiims-table .vrate.severe { color: var(--alarm); }
+  #vacancies-tab .aiims-table .vrate.high { color: var(--warn); }
+
+  /* ----- new viz types: donut, RD comparison, pipeline, pyramid, ticker ----- */
+  /* SVG donut */
+  #vacancies-tab .donut-wrap { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: center; }
+  @media (max-width: 720px) { #vacancies-tab .donut-wrap { grid-template-columns: 1fr; } }
+  #vacancies-tab .donut-svg { width: 280px; height: 280px; display: block; margin: 0 auto; }
+  #vacancies-tab .donut-center { fill: var(--ink); font-family: var(--serif); font-weight: 700; }
+  #vacancies-tab .donut-center-label { fill: var(--muted); font-size: 11px; }
+  #vacancies-tab .donut-legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-variant-numeric: tabular-nums; }
+  #vacancies-tab .donut-legend .row { display: grid; grid-template-columns: 14px 60px 1fr auto; gap: 8px; align-items: center; }
+  #vacancies-tab .donut-legend .swatch { width: 14px; height: 14px; border-radius: 3px; }
+  #vacancies-tab .donut-legend .cat { font-weight: 700; }
+  #vacancies-tab .donut-legend .gap { color: var(--muted); font-style: italic; font-size: 12px; }
+  #vacancies-tab .donut-legend .gap.under { color: var(--alarm); }
+  #vacancies-tab .donut-legend .gap.over { color: var(--warn); font-weight: 600; }
+
+  /* R&D comparison strip */
+  #vacancies-tab .rd-strip { display: grid; gap: 10px; }
+  #vacancies-tab .rd-row { display: grid; grid-template-columns: 90px 1fr 90px; gap: 12px; align-items: center; font-size: 13px; }
+  #vacancies-tab .rd-country { font-weight: 700; }
+  #vacancies-tab .rd-bar-track { background: var(--chip-bg); height: 22px; border-radius: 4px; position: relative; overflow: hidden; }
+  #vacancies-tab .rd-bar-fill { height: 100%; border-radius: 4px; }
+  #vacancies-tab .rd-pct { font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
+  #vacancies-tab .rd-row.india .rd-bar-fill { background: linear-gradient(90deg, var(--alarm), #931020); }
+  #vacancies-tab .rd-row.india .rd-pct { color: var(--alarm); }
+  #vacancies-tab .rd-row:not(.india) .rd-bar-fill { background: linear-gradient(90deg, var(--accent), var(--accent-deep)); opacity: 0.7; }
+
+  /* Talent pipeline (CSS Sankey-ish) */
+  #vacancies-tab .pipeline { display: grid; grid-template-columns: 1fr 36px 1fr 36px 1fr; gap: 0; align-items: stretch; margin-top: 8px; }
+  #vacancies-tab .pipe-stage { background: var(--chip-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 14px 14px; text-align: center; min-height: 130px; display: flex; flex-direction: column; justify-content: center; }
+  #vacancies-tab .pipe-stage .pipe-num { font-family: var(--serif); font-weight: 700; font-size: 26px; color: var(--ink); display: block; margin-bottom: 2px; line-height: 1.1; }
+  #vacancies-tab .pipe-stage .pipe-num-sub { font-size: 11px; color: var(--muted); }
+  #vacancies-tab .pipe-stage .pipe-label { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  #vacancies-tab .pipe-stage .pipe-note { font-size: 11.5px; color: var(--muted); line-height: 1.4; margin-top: 6px; }
+  #vacancies-tab .pipe-stage.leak { border-left: 4px solid var(--alarm); background: rgba(200,16,46,0.04); }
+  #vacancies-tab .pipe-stage.input { border-left: 4px solid var(--accent); }
+  #vacancies-tab .pipe-arrow { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 22px; }
+  #vacancies-tab .pipe-leak-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 12px; font-size: 11.5px; color: var(--muted); }
+  #vacancies-tab .pipe-leak-row .leak-arrow { text-align: center; color: var(--alarm); font-weight: 700; }
+  @media (max-width: 720px) { #vacancies-tab .pipeline { grid-template-columns: 1fr; gap: 6px; } #vacancies-tab .pipe-arrow { transform: rotate(90deg); padding: 4px 0; } }
+
+  /* Caste rank pyramid */
+  #vacancies-tab .pyramid { display: grid; gap: 6px; max-width: 640px; margin: 8px auto 0; }
+  #vacancies-tab .pyr-row { display: grid; grid-template-columns: 130px 1fr 70px; gap: 10px; align-items: center; }
+  #vacancies-tab .pyr-rank { font-weight: 700; font-size: 13px; text-align: right; }
+  #vacancies-tab .pyr-bar { display: flex; height: 30px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  #vacancies-tab .pyr-seg { display: flex; align-items: center; justify-content: center; font-size: 10.5px; color: white; font-weight: 700; min-width: 0; }
+  #vacancies-tab .pyr-seg.gen { background: #6b6b6b; }
+  #vacancies-tab .pyr-seg.obc { background: #b88a2e; }
+  #vacancies-tab .pyr-seg.sc { background: #b46438; }
+  #vacancies-tab .pyr-seg.st { background: #a32626; }
+  #vacancies-tab .pyr-total { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12px; }
+  #vacancies-tab .pyr-legend { display: flex; gap: 16px; justify-content: center; margin-top: 12px; font-size: 11.5px; color: var(--muted); }
+  #vacancies-tab .pyr-legend .lswatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+
+  /* ============================================================
+     UNIFIED JBM CHART SYSTEM
+     One visual language. One color discipline. One typographic scale.
+     Every chart on the Vacancies page uses these primitives.
+     ============================================================ */
+  #vacancies-tab .jbm-card { background: var(--panel); border: 1px solid var(--border); padding: 24px 28px 22px; margin-bottom: 24px; }
+  #vacancies-tab .jbm-card .jbm-title { font-family: var(--serif); font-size: 19px; font-weight: 700; color: var(--ink); line-height: 1.32; letter-spacing: -0.005em; margin: 0 0 6px; max-width: 720px; }
+  #vacancies-tab .jbm-card .jbm-deck { font-family: var(--sans, "Inter"); font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 0 18px; max-width: 720px; }
+  #vacancies-tab .jbm-card .jbm-chart { margin: 4px 0; }
+  #vacancies-tab .jbm-card .jbm-source { font-family: var(--sans, "Inter"); font-size: 11px; color: var(--muted); font-style: italic; line-height: 1.5; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); max-width: 720px; }
+  #vacancies-tab .jbm-card .jbm-source strong { font-style: normal; color: var(--ink); font-weight: 700; }
+  /* JBM color discipline:
+       --jbm-emph    : ONE accent for what the chart is making you look at
+       --jbm-context : muted grey for everything else
+       --jbm-promise : Ambedkar cobalt for what was promised by statute
+       --jbm-grid    : barely-there gridline grey
+   */
+  #vacancies-tab .jbm-card { --jbm-emph: var(--alarm); --jbm-context: #b3b1a6; --jbm-promise: var(--accent); --jbm-grid: rgba(0,0,0,0.08); }
+  html[data-theme="dark"] #vacancies-tab .jbm-card { --jbm-grid: rgba(255,255,255,0.10); }
+  /* Standard SVG primitives (apply within .jbm-card) */
+  #vacancies-tab .jbm-card svg.jbm-svg { width: 100%; max-width: 760px; display: block; overflow: visible; font-family: var(--sans, "Inter"); }
+  #vacancies-tab .jbm-card svg.jbm-svg .grid-y, #vacancies-tab .jbm-card svg.jbm-svg .grid-x { stroke: var(--jbm-grid); stroke-width: 1; }
+  #vacancies-tab .jbm-card svg.jbm-svg .axis-label { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  #vacancies-tab .jbm-card svg.jbm-svg .axis-label.bold { font-weight: 700; fill: var(--ink); }
+  #vacancies-tab .jbm-card svg.jbm-svg .axis-title { font-size: 10.5px; fill: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+  #vacancies-tab .jbm-card svg.jbm-svg .data-label { font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  #vacancies-tab .jbm-card svg.jbm-svg .data-label.emph { fill: var(--jbm-emph); }
+  #vacancies-tab .jbm-card svg.jbm-svg .data-label.context { fill: var(--muted); font-weight: 500; }
+  #vacancies-tab .jbm-card svg.jbm-svg .anno-line { stroke: var(--jbm-emph); stroke-width: 1.25; fill: none; }
+  #vacancies-tab .jbm-card svg.jbm-svg .anno-text { font-size: 11.5px; fill: var(--ink); }
+  #vacancies-tab .jbm-card svg.jbm-svg .anno-text.emph { fill: var(--jbm-emph); font-weight: 700; }
+  #vacancies-tab .jbm-card svg.jbm-svg .bar-emph { fill: var(--jbm-emph); }
+  #vacancies-tab .jbm-card svg.jbm-svg .bar-context { fill: var(--jbm-context); }
+  #vacancies-tab .jbm-card svg.jbm-svg .bar-promise { fill: var(--jbm-promise); }
+  #vacancies-tab .jbm-card svg.jbm-svg .ref-line { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 4,3; opacity: 0.6; }
+
+  /* JBM-standard SVG line chart for time series */
+  #vacancies-tab .line-svg { width: 100%; max-width: 760px; height: auto; aspect-ratio: 760/360; display: block; margin: 4px 0 8px; overflow: visible; font-family: var(--sans, "Inter"); }
+  #vacancies-tab .line-svg .grid { stroke: var(--border); stroke-width: 1; }
+  #vacancies-tab .line-svg .axis-num { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  #vacancies-tab .line-svg .axis-label-x { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  #vacancies-tab .line-svg .axis-y-title { font-size: 10.5px; fill: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+  #vacancies-tab .line-svg .line-disclosed { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+  #vacancies-tab .line-svg .line-withheld  { stroke: var(--alarm);  stroke-width: 2.5; fill: none; }
+  #vacancies-tab .line-svg .dot { stroke: white; stroke-width: 2; }
+  #vacancies-tab .line-svg .dot.disclosed { fill: var(--accent); }
+  #vacancies-tab .line-svg .dot.withheld  { fill: var(--alarm); }
+  #vacancies-tab .line-svg .dot-label { font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  #vacancies-tab .line-svg .dot-label.disclosed { fill: var(--accent); }
+  #vacancies-tab .line-svg .dot-label.withheld  { fill: var(--alarm); }
+  #vacancies-tab .line-svg .seg-label { font-size: 11.5px; font-weight: 600; }
+  #vacancies-tab .line-svg .seg-label.disclosed { fill: var(--accent); }
+  #vacancies-tab .line-svg .seg-label.withheld  { fill: var(--alarm); }
+  #vacancies-tab .line-svg .anno-line { stroke: var(--ink); stroke-width: 1; opacity: 0.5; fill: none; }
+  #vacancies-tab .line-svg .anno-text { font-size: 11.5px; fill: var(--ink); }
+  #vacancies-tab .line-svg .anno-text.bold { font-weight: 700; fill: var(--alarm); }
+
+  /* JBM-style ranked horizontal bar chart for AIIMS / institutions */
+  #vacancies-tab .ranked-bars { display: grid; gap: 4px; max-width: 760px; margin: 12px 0 8px; font-family: var(--sans, "Inter"); }
+  #vacancies-tab .rb-row { display: grid; grid-template-columns: 170px 1fr 60px; gap: 12px; align-items: center; padding: 4px 0; font-size: 12.5px; }
+  #vacancies-tab .rb-row.severe { background: rgba(200,16,46,0.05); border-left: 3px solid var(--alarm); padding-left: 8px; margin-left: -11px; }
+  #vacancies-tab .rb-row .rb-name { font-weight: 600; }
+  #vacancies-tab .rb-row.severe .rb-name { color: var(--alarm); font-weight: 700; }
+  #vacancies-tab .rb-row .rb-bar-track { height: 18px; background: transparent; position: relative; }
+  #vacancies-tab .rb-row .rb-bar-fill { height: 100%; border-radius: 2px; }
+  #vacancies-tab .rb-row .rb-bar-fill.severe { background: var(--alarm); }
+  #vacancies-tab .rb-row .rb-bar-fill.high   { background: #c97a4a; }
+  #vacancies-tab .rb-row .rb-bar-fill.normal { background: #b3b1a6; }
+  #vacancies-tab .rb-row .rb-pct { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  #vacancies-tab .rb-row.severe .rb-pct { color: var(--alarm); }
+  #vacancies-tab .rb-row .rb-pct.high { color: #b46438; }
+  #vacancies-tab .rb-axis { display: grid; grid-template-columns: 170px 1fr 60px; gap: 12px; font-size: 10.5px; color: var(--muted); margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border); }
+  #vacancies-tab .rb-axis-ticks { display: flex; justify-content: space-between; }
+
+  /* MPs bar chart by state */
+  #vacancies-tab .mp-state-chart { display: grid; gap: 6px; max-width: 600px; margin: 8px 0; }
+  #vacancies-tab .mp-state-row { display: grid; grid-template-columns: 110px 1fr 30px; gap: 12px; align-items: center; font-size: 12.5px; }
+  #vacancies-tab .mp-state-row .mp-state-name { font-weight: 600; text-align: right; }
+  #vacancies-tab .mp-state-row .mp-state-bar { height: 22px; background: var(--accent); border-radius: 2px; }
+  #vacancies-tab .mp-state-row .mp-state-count { font-variant-numeric: tabular-nums; font-weight: 700; }
+  #vacancies-tab .mp-state-row.muted .mp-state-bar { background: #b3b1a6; }
+  #vacancies-tab .mp-state-row.muted { color: var(--muted); }
+
+  /* Burn-Murdoch slope chart: mandate (left) → actual share (right).
+     Lines that slope down = categories under-realised. One outlier in
+     saturated red, others in muted neutral. */
+  #vacancies-tab .slope-card { padding: 24px 28px; }
+  #vacancies-tab .slope-svg { width: 100%; max-width: 760px; height: 320px; display: block; margin: 8px 0; overflow: visible; }
+  #vacancies-tab .slope-svg .grid { stroke: var(--border); stroke-dasharray: 2,3; }
+  #vacancies-tab .slope-svg .axis-label { font-size: 11px; fill: var(--muted); font-family: var(--sans, "Inter"); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  #vacancies-tab .slope-svg .col-label { font-size: 13px; fill: var(--ink); font-weight: 700; }
+  #vacancies-tab .slope-svg .col-sub { font-size: 11px; fill: var(--muted); }
+  #vacancies-tab .slope-svg .line { stroke-width: 2; fill: none; }
+  #vacancies-tab .slope-svg .line.muted { stroke: #c5c2b8; }
+  #vacancies-tab .slope-svg .line.outlier-red { stroke: var(--alarm); stroke-width: 3; }
+  #vacancies-tab .slope-svg .line.outlier-orange { stroke: #c97a4a; stroke-width: 2.5; }
+  #vacancies-tab .slope-svg .line.gain { stroke: #6b6b6b; stroke-width: 2; }
+  #vacancies-tab .slope-svg .point { stroke-width: 0; }
+  #vacancies-tab .slope-svg .point.muted { fill: #c5c2b8; }
+  #vacancies-tab .slope-svg .point.outlier-red { fill: var(--alarm); }
+  #vacancies-tab .slope-svg .point.outlier-orange { fill: #c97a4a; }
+  #vacancies-tab .slope-svg .point.gain { fill: #6b6b6b; }
+  #vacancies-tab .slope-svg .row-label { font-size: 12px; font-weight: 600; }
+  #vacancies-tab .slope-svg .row-label.muted { fill: var(--muted); }
+  #vacancies-tab .slope-svg .row-label.outlier-red { fill: var(--alarm); font-weight: 700; }
+  #vacancies-tab .slope-svg .row-label.outlier-orange { fill: #b46438; font-weight: 700; }
+  #vacancies-tab .slope-svg .annotation { font-size: 11.5px; font-style: italic; fill: var(--alarm); font-weight: 600; }
+  #vacancies-tab .slope-svg .annotation-arrow { stroke: var(--alarm); stroke-width: 1.5; fill: none; marker-end: url(#arrowred); }
+  #vacancies-tab .chart-source { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+  #vacancies-tab .chart-source strong { color: var(--ink); font-style: normal; font-weight: 700; }
+
+  /* Generic JBM-style chart annotations on top of any chart */
+  #vacancies-tab .chart-anno { position: relative; }
+  #vacancies-tab .anno-callout { background: rgba(200,16,46,0.92); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600; line-height: 1.3; max-width: 220px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+  #vacancies-tab .anno-callout.cobalt { background: rgba(31,58,138,0.92); }
+  #vacancies-tab .anno-callout.muted { background: rgba(95,93,87,0.92); }
+
+  /* Hero stat — NYT/FT-style opener */
+  #vacancies-tab .hero-stat { background: var(--bg); border: none; padding: 32px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  #vacancies-tab .hero-stat .hs-kicker { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--alarm); font-weight: 700; margin-bottom: 8px; }
+  #vacancies-tab .hero-stat .hs-num { font-family: var(--serif); font-weight: 800; font-size: 100px; line-height: 0.95; color: var(--alarm); letter-spacing: -0.04em; display: block; }
+  @media (max-width: 720px) { #vacancies-tab .hero-stat .hs-num { font-size: 72px; } }
+  #vacancies-tab .hero-stat .hs-headline { font-family: var(--serif); font-size: 22px; line-height: 1.35; color: var(--ink); font-weight: 600; max-width: 680px; margin: 14px 0 0; }
+  #vacancies-tab .hero-stat .hs-headline em { font-style: italic; color: var(--alarm); }
+  #vacancies-tab .hero-stat .hs-context { font-size: 13px; color: var(--muted); margin-top: 12px; max-width: 680px; line-height: 1.55; }
+
+  /* Sub-hero stat strip — three big numbers */
+  #vacancies-tab .hero-stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 0 0 32px; }
+  @media (max-width: 720px) { #vacancies-tab .hero-stat-strip { grid-template-columns: 1fr; } }
+  #vacancies-tab .hero-stat-strip .hss-cell { background: var(--panel); padding: 18px 20px; }
+  #vacancies-tab .hero-stat-strip .hss-num { font-family: var(--serif); font-weight: 800; font-size: 38px; line-height: 1; color: var(--alarm); display: block; letter-spacing: -0.02em; }
+  #vacancies-tab .hero-stat-strip .hss-cell:nth-child(2) .hss-num { color: var(--accent); }
+  #vacancies-tab .hero-stat-strip .hss-cell:nth-child(3) .hss-num { color: var(--alarm); }
+  #vacancies-tab .hero-stat-strip .hss-label { font-size: 12px; color: var(--ink); margin-top: 6px; line-height: 1.45; font-weight: 500; }
+  #vacancies-tab .hero-stat-strip .hss-source { font-size: 10.5px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+  /* Reading-first: per-chart inline source/citation strips are hidden in
+     the main flow and re-collected into a single bibliography at the end of
+     the tab (built by renderVacancies after innerHTML is set). The original
+     elements remain in the DOM so the bibliography builder can read them;
+     `display: none` removes them from rendering AND from the AT tree. */
+  #vacancies-tab .chart-source,
+  #vacancies-tab .jbm-source,
+  #vacancies-tab .hero-stat-strip .hss-source { display: none; }
+
+  /* Bibliography block appended by JS at the end of #vacancies-tab. */
+  #vacancies-tab .gap-bibliography { margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--border); }
+  #vacancies-tab .gap-bibliography h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--ink); margin: 0 0 12px; letter-spacing: -0.01em; }
+  #vacancies-tab .gap-bibliography .bib-method { font-size: 14px; color: var(--ink); max-width: 760px; line-height: 1.6; margin: 0 0 20px; font-family: var(--serif); }
+  #vacancies-tab .gap-bibliography ol { font-size: 13px; color: var(--muted); max-width: 760px; line-height: 1.6; padding-left: 22px; margin: 0; font-family: var(--sans, "Inter"); }
+  #vacancies-tab .gap-bibliography ol li { margin-bottom: 10px; }
+  #vacancies-tab .gap-bibliography ol li strong { color: var(--ink); font-weight: 700; }
+
+  /* Mobile chart polish: SVG charts and card paddings shrink to make the
+     actual data area larger on small viewports. */
+  @media (max-width: 640px) {
+    #vacancies-tab svg { max-width: 100%; height: auto; }
+    #vacancies-tab .jbm-card { padding: 16px 12px; border-radius: 8px; }
+    #vacancies-tab .hs-num { font-size: 76px !important; }
+    #vacancies-tab .hero-stat-strip { grid-template-columns: 1fr !important; gap: 12px !important; }
+    #vacancies-tab .act-header .act-title { font-size: 20px; }
+    #vacancies-tab .act-deck { font-size: 15px; line-height: 1.5; }
+  }
+
+  /* Section headers tightened */
+  #vacancies-tab .act-header { margin: 56px 0 8px; padding-bottom: 12px; border-bottom: 2px solid var(--alarm); display: flex; align-items: baseline; gap: 12px; }
+  #vacancies-tab .act-header .act-num { font-family: var(--mono); font-size: 11px; color: var(--alarm); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  #vacancies-tab .act-header .act-title { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
+  #vacancies-tab .act-deck { font-family: var(--serif); font-size: 17px; line-height: 1.45; color: var(--ink); font-weight: 500; max-width: 780px; margin: 0 0 18px; }
+  #vacancies-tab .act-deck strong { color: var(--alarm); font-weight: 700; }
+
+  /* Counterfactual ticker */
+  #vacancies-tab .counterfactual { background: linear-gradient(135deg, rgba(31,58,138,0.08), rgba(200,16,46,0.06)); border: 1.5px solid var(--border); border-left: 5px solid var(--alarm); border-radius: 10px; padding: 20px 24px; }
+  #vacancies-tab .counterfactual .cf-num { font-family: var(--serif); font-weight: 800; font-size: 36px; color: var(--alarm); display: block; line-height: 1; margin-bottom: 4px; letter-spacing: -0.02em; }
+  #vacancies-tab .counterfactual .cf-label { font-size: 13px; color: var(--ink); font-weight: 600; line-height: 1.5; }
+  #vacancies-tab .counterfactual .cf-bullets { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 18px; }
+  @media (max-width: 720px) { #vacancies-tab .counterfactual .cf-bullets { grid-template-columns: 1fr; } }
+  #vacancies-tab .counterfactual .cf-bullet { background: rgba(255,255,255,0.5); padding: 12px 14px; border-radius: 6px; }
+  #vacancies-tab .counterfactual .cf-bullet b { display: block; color: var(--alarm); font-size: 22px; font-family: var(--serif); margin-bottom: 2px; line-height: 1.1; }
+  #vacancies-tab .counterfactual .cf-bullet span { font-size: 12px; color: var(--ink); line-height: 1.45; display: block; }
+  html[data-theme="dark"] #vacancies-tab .counterfactual { background: linear-gradient(135deg, rgba(108,149,232,0.10), rgba(239,83,80,0.08)); }
+  html[data-theme="dark"] #vacancies-tab .counterfactual .cf-bullet { background: rgba(0,0,0,0.25); }
+
+  /* Who-is-asking MPs panel */
+  #vacancies-tab .mps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 6px; }
+  #vacancies-tab .mp-card { background: var(--chip-bg); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 4px; font-size: 12.5px; }
+  #vacancies-tab .mp-name { font-weight: 700; color: var(--ink); display: block; line-height: 1.35; }
+  #vacancies-tab .mp-aff { font-size: 11px; color: var(--muted); margin-top: 2px; display: block; }
+  #vacancies-tab .mp-state { font-size: 11px; color: var(--accent); font-weight: 600; }
+
+  /* Footer red top border bookends the masthead's red top strip — the
+     full page sits inside a Bahujan-radical-tradition frame. */
+  footer { max-width: 1480px; margin: 40px auto 0; padding: 24px 32px; border-top: 4px solid var(--alarm); font-size: 12px; color: var(--muted); line-height: 1.6; }
