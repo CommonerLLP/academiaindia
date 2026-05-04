@@ -4854,7 +4854,7 @@ const POSTDOC_ABROAD = {
 
 const RESOURCES_BLOCKS = [
   {
-    title: "If you're applying — practical infrastructure",
+    title: "If you're applying to Indian institutions — practical infrastructure",
     items: [
       { name: "RTI Online (Government of India)", url: "https://rtionline.gov.in/", note: "File RTIs to ask an institute its current roster status, de-reservation history, PwBD compliance figures, or to request the unredacted advertisement annexure when only summary numbers are published." },
       { name: "Lok Sabha / Rajya Sabha questions search", url: "https://sansad.in/", note: "Past parliamentary questions on faculty vacancies are the most useful institutional accountability data available. Search by ministry (HRD/Education), question type (unstarred), and keyword." },
@@ -4875,7 +4875,6 @@ const RESOURCES_BLOCKS = [
   {
     title: "If you're tracking institutional accountability",
     items: [
-      { name: "Frontline / The Wire / Caravan archives on faculty hiring", url: "#", note: "Investigative reporting on specific institutional hiring failures, de-reservation episodes, and protest-led reversals. Search 'IIT faculty caste', 'central university reservation roster', and similar." },
       { name: "DOPT (Department of Personnel and Training) reservation orders", url: "https://dopt.gov.in/", note: "Most authoritative source for reservation procedure circulars, including roster maintenance, certificate validity, and de-reservation/dereservation rules." },
       { name: "UGC reservation circulars", url: "https://www.ugc.gov.in/", note: "Institution-specific guidance on roster computation. The 13-point roster controversy and its 2019 reversal are documented in the circulars archive." },
     ],
@@ -4977,20 +4976,28 @@ function renderResources() {
       </div>
     </div>`;
 
-  const blocks = RESOURCES_BLOCKS.map(b => `
+  // Render the Indian-applications block followed by the RTI templates
+  // as one conceptual unit (both serve the candidate applying within
+  // India), then render the remaining blocks. This keeps the RTI
+  // templates positioned with their natural audience instead of
+  // floating at the very bottom of the page.
+  const renderBlock = (b) => `
     <div class="res-block">
       <h3>${escapeHTML(b.title)}</h3>
       <ul>${b.items.map(renderItem).join("")}</ul>
-    </div>`).join("");
+    </div>`;
+  const indianApplyBlock = RESOURCES_BLOCKS.length ? renderBlock(RESOURCES_BLOCKS[0]) : "";
+  const remainingBlocks = RESOURCES_BLOCKS.slice(1).map(renderBlock).join("");
 
   host.innerHTML = `
     <div class="res-intro">
       <h2>Resources for candidates</h2>
-      <p>Tools and references for Bahujan PhD scholars navigating the Indian academic job market — and the international fellowship circuit that runs alongside it. The page leads with postdoctoral routes abroad because, on the evidence of the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a>, applying within India alone is not a strategy. RTI templates and Indian institutional infrastructure follow further down.</p>
+      <p>Tools and references for Bahujan PhD scholars navigating the Indian academic job market — and the international fellowship circuit that runs alongside it. The page leads with postdoctoral routes abroad because, on the evidence of the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a>, applying within India alone is not a strategy. Indian-institution infrastructure (including RTI templates) and broader networks follow.</p>
     </div>
     ${postdocBlock}
-    ${blocks}
+    ${indianApplyBlock}
     ${rtiBlock}
+    ${remainingBlocks}
   `;
 
   // Wire copy-to-clipboard for each template.
