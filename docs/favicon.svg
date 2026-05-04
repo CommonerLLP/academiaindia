@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    Favicon for whoseuniversity.org
+    Oxblood (#7a1620) rounded square, ivory italic serif "?"
+    Works at 16×16 and 32×32; SVG scales cleanly.
+  -->
+  <rect width="32" height="32" rx="5" fill="#7a1620"/>
+  <text x="16" y="24"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="21" font-weight="bold" font-style="italic"
+        fill="#f5f0e6" text-anchor="middle">?</text>
+</svg>

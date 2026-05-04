@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1200 630" width="1200" height="630"
+     role="img" aria-label="Whose University? — public-interest research on India's higher-education institutions">
+  <title>Whose University?</title>
+  <!--
+    Open Graph card for whoseuniversity.org
+    1200 × 630 — standard og:image / twitter:card summary_large_image size.
+
+    Layout: two-column split at x=750.
+      Left (ivory):  navy top strip · eyebrow · title · subtitle · URL
+      Right (oxblood): clipped giant decorative "?" as a watermark
+
+    Fonts: SVG text falls back to Georgia / Times New Roman (system serif).
+    External fonts are not fetched when images are crawled by social scrapers,
+    so Georgia is the production rendering face here — close enough to
+    Newsreader at the sizes used.
+
+    To regenerate as PNG: open in any browser, resize to 1200×630, screenshot.
+    Or: `npx puppeteer-screenshot og.svg og.png --width 1200 --height 630`
+  -->
+
+  <defs>
+    <!-- Clip for right-panel decorative content -->
+    <clipPath id="rp-clip">
+      <rect x="750" y="0" width="450" height="630"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Backgrounds ── -->
+  <rect width="1200" height="630" fill="#f5f0e6"/>
+  <rect x="750" width="450" height="630" fill="#7a1620"/>
+
+  <!-- ── Top rule (deep navy, full width) ── -->
+  <rect width="1200" height="8" fill="#1a3a5e"/>
+
+  <!-- ════════════════ LEFT PANEL ════════════════ -->
+
+  <!-- Eyebrow -->
+  <text x="70" y="68"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="13" fill="#7a1620" letter-spacing="4">PUBLIC-INTEREST RESEARCH  ·  INDIA</text>
+  <rect x="70" y="80" width="620" height="1" fill="#7a1620" opacity="0.35"/>
+
+  <!-- Title — two lines, 90 px bold -->
+  <text x="70" y="215"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="90" font-weight="bold" fill="#1c1410">Whose</text>
+  <text x="70" y="320"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="90" font-weight="bold" fill="#1c1410">University?</text>
+
+  <!-- Oxblood rule under title -->
+  <rect x="70" y="343" width="380" height="2.5" fill="#7a1620"/>
+
+  <!-- Subtitle (italic) -->
+  <text x="70" y="384"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="24" font-style="italic" fill="#3a2820">Tracking who is kept out of the cadre</text>
+  <text x="70" y="415"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="24" font-style="italic" fill="#3a2820">— and how.</text>
+
+  <!-- URL (bottom of left panel, on ivory) -->
+  <rect x="70" y="555" width="620" height="1" fill="#7a1620" opacity="0.30"/>
+  <text x="70" y="594"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="20" fill="#7a1620" letter-spacing="1.5">whoseuniversity.org</text>
+
+  <!-- ════════════════ RIGHT PANEL ════════════════ -->
+  <g clip-path="url(#rp-clip)">
+    <!-- Giant decorative italic "?" — watermark effect -->
+    <text x="955" y="570"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="520" font-style="italic" fill="#f5f0e6"
+          opacity="0.10" text-anchor="middle">?</text>
+  </g>
+</svg>
