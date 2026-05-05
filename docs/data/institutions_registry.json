@@ -238,7 +238,8 @@
     "coverage_status": "Active",
     "notes": "",
     "lat": 22.52,
-    "lon": 75.92
+    "lon": 75.92,
+    "apply_url": "https://www.iiti.ac.in/recruitments/faculty-positions"
   },
   {
     "id": "iit-mandi",
@@ -963,7 +964,7 @@
     "coverage_status": "Active",
     "notes": "Private liberal-arts university with HSS faculty hiring through a careers portal; parser keeps coarse official listings when the portal is not machine-friendly.",
     "lat": 28.946,
-    "lon": 77.100
+    "lon": 77.1
   },
   {
     "id": "jgu-sonipat",
@@ -1014,7 +1015,7 @@
     "coverage_status": "Active",
     "notes": "Faculty careers page includes standing calls across schools, including Arts and Sciences and social-science/public-policy adjacent areas.",
     "lat": 23.039,
-    "lon": 72.550
+    "lon": 72.55
   },
   {
     "id": "krea-university",
