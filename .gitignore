@@ -7,6 +7,11 @@ venv/
 env/
 .pytest_cache/
 
+# Node (dev-time tooling only — site ships zero npm packages)
+node_modules/
+package-lock.json
+.vitest_cache/
+
 # Scraper working directory
 .cache/
 *.log

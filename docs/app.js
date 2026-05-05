@@ -1,3 +1,8 @@
+// ---------- imports ----------
+// Pure helpers extracted to lib/ so they can be unit-tested in Node.
+// Anything that doesn't touch DOM/state should live there.
+import { escapeHTML, escapeAttr, escapeRegExp, safeUrl, resolveUrl } from "./lib/sanitize.js";
+
 // ---------- state ----------
 let ADS = [];
 let COVERAGE = null;
@@ -252,13 +257,7 @@ function primaryField(ad) {
 }
 
 // ---------- helpers ----------
-function escapeHTML(s) {
-  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-}
-const escapeAttr = escapeHTML;
-function escapeRegExp(s) {
-  return String(s ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+// escapeHTML, escapeAttr, escapeRegExp imported from lib/sanitize.js (top of file).
 
 // Per-listing campus detection. Multi-campus institutions (Azim Premji
 // Bengaluru / Bhopal / Ranchi; AIIMS; BITS Pilani; etc.) carry one
@@ -404,36 +403,7 @@ function sanitizeExcerpt(text) {
   return out;
 }
 
-// URL allowlist. Renderer is fed third-party scrape data; an `apply_url`
-// of "javascript:alert(1)" or "data:text/html,…" would otherwise execute
-// or smuggle content on click. Validate every rendered href: only http,
-// https, mailto, and file (for local dev) are honoured. Anything else is
-// neutralised to "#" — the link still renders, but cannot navigate.
-function safeUrl(u) {
-  if (u == null) return "#";
-  const s = String(u).trim();
-  if (!s) return "#";
-  if (s.startsWith("#")) return s;       // in-page anchor
-  if (s.startsWith("/") || s.startsWith("./") || s.startsWith("../")) return s; // same-origin
-  try {
-    const parsed = new URL(s, window.location.origin);
-    const scheme = parsed.protocol.toLowerCase();
-    if (scheme === "http:" || scheme === "https:" || scheme === "mailto:" || scheme === "file:") {
-      return parsed.toString();
-    }
-  } catch (_) { /* fall through */ }
-  return "#";
-}
-
-function resolveUrl(u) {
-  if (!u) return "#";
-  // Resolve legacy relative paths to scraped PDF cache (../foo.pdf style)
-  // first, then sanitise the scheme.
-  const resolved = (u.startsWith("http") || u.startsWith("file://") || u.startsWith("/") || u.startsWith("#"))
-    ? u
-    : "../" + u;
-  return safeUrl(resolved);
-}
+// safeUrl + resolveUrl are imported from lib/sanitize.js (top of file).
 
 function parseDate(s) {
   if (!s) return null;
