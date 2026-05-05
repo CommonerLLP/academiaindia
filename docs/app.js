@@ -92,13 +92,14 @@ const PROFILE_NEG = [
 ];
 const FACULTY_HINT = /\bfaculty\b|\bassistant\s+professor\b|\bassociate\s+professor\b|\bprofessor\b|\blecturer\b|\breader\b|\bpostdoc|\bacademic\s+associate\b|\bteaching\s+fellow\b|\bresearch\s+(position|fellow|associate)\b/i;
 function classifyAd(ad) {
+  const sp = getStructuredPosition(ad);
   // Identifying fields: what the post IS. Negatives run only here to avoid
   // killing legit HSS posts whose broader raw_text_excerpt contains institute
   // boilerplate (e.g. "School of Engineering" appearing on a Centre for
   // Educational Technology ad from IIT Bombay).
-  const core = [ad.title, ad.department, ad.discipline, ad.ad_number]
+  const core = [ad.title, sp?.department, sp?.discipline, sp?.school_or_centre, ...(sp?.areas || []), ad.department, ad.discipline, ad.ad_number]
     .filter(Boolean).join(" | ");
-  const full = [core, ad.raw_text_excerpt].filter(Boolean).join(" | ");
+  const full = [core, sp?.raw_section_text, ad.pdf_excerpt, ad.raw_text_excerpt].filter(Boolean).join(" | ");
   // Core fields decide first. This prevents a STEM/business title from being
   // marked HSS just because the surrounding page boilerplate says "liberal
   // education", while still keeping explicitly HSS titles visible.
@@ -217,9 +218,10 @@ const FIELD_FALLBACK_RULES = FIELD_RULES
 const CORE_OUT_OF_SCOPE_RE = /\b(aerospace|applied\s+mechanics|biomedical|biosciences?|bioengineering|biotechnology|chemical\s+engineering|chemistry|civil\s+engineering|computer\s+science|data\s+science|artificial\s+intelligence|electrical\s+engineering|electronics?|energy\s+science|environmental\s+science|industrial\s+engineering|operations\s+research|mathematics|mechanical\s+engineering|metallurgical|materials\s+science|semiconductor|systems\s+and\s+control|medical\s+sciences?|physics|ocean\s+engineering|earth\s+sciences?|robotics|security\s+engineer|technical\s+support)\b/i;
 
 function fieldTags(ad) {
-  const core = [ad.title, ad.department, ad.discipline]
+  const sp = getStructuredPosition(ad);
+  const core = [ad.title, sp?.department, sp?.discipline, sp?.school_or_centre, ...(sp?.areas || []), ad.department, ad.discipline]
     .filter(Boolean).join(" | ");
-  const full = [core, ad.raw_text_excerpt].filter(Boolean).join(" | ");
+  const full = [core, sp?.raw_section_text, ad.pdf_excerpt, ad.raw_text_excerpt].filter(Boolean).join(" | ");
   const match = (text, ruleset = FIELD_RULES) => ruleset
     .filter(([, rules]) => rules.some(r => r.test(text)))
     .map(([label]) => label);
@@ -446,25 +448,38 @@ function sourceLinkLabel(ad) {
 // IIT rolling ads cover Asst/Assoc/Full simultaneously, in which case all
 // three checkboxes light up for that ad. We err on inclusive matching so a
 // user looking for "Associate Professor" doesn't miss generic faculty ads.
-function _t(ad) { return (ad.title || "").toLowerCase(); }
+function _t(ad) {
+  const sp = getStructuredPosition(ad);
+  return [ad.title, sp?.post_type, ...(sp?.ranks || [])].filter(Boolean).join(" ").toLowerCase();
+}
 function isAsstProfMatch(ad) {
+  const sp = getStructuredPosition(ad);
+  const ranks = Array.isArray(sp?.ranks) ? sp.ranks.map(r => String(r).toLowerCase()) : [];
+  if (ranks.some(r => /\bassistant\s+professor\b/.test(r))) return true;
   // "Assistant Professor" explicitly, OR a generic Faculty post that doesn't
   // narrow to a higher rank.
   const t = _t(ad);
   if (/\bassistant\s+professor\b/.test(t)) return true;
-  if (ad.post_type === "Faculty" && !/\bassociate\s+professor\b|\bprofessor\b|\bvisiting\b|\bpostdoc/.test(t)) return true;
+  const postType = sp?.post_type || ad.post_type;
+  if (postType === "Faculty" && !/\bassociate\s+professor\b|\bprofessor\b|\bvisiting\b|\bpostdoc/.test(t)) return true;
   // The IIT rolling-ad convention bundles all three ranks under a single
   // call — "Faculty (Asst/Assoc/Prof) — …" — count those as Asst.
   if (/\b(asst|assistant)\s*\/\s*(assoc|associate)\b/i.test(ad.title || "")) return true;
   return false;
 }
 function isAssocProfMatch(ad) {
+  const sp = getStructuredPosition(ad);
+  const ranks = Array.isArray(sp?.ranks) ? sp.ranks.map(r => String(r).toLowerCase()) : [];
+  if (ranks.some(r => /\bassociate\s+professor\b/.test(r))) return true;
   const t = _t(ad);
   if (/\bassociate\s+professor\b/.test(t)) return true;
   if (/assoc(iate)?\s*[\/]/i.test(ad.title || "")) return true;  // "Asst/Assoc/Prof"
   return false;
 }
 function isFullProfMatch(ad) {
+  const sp = getStructuredPosition(ad);
+  const ranks = Array.isArray(sp?.ranks) ? sp.ranks.map(r => String(r).trim().toLowerCase()) : [];
+  if (ranks.some(r => r === "professor" || r === "full professor")) return true;
   const t = _t(ad);
   // "Professor" but NOT preceded by Assistant/Associate/Visiting/Adjunct.
   if (/\bprofessor\b/.test(t)
@@ -473,8 +488,10 @@ function isFullProfMatch(ad) {
   return false;
 }
 function isResearchMatch(ad) {
+  const sp = getStructuredPosition(ad);
   const t = _t(ad);
-  return ad.post_type === "Research" || ad.post_type === "Scientific" ||
+  const postType = sp?.post_type || ad.post_type;
+  return postType === "Research" || postType === "Scientific" || postType === "Postdoc" ||
          /postdoc|post[- ]doc|research\s+fellow/.test(t);
 }
 // Visiting faculty is a distinct labour category — semester-bound, contractual,
@@ -483,7 +500,9 @@ function isResearchMatch(ad) {
 // Faculty ads from silently mixing into the Asst/Assoc/Full counts and gives
 // candidates an explicit toggle for them.
 function isVisitingMatch(ad) {
+  const sp = getStructuredPosition(ad);
   if (ad.post_type === "Visiting") return true;
+  if (sp?.post_type === "Visiting" || sp?.contract_status === "Visiting") return true;
   return /\bvisiting\s+(faculty|professor|fellow|scholar|lecturer)\b/.test(_t(ad));
 }
 // Backwards-compatible alias used by quick-chip handlers and any older code.
@@ -514,10 +533,16 @@ const isFacultyMatch = isAsstProfMatch;
 
 function contractLabel(cs) {
   // Map ContractStatus enum → Indian academic vocabulary.
-  if (cs === "Regular" || cs === "TenureTrack") return "Permanent";
-  if (cs === "Contractual") return "Contract";
-  if (cs === "Guest") return "Visiting";
+  if (cs === "Regular" || cs === "TenureTrack" || cs === "Permanent") return "Permanent";
+  if (cs === "Contractual" || cs === "Contract") return "Contract";
+  if (cs === "Guest" || cs === "Visiting") return "Visiting";
   return null; // Unknown → omit the line entirely
+}
+
+function getStructuredPosition(ad = {}) {
+  if (ad.structured_position) return ad.structured_position;
+  if (Array.isArray(ad.structured_positions) && ad.structured_positions.length) return ad.structured_positions[0];
+  return null;
 }
 
 const DEPARTMENT_UNIT_OVERRIDES = new Map([
@@ -588,6 +613,14 @@ function normalizeRecruitingUnitName(unit, ad = {}) {
   return clean;
 }
 
+function normalizeDisciplineName(discipline) {
+  return String(discipline || "")
+    .replace(/\bInterdisciplina\s+ry\b/gi, "Interdisciplinary")
+    .replace(/\s+(?:has|is|offers|provides)\b[\s\S]*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function inferRecruitingUnitFromText(ad = {}) {
   const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""}`.replace(/\s+/g, " ");
   const m = text.match(/\b((?:School|Faculty|Centre|Center)\s+of\s+[A-Z][A-Za-z &]+?)(?=\s+(?:has|is|offers|provides|for|We|Campus|Location|$)|[.,;])/);
@@ -618,8 +651,9 @@ function titleFieldLabel(title) {
 //   4. ad.department even if generic (better than nothing)
 //   5. derived from post_type (e.g., "Visiting position")
 function cardDiscipline(ad) {
-  const dept = normalizeRecruitingUnitName(ad.department, ad);
-  const discipline = normalizeRecruitingUnitName(ad.discipline, ad);
+  const sp = getStructuredPosition(ad);
+  const dept = normalizeRecruitingUnitName(sp?.department || sp?.school_or_centre || ad.department, ad);
+  const discipline = normalizeDisciplineName(sp?.discipline || ad.discipline);
   const isProperUnit = dept && /\b(department|centre|center|school|faculty|institute)\b/i.test(dept);
   const isGenericDept = dept && /^(?:humanities|social sciences|various|multiple|all\s+departments)$/i.test(dept.trim());
   if (dept && isProperUnit && !isGenericDept) {
@@ -774,6 +808,40 @@ function summarizeEvaluationCue(text, ad = {}) {
   return bits.length ? bits.slice(0, 2).join("; ") : null;
 }
 
+function structuredEligibilityCue(pos) {
+  if (!pos) return null;
+  const q = pos.qualifications || {};
+  const bits = [];
+  if (q.phd) bits.push(`PhD ${q.phd}`);
+  if (q.first_class_preceding_degree) bits.push(`First class preceding degree ${q.first_class_preceding_degree}`);
+  if (typeof q.post_phd_experience_years === "number") bits.push(`${q.post_phd_experience_years}y post-PhD experience`);
+  if (q.other) bits.push(q.other);
+  if (pos.specific_eligibility) bits.push(pos.specific_eligibility);
+  if (!bits.length && pos.general_eligibility) bits.push(pos.general_eligibility);
+  return bits.length ? bits.slice(0, 3).join("; ") : null;
+}
+
+function structuredEvaluationCue(pos) {
+  if (!pos) return null;
+  const q = pos.qualifications || {};
+  const bits = [];
+  if (q.publications_required) bits.push(`Publications: ${q.publications_required}`);
+  if (q.teaching_experience) bits.push(`Teaching: ${q.teaching_experience}`);
+  return bits.length ? bits.slice(0, 2).join("; ") : null;
+}
+
+function structuredCues(ad = {}) {
+  const pos = getStructuredPosition(ad);
+  if (!pos) return {};
+  return {
+    areas: Array.isArray(pos.areas) && pos.areas.length ? pos.areas : null,
+    methods: pos.methods_preference || null,
+    approach: pos.approach || null,
+    eligibility: structuredEligibilityCue(pos),
+    evaluation: structuredEvaluationCue(pos),
+  };
+}
+
 function extractCardCues(text, ad = {}) {
   text = String(text || "");
   const cues = { areas: null, methods: null, approach: null, eligibility: null, evaluation: null };
@@ -854,6 +922,19 @@ function extractCardCues(text, ad = {}) {
 // "Rank · Contract" line. For Visiting the contract is implied so we
 // just say "Visiting Faculty"; otherwise the line is "<Rank> · <Contract>".
 function cardRankLine(ad) {
+  const sp = getStructuredPosition(ad);
+  if (sp) {
+    let rank = "";
+    const ranks = Array.isArray(sp.ranks) ? sp.ranks.filter(Boolean) : [];
+    if (ranks.length === 1) rank = ranks[0];
+    else if (ranks.length > 1 && ranks.length <= 3) rank = ranks.join(" / ");
+    else if (ranks.length > 3) rank = "Faculty (multiple ranks)";
+    if (!rank && (sp.post_type === "Research" || sp.post_type === "Postdoc" || sp.post_type === "Scientific")) rank = "Postdoc / Research Fellow";
+    if (!rank) rank = "Faculty";
+    const cs = contractLabel(sp.contract_status);
+    if (cs && cs !== "Visiting") return `${rank} · ${cs}`;
+    return rank;
+  }
   let rank;
   if (ad.post_type === "Visiting") {
     rank = "Visiting Faculty";
@@ -1390,6 +1471,15 @@ function currentFilterState() {
   };
 }
 
+function filterHaystack(ad, inst = {}) {
+  const sp = getStructuredPosition(ad);
+  return [
+    ad.title, ad.department, ad.discipline, inst.name, inst.short_name,
+    sp?.department, sp?.discipline, sp?.school_or_centre,
+    ...(sp?.areas || []), sp?.methods_preference, sp?.approach,
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
 function applyFilters(st) {
   return ADS.filter(ad => {
     const inst = INSTITUTIONS[ad.institution_id] || {};
@@ -1412,8 +1502,7 @@ function applyFilters(st) {
       if (!any) return false;
     }
     if (st.query) {
-      const hay = `${ad.title} ${ad.department||""} ${ad.discipline||""} ${inst.name||""}`.toLowerCase();
-      if (!hay.includes(st.query)) return false;
+      if (!filterHaystack(ad, inst).includes(st.query)) return false;
     }
     // Phase-2 synthetic "closing this week" quick-filter — checks the
     // calendar rather than a checkbox group. Window-scoped so the state
@@ -1488,14 +1577,15 @@ function extractTraps(ad) {
 // Centralised "is this a reserved-post ad" check. Used by the chip filter
 // AND the per-card render code, so the logic stays consistent.
 function isReservedPost(ad) {
-  const cat = ad.category_breakdown || {};
+  const sp = getStructuredPosition(ad);
+  const cat = sp?.reservation_breakdown || ad.category_breakdown || {};
   const hasCounts = ["UR","SC","ST","OBC","EWS","PwBD"].some(k => cat[k] != null && cat[k] > 0);
   if (hasCounts) {
     // True only if at least one RESERVED category has > 0 (UR-only doesn't count).
     return ["SC","ST","OBC","EWS","PwBD"].some(k => cat[k] != null && cat[k] > 0);
   }
-  const txt = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
-  return /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(txt);
+  const txt = `${ad.title || ""} ${sp?.raw_section_text || ""} ${ad.pdf_excerpt || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
+  return Boolean(sp?.is_special_recruitment_drive) || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(txt);
 }
 
 function applySort(ads, sort) {
@@ -1544,8 +1634,7 @@ function adPassesFilter(ad, st, skipDim) {
     if (!any) return false;
   }
   if (st.query) {
-    const hay = `${ad.title} ${ad.department||""} ${ad.discipline||""} ${inst.name||""}`.toLowerCase();
-    if (!hay.includes(st.query)) return false;
+    if (!filterHaystack(ad, inst).includes(st.query)) return false;
   }
   if (window._reservedOnly && !isReservedPost(ad)) return false;
   return true;
@@ -1773,7 +1862,9 @@ function renderAd(ad) {
   const institutionScope = isPrivateInstitution ? "private" : "public";
   const cls = classifyAd(ad);
   const tier = urgencyTier(ad);
-  const cat = ad.category_breakdown || {};
+  const structuredPosForRender = getStructuredPosition(ad);
+  const cat = structuredPosForRender?.reservation_breakdown || ad.category_breakdown || {};
+  const effectivePostCount = structuredPosForRender?.number_of_posts ?? ad.number_of_posts;
   const catBits = ["UR","SC","ST","OBC","EWS","PwBD"].filter(k => cat[k] != null && cat[k] > 0).map(k => [k, cat[k]]);
   const roster = catBits.length
     ? `<div class="roster">Roster: ${catBits.map(([k,v],i) => `${i?'<span class="sep">·</span>':""}<span class="k">${k}</span>:${v}`).join("")}</div>`
@@ -1795,7 +1886,7 @@ function renderAd(ad) {
     const cs = ad.contract_status === "TenureTrack" ? "Tenure-Track" : ad.contract_status;
     chips.push(`<span class="chip muted">${escapeHTML(cs)}</span>`);
   }
-  if (ad.number_of_posts) chips.push(`<span class="chip muted">${ad.number_of_posts} ${ad.number_of_posts===1?"post":"posts"}</span>`);
+  if (effectivePostCount) chips.push(`<span class="chip muted">${effectivePostCount} ${effectivePostCount===1?"post":"posts"}</span>`);
   if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) chips.push(`<span class="chip lowconf">rough parse</span>`);
   chips.push(`<span class="chip muted">${escapeHTML(sourceLabel(ad))}</span>`);
   const seenDays = daysSince(ad.snapshot_fetched_at);
@@ -1868,7 +1959,8 @@ function renderAd(ad) {
   // (scripts/enrich_current_with_pdf.py) extracts substantive chunks
   // from those PDFs and writes them as ad.pdf_excerpt; we prefer it
   // when present, falling back to ad.raw_text_excerpt.
-  const cleanedExcerpt = sanitizeExcerpt(ad.pdf_excerpt || ad.raw_text_excerpt || "");
+  const structuredPos = getStructuredPosition(ad);
+  const cleanedExcerpt = sanitizeExcerpt(structuredPos?.raw_section_text || ad.pdf_excerpt || ad.raw_text_excerpt || "");
   // The cover-letter scan: a candidate reads this section to decide
   // three things — (1) do my projects fit the sub-areas they're hiring
   // in, (2) do I clear the stated eligibility screen, (3) how will the
@@ -1878,7 +1970,15 @@ function renderAd(ad) {
   // cards this surfaces a pattern: most departments do not enunciate
   // their requirements clearly, leaving candidates to guess. That
   // pattern IS the political point of this view; it should be visible.
-  const cues = extractCardCues(cleanedExcerpt, ad);
+  const extractedCues = extractCardCues(cleanedExcerpt, ad);
+  const sCues = structuredCues(ad);
+  const cues = {
+    areas: sCues.areas || extractedCues.areas,
+    methods: sCues.methods || extractedCues.methods,
+    approach: sCues.approach || extractedCues.approach,
+    eligibility: sCues.eligibility || extractedCues.eligibility,
+    evaluation: sCues.evaluation || extractedCues.evaluation,
+  };
   const NS_TIP = "The source ad did not disclose this clearly enough to extract.";
   const empty = `<span class="card-cue-empty" title="${NS_TIP}">Not disclosed in source ad</span>`;
   const areasValue = cues.areas
@@ -1999,8 +2099,11 @@ function renderAd(ad) {
   if (isPrivateInstitution && !catBits.length) {
     flags.push(`<span class="card-flag dim" title="Private universities are outside the CEI(RTC) Act, 2019 faculty-reservation roster.">CEI roster n/a</span>`);
   }
-  if (ad.number_of_posts) {
-    flags.push(`<span class="card-flag">${ad.number_of_posts} ${ad.number_of_posts === 1 ? "post" : "posts"}</span>`);
+  if (structuredPos?.source_pdf) {
+    flags.push(`<span class="card-flag dim" title="This card uses structured fields extracted from the linked PDF.">PDF extracted</span>`);
+  }
+  if (effectivePostCount) {
+    flags.push(`<span class="card-flag">${effectivePostCount} ${effectivePostCount === 1 ? "post" : "posts"}</span>`);
   }
   if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) {
     flags.push(`<span class="card-flag warn" title="Heuristically parsed; verify all details against the original notification.">⚠ rough parse</span>`);
@@ -2043,13 +2146,14 @@ function renderAd(ad) {
     ? ADS.filter(x => x.original_url === ad.original_url).length
     : 0;
   const isCompositeAd = (() => {
-    if (typeof ad.number_of_posts === "number" && ad.number_of_posts >= 2) return true;
+    if (structuredPos?.is_composite_call) return true;
+    if (typeof effectivePostCount === "number" && effectivePostCount >= 2) return true;
     if (sourcePeerCount >= 2) return true;
     if (/\b(rolling|rol?lling|all\s+areas?|multiple\s+(areas?|disciplines?)|composite|cadre|various\s+academic\s+units?|department[\s-]?wise|departments?,\s*centres?,\s*(and\s*)?schools?)\b/.test(shapeText)) return true;
     return false;
   })();
   const isExplicitSinglePostAd = (() => {
-    if (ad.number_of_posts === 1) return true;
+    if (effectivePostCount === 1) return true;
     if (isCompositeAd) return false;
     return /\b(?:one|1)\s+(?:post|position|vacancy)\b|\bsingle[\s-]+(?:post|position|vacancy)\b/i.test(_adText);
   })();
@@ -2064,7 +2168,7 @@ function renderAd(ad) {
   // The statutory percentages (SC-15%, ST-7.5%, OBC-27%, EWS-10%, PwBD-4%)
   // are the constitutional floor every CFTI is bound by; reproducing them
   // on every card is boilerplate noise, not information.
-  const isSRD = /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(_adText);
+  const isSRD = Boolean(structuredPos?.is_special_recruitment_drive) || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(_adText);
   // Private universities are outside the CEI(RTC) faculty-reservation
   // regime. Do not classify their shared jobs pages as "composite
   // recruitment" failures; that roster-disclosure question applies to
@@ -2119,10 +2223,18 @@ function renderAd(ad) {
   // actually substantive content beyond reservation/links. Eligibility +
   // publications + general-eligibility are the meat; everything else is
   // either inline above or noise.
-  const hasSubstantiveDetails = ad.unit_eligibility || ad.publications_required || ad.general_eligibility || ad.process_note || ad.contact || ad._source_note;
+  const structuredDetails = structuredPos ? [
+    structuredPos.general_eligibility ? `<div class="detail-block"><span class="k">PDF general eligibility</span><div class="v">${escapeHTML(structuredPos.general_eligibility)}</div></div>` : "",
+    structuredPos.specific_eligibility ? `<div class="detail-block"><span class="k">PDF specific eligibility</span><div class="v">${escapeHTML(structuredPos.specific_eligibility)}</div></div>` : "",
+    structuredPos.qualifications?.publications_required ? `<div class="detail-block"><span class="k">PDF publication requirements</span><div class="v">${escapeHTML(structuredPos.qualifications.publications_required)}</div></div>` : "",
+    structuredPos.pay_scale ? `<div class="detail-block"><span class="k">PDF pay scale</span><div class="v">${escapeHTML(structuredPos.pay_scale)}</div></div>` : "",
+    structuredPos.extraction_confidence != null ? `<div class="detail-block"><span class="k">PDF extraction</span><div class="v">${escapeHTML(structuredPos.extraction_method || "structured extraction")} · confidence ${Math.round(Number(structuredPos.extraction_confidence || 0) * 100)}%</div></div>` : "",
+  ].join("") : "";
+  const hasSubstantiveDetails = structuredDetails || ad.unit_eligibility || ad.publications_required || ad.general_eligibility || ad.process_note || ad.contact || ad._source_note;
   const detailsHTML2 = hasSubstantiveDetails
     ? `<details class="details">
         <summary>Eligibility &amp; publication requirements ▾</summary>
+        ${structuredDetails}
         ${ad._source_note ? `<div class="detail-block"><span class="k">Source note</span><div class="v">${escapeHTML(ad._source_note)}</div></div>` : ""}
         ${ad.unit_eligibility ? `<div class="detail-block"><span class="k">Unit eligibility</span><div class="v">${escapeHTML(ad.unit_eligibility)}</div></div>` : ""}
         ${ad.publications_required ? `<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(ad.publications_required)}</div></div>` : ""}
