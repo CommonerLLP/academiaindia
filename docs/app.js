@@ -1188,6 +1188,22 @@ function wireEvents() {
   document.getElementById("search").addEventListener("input", render);
   document.getElementById("sort").addEventListener("change", render);
 
+  window._listingViewMode = localStorage.getItem("hei.listing-view") || "candidate";
+  const setListingViewMode = (mode) => {
+    window._listingViewMode = mode === "accountability" ? "accountability" : "candidate";
+    localStorage.setItem("hei.listing-view", window._listingViewMode);
+    document.body.dataset.listingView = window._listingViewMode;
+    document.querySelectorAll("[data-view-mode]").forEach(btn => {
+      const on = btn.dataset.viewMode === window._listingViewMode;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  };
+  setListingViewMode(window._listingViewMode);
+  document.querySelectorAll("[data-view-mode]").forEach(btn => {
+    btn.addEventListener("click", () => setListingViewMode(btn.dataset.viewMode));
+  });
+
   // ---- Phase-2 hero search ---------------------------------------------
   // The hero input is the user-facing field; the legacy `#search` (now a
   // hidden input) is the value the rest of the JS reads. Mirror writes.
@@ -1597,6 +1613,89 @@ function isReservedPost(ad) {
   return Boolean(sp?.is_special_recruitment_drive) || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(txt);
 }
 
+function recruitmentShape(ad, inst, structuredPos, effectivePostCount) {
+  const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.pdf_excerpt || ""} ${structuredPos?.raw_section_text || ""} ${ad.reservation_note || ""}`;
+  const shapeText = `${text} ${ad.original_url || ""} ${ad.ad_number || ""} ${ad._source_method || ""}`.toLowerCase();
+  const sourcePeerCount = ad.original_url
+    ? ADS.filter(x => x.original_url === ad.original_url).length
+    : 0;
+  const composite = Boolean(structuredPos?.is_composite_call)
+    || (typeof effectivePostCount === "number" && effectivePostCount >= 2)
+    || sourcePeerCount >= 2
+    || /\b(rolling|rol?lling|all\s+areas?|multiple\s+(areas?|disciplines?)|composite|cadre|various\s+academic\s+units?|department[\s-]?wise|departments?,\s*centres?,\s*(and\s*)?schools?)\b/.test(shapeText);
+  const single = !composite && (
+    effectivePostCount === 1
+    || /\b(?:one|1)\s+(?:post|position|vacancy)\b|\bsingle[\s-]+(?:post|position|vacancy)\b/i.test(text)
+  );
+  return {
+    composite,
+    single,
+    sourcePeerCount,
+    text,
+  };
+}
+
+function rosterVerdict(ad, inst, structuredPos, catBits, effectivePostCount) {
+  const instType = String(inst?.type || "");
+  const isPrivate = instType.toLowerCase().includes("private");
+  const shape = recruitmentShape(ad, inst, structuredPos, effectivePostCount);
+  const isSRD = Boolean(structuredPos?.is_special_recruitment_drive)
+    || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(shape.text);
+
+  if (isPrivate && !catBits.length) {
+    return {
+      tone: "private",
+      label: "Private institution",
+      title: "CEI roster not applicable",
+      why: "Private universities sit outside the CEI(RTC) Act, 2019 faculty-reservation roster. This card is therefore not marked as a roster-disclosure failure.",
+      shapeLabel: "Private recruitment",
+    };
+  }
+  if (catBits.length) {
+    return {
+      tone: "disclosed",
+      label: "Roster categories disclosed",
+      title: "Post-wise counts published",
+      why: "The advertisement publishes category-wise post counts, so candidates can see how UR/SC/ST/OBC/EWS/PwBD seats are being operationalised.",
+      shapeLabel: shape.composite ? "Composite call" : shape.single ? "Single post" : "Post-wise counts visible",
+    };
+  }
+  if (isSRD) {
+    return {
+      tone: "srd",
+      label: "Affirmative-action call",
+      title: "Special Recruitment Drive",
+      why: "This ad is framed as a Special Recruitment Drive for reserved-category candidates, typically to fill backlog SC/ST/OBC/PwBD posts.",
+      shapeLabel: "SRD / backlog drive",
+    };
+  }
+  if (shape.composite) {
+    return {
+      tone: "missing",
+      label: "Roster disclosure missing",
+      title: "Composite call, roster not mapped",
+      why: "This public-institution ad appears to combine multiple units, ranks, or areas, but does not map selections to UR/SC/ST/OBC/EWS/PwBD roster points.",
+      shapeLabel: "Composite / rolling call",
+    };
+  }
+  if (shape.single) {
+    return {
+      tone: "single",
+      label: "Roster disclosure missing",
+      title: "Single post, roster point not disclosed",
+      why: "This public-institution ad appears to be for one post, but the advertisement does not disclose the roster category attached to that appointment.",
+      shapeLabel: "Single-position ad",
+    };
+  }
+  return {
+    tone: "unknown",
+    label: "Roster unclear",
+    title: "Recruitment shape unclear",
+    why: "This public-institution ad does not disclose enough post-wise information to tell whether the recruitment is single-post or bulk, or which roster point is being used.",
+    shapeLabel: "Unclear from source",
+  };
+}
+
 function applySort(ads, sort) {
   const deadlineRank = (ad) => {
     const d = daysUntil(ad.closing_date);
@@ -1875,78 +1974,13 @@ function renderAd(ad) {
   const instType = String(inst.type || "");
   const isPrivateInstitution = instType.toLowerCase().includes("private");
   const institutionScope = isPrivateInstitution ? "private" : "public";
-  const cls = classifyAd(ad);
   const tier = urgencyTier(ad);
   const structuredPosForRender = getStructuredPosition(ad);
   const cat = structuredPosForRender?.reservation_breakdown || ad.category_breakdown || {};
   const effectivePostCount = structuredPosForRender?.number_of_posts ?? ad.number_of_posts;
   const catBits = ["UR","SC","ST","OBC","EWS","PwBD"].filter(k => cat[k] != null && cat[k] > 0).map(k => [k, cat[k]]);
-  const roster = catBits.length
-    ? `<div class="roster">Roster: ${catBits.map(([k,v],i) => `${i?'<span class="sep">·</span>':""}<span class="k">${k}</span>:${v}`).join("")}</div>`
-    : "";
-  const typeColor = TYPE_COLORS[inst.type] || "var(--muted)";
-  const fields = fieldTags(ad).filter(f => f !== "Other");
-  const hssFlag = fields.slice(0, 2).map(f => `<span class="hss-flag">${escapeHTML(f)}</span>`).join("");
-  const status = listingStatus(ad);
-
-  // Chips: post type + contract + posts + low-confidence flag
-  const chips = [];
-  if (status !== "ready") chips.push(`<span class="chip lowconf">${escapeHTML(QUALITY_LABELS[status])}</span>`);
-  if (ad.post_type && ad.post_type !== "Unknown") {
-    const label = ad.post_type === "Research" || ad.post_type === "Scientific" ? "Research/Postdoc"
-                : ad.post_type === "NonFaculty" ? "Non-Faculty" : ad.post_type;
-    chips.push(`<span class="chip">${label}</span>`);
-  }
-  if (ad.contract_status && ad.contract_status !== "Unknown") {
-    const cs = ad.contract_status === "TenureTrack" ? "Tenure-Track" : ad.contract_status;
-    chips.push(`<span class="chip muted">${escapeHTML(cs)}</span>`);
-  }
-  if (effectivePostCount) chips.push(`<span class="chip muted">${effectivePostCount} ${effectivePostCount===1?"post":"posts"}</span>`);
-  if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) chips.push(`<span class="chip lowconf">rough parse</span>`);
-  chips.push(`<span class="chip muted">${escapeHTML(sourceLabel(ad))}</span>`);
   const seenDays = daysSince(ad.snapshot_fetched_at);
-  if (seenDays != null) {
-    chips.push(`<span class="chip muted">checked ${seenDays === 0 ? "today" : seenDays + "d ago"}</span>`);
-    if (seenDays >= 14) chips.push(`<span class="chip lowconf">stale source</span>`);
-  }
-
   const saved = SAVED.has(ad.id);
-
-  // Title with optional sub-area appended (e.g. "Sociology" inside HSS unit).
-  // The title already contains "Faculty — <Dept>" or "Faculty — <Dept> — <Sub>";
-  // we render it as-is but split off the trailing sub-area in muted style.
-  const title = ad.title || "(untitled)";
-  const titleHTML = (() => {
-    const parts = title.split(/\s+—\s+/);
-    if (parts.length >= 3) {
-      // "Faculty — Dept — SubArea"
-      const [head, dept, ...rest] = parts;
-      return `${escapeHTML(head + " — " + dept)} <span class="field-spec">— ${escapeHTML(rest.join(" — "))}</span>`;
-    }
-    return escapeHTML(title);
-  })();
-
-  // Meta-line: dept (only if not already in title), discipline (only if differs from dept),
-  // posted-date. This is the fix for the redundant DEPT/FIELD problem.
-  const metaParts = [];
-  const inTitle = (s) => s && title.toLowerCase().includes(s.toLowerCase());
-  if (ad.department && !inTitle(ad.department)) {
-    metaParts.push(`<span class="dept">${escapeHTML(ad.department)}</span>`);
-  }
-  if (ad.discipline && ad.discipline !== ad.department && !inTitle(ad.discipline)) {
-    metaParts.push(`<span class="dept">${escapeHTML(ad.discipline)}</span>`);
-  }
-  if (ad.publication_date) {
-    metaParts.push(`<span class="posted">posted ${escapeHTML(formatDate(ad.publication_date))}</span>`);
-  }
-  const metaLine = (metaParts.length || chips.length)
-    ? `<div class="meta-line">${chips.join("")}${chips.length && metaParts.length ? '<span class="dot">·</span>' : ''}${metaParts.join('<span class="dot">·</span>')}</div>`
-    : "";
-
-  // Deadline pill
-  const deadlinePill = ad.closing_date
-    ? `<span class="deadline-pill">${escapeHTML(formatCountdown(ad))} <span class="dl-date">· ${escapeHTML(formatDate(ad.closing_date))}</span></span>`
-    : `<span class="deadline-pill no-dl">rolling, no deadline</span>`;
 
   // Action links: PDF + apply portal + listing page (in that order — original PDF first)
   const actionLinks = [];
@@ -2025,7 +2059,7 @@ function renderAd(ad) {
     if (cleanedExcerpt.length > SHORT) {
       descriptionRow = `
         <div class="card-cue card-cue-description">
-          <span class="card-cue-label">Description</span>
+          <span class="card-cue-label">Source language</span>
           <div class="card-desc-body" data-expanded="false">
             <p class="card-desc-text">${escapeHTML(cleanedExcerpt)}</p>
             <button type="button" class="card-desc-toggle" aria-expanded="false">see more</button>
@@ -2034,14 +2068,14 @@ function renderAd(ad) {
     } else {
       descriptionRow = `
         <div class="card-cue card-cue-description">
-          <span class="card-cue-label">Description</span>
+          <span class="card-cue-label">Source language</span>
           <span class="card-cue-value">${escapeHTML(cleanedExcerpt)}</span>
         </div>`;
     }
   } else {
     descriptionRow = `
       <div class="card-cue card-cue-description is-empty">
-        <span class="card-cue-label">Description</span>
+        <span class="card-cue-label">Source language</span>
         <span class="card-cue-empty" title="${NS_TIP}">Not provided in the advertisement</span>
       </div>`;
   }
@@ -2062,21 +2096,6 @@ function renderAd(ad) {
       </div>
       ${descriptionRow}
     </div>`;
-
-  // Collapsible details — short label, button-ish
-  const hasDetails = ad.unit_eligibility || ad.publications_required || ad.general_eligibility || ad.reservation_note || ad.process_note || ad.contact || ad._source_note;
-  const detailsHTML = hasDetails ? `
-    <details class="details">
-      <summary>Eligibility &amp; how to apply ▾</summary>
-      ${ad._source_note ? `<div class="detail-block"><span class="k">Source note</span><div class="v">${escapeHTML(ad._source_note)}</div></div>` : ""}
-      ${cues.areas && cues.areas.length > 3 ? `<div class="detail-block"><span class="k">Full topical fit</span><div class="v">${escapeHTML(cues.areas.join("; "))}</div></div>` : ""}
-      ${ad.unit_eligibility ? `<div class="detail-block"><span class="k">Unit eligibility</span><div class="v">${escapeHTML(ad.unit_eligibility)}</div></div>` : ""}
-      ${ad.publications_required ? `<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(ad.publications_required)}</div></div>` : ""}
-      ${ad.general_eligibility ? `<div class="detail-block"><span class="k">General eligibility</span><div class="v">${escapeHTML(ad.general_eligibility)}</div></div>` : ""}
-      ${ad.reservation_note ? `<div class="detail-block"><span class="k">Reservation</span><div class="v">${escapeHTML(ad.reservation_note)}</div></div>` : ""}
-      ${ad.process_note ? `<div class="detail-block"><span class="k">Process</span><div class="v">${escapeHTML(ad.process_note)}</div></div>` : ""}
-      ${ad.contact ? `<div class="detail-block"><span class="k">Contact</span><div class="v">${escapeHTML(ad.contact)}</div></div>` : ""}
-    </details>` : "";
 
   // ---- Card layout (institution-first) --------------------------------
   // Two-line headline scanned in <2 seconds:
@@ -2147,77 +2166,33 @@ function renderAd(ad) {
     deadlineHTML = `<div class="deadline-num small">rolling</div>`;
   }
 
-  // Reservation operates at the cadre/institutional-roster level under the
-  // CEI(RTC) Act, 2019. For public institutions we distinguish:
-  //   - composite / rolling source ads: shared source URL, explicit multi-post
-  //     count, rolling/cadre wording, or multiple units under one call;
-  //   - explicitly single-post ads: only when the ad says one/1 post;
-  //   - unknown roster point: no post-wise category/roster mapping visible.
-  // Private universities are handled separately below because the CEI(RTC)
-  // roster-disclosure question does not apply to them.
-  const _adText = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
-  const shapeText = `${_adText} ${ad.original_url || ""} ${ad.ad_number || ""} ${ad._source_method || ""}`.toLowerCase();
-  const sourcePeerCount = ad.original_url
-    ? ADS.filter(x => x.original_url === ad.original_url).length
-    : 0;
-  const isCompositeAd = (() => {
-    if (structuredPos?.is_composite_call) return true;
-    if (typeof effectivePostCount === "number" && effectivePostCount >= 2) return true;
-    if (sourcePeerCount >= 2) return true;
-    if (/\b(rolling|rol?lling|all\s+areas?|multiple\s+(areas?|disciplines?)|composite|cadre|various\s+academic\s+units?|department[\s-]?wise|departments?,\s*centres?,\s*(and\s*)?schools?)\b/.test(shapeText)) return true;
-    return false;
-  })();
-  const isExplicitSinglePostAd = (() => {
-    if (effectivePostCount === 1) return true;
-    if (isCompositeAd) return false;
-    return /\b(?:one|1)\s+(?:post|position|vacancy)\b|\bsingle[\s-]+(?:post|position|vacancy)\b/i.test(_adText);
-  })();
-  // Reservation messaging — four states (plus private-uni handled below):
-  //   1. Per-post roster counts published → real coloured pills.
-  //   2. Special Recruitment Drive (SRD) for reserved categories →
-  //      affirmative-action call out, explain what an SRD is.
-  //   3. Composite cadre-level recruitment (multi-post call) without
-  //      per-post breakdown → flag the missing roster arithmetic.
-  //   4. Single-position / per-area ad → explain that reservation applies
-  //      at cadre-roster level, not at the individual-ad level.
-  // The statutory percentages (SC-15%, ST-7.5%, OBC-27%, EWS-10%, PwBD-4%)
-  // are the constitutional floor every CFTI is bound by; reproducing them
-  // on every card is boilerplate noise, not information.
-  const isSRD = Boolean(structuredPos?.is_special_recruitment_drive) || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(_adText);
-  // Private universities are outside the CEI(RTC) faculty-reservation
-  // regime. Do not classify their shared jobs pages as "composite
-  // recruitment" failures; that roster-disclosure question applies to
-  // public/CEI institutions.
-  const isPrivate = isPrivateInstitution;
-  // Each reservation-state row shows a label + an info icon. The
-  // explanation sits behind a click/keyboard disclosure so it works on
-  // touch devices too; browser-native title tooltips are too fragile for
-  // decision-critical context.
-  let reservPillsHTML = "";
-  const reservInfo = (tip) => `
-    <details class="reserv-info">
-      <summary aria-label="Explain reservation status"><span aria-hidden="true">?</span></summary>
-      <div class="reserv-info-pop">${escapeHTML(tip)}</div>
-    </details>`;
-  if (isPrivate && !catBits.length) {
-    reservPillsHTML = "";
-  } else if (catBits.length) {
-    reservPillsHTML = `<div class="row-reserv"><span class="reserv-label">Reserved seats</span>${
-      catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")
-    }</div>`;
-  } else if (isSRD) {
-    const tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
-    reservPillsHTML = `<div class="row-reserv reserv-srd"><span class="reserv-label good">✓ Special Recruitment Drive</span>${reservInfo(tip)}</div>`;
-  } else if (isCompositeAd) {
-    const tip = "Composite or rolling faculty call. The ad may list many departments/areas under one recruitment PDF, but it does not disclose which roster category each selection point maps to.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing"><span class="reserv-label warn">⚠ Composite / rolling recruitment</span>${reservInfo(tip)}</div>`;
-  } else if (isExplicitSinglePostAd) {
-    const tip = "This public-institution ad appears to be for one post/position, but the roster category for that appointment is not disclosed in the advertisement.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Single post: roster point not disclosed</span>${reservInfo(tip)}</div>`;
-  } else {
-    const tip = "This public-institution ad does not disclose enough post-wise roster information to tell whether the recruitment is single-post or bulk, or which UR/SC/ST/OBC/EWS/PwBD roster point is being used.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Roster point not disclosed</span>${reservInfo(tip)}</div>`;
+  const verdict = rosterVerdict(ad, inst, structuredPos, catBits, effectivePostCount);
+  const categoryHTML = catBits.length
+    ? `<div class="acct-cats">${catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")}</div>`
+    : "";
+  const accountFacts = [
+    ["Institution", isPrivateInstitution ? "Private" : "Public / CEI"],
+    ["Recruitment shape", verdict.shapeLabel],
+    ["Posts", effectivePostCount ? `${effectivePostCount} ${effectivePostCount === 1 ? "post" : "posts"}` : "Not post-wise disclosed"],
+    ["Source", structuredPos?.source_pdf ? "Structured PDF extraction" : sourceLabel(ad)],
+  ];
+  if (typeof structuredPos?.extraction_confidence === "number") {
+    accountFacts.push(["Extraction", `${Math.round(structuredPos.extraction_confidence * 100)}% confidence`]);
   }
+  const accountabilityHTML = `
+    <aside class="accountability-panel verdict-${escapeAttr(verdict.tone)}" aria-label="Public-accountability reading">
+      <div class="acct-top">
+        <span class="acct-eyebrow">${escapeHTML(verdict.label)}</span>
+        <div class="acct-deadline">${deadlineHTML}</div>
+      </div>
+      <h4>${escapeHTML(verdict.title)}</h4>
+      <p>${escapeHTML(verdict.why)}</p>
+      ${categoryHTML}
+      <dl class="acct-facts">
+        ${accountFacts.map(([k, v]) => `<div><dt>${escapeHTML(k)}</dt><dd>${escapeHTML(v)}</dd></div>`).join("")}
+      </dl>
+      <button type="button" class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
+    </aside>`;
   // Hiring-language traps — surface known exclusion phrases that the ad
   // contains, so candidates can see the structural barriers up front.
   const traps = extractTraps(ad);
@@ -2260,28 +2235,26 @@ function renderAd(ad) {
     : "";
 
   return `
-    <article class="listing tier-${tier} scope-${institutionScope}" data-jobid="${escapeAttr(ad.id)}">
+    <article class="listing tier-${tier} scope-${institutionScope} verdict-${escapeAttr(verdict.tone)}" data-jobid="${escapeAttr(ad.id)}">
       <div class="tier-bar"></div>
-      <div class="card-body">
-        <div class="card-headline">
-          <h3 class="card-institution">${escapeHTML(instName)}${cityPart}</h3>
-          <p class="card-subhead">
-            <span class="card-discipline">${escapeHTML(discipline)}</span>
-            <span class="card-sep">·</span>
-            <span class="card-rank">${escapeHTML(rankLine)}</span>
-          </p>
-          ${flags.length ? `<div class="card-flags">${flags.join('')}</div>` : ""}
+      <div class="listing-grid">
+        <div class="candidate-panel">
+          <div class="card-headline">
+            <h3 class="card-institution">${escapeHTML(instName)}${cityPart}</h3>
+            <p class="card-subhead">
+              <span class="card-discipline">${escapeHTML(discipline)}</span>
+              <span class="card-sep">·</span>
+              <span class="card-rank">${escapeHTML(rankLine)}</span>
+            </p>
+            ${flags.length ? `<div class="card-flags">${flags.join('')}</div>` : ""}
+          </div>
+          ${areasHTML}
+          ${trapsHTML}
+          ${applyLinksHTML}
+          ${detailsHTML2}
         </div>
-        <div class="card-deadline">${deadlineHTML}</div>
-        <div class="card-actions">
-          <button type="button" class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
-        </div>
+        ${accountabilityHTML}
       </div>
-      ${reservPillsHTML}
-      ${areasHTML}
-      ${trapsHTML}
-      ${applyLinksHTML}
-      ${detailsHTML2}
     </article>`;
 }
 
@@ -2912,7 +2885,7 @@ function chart2_mandateVsReality(snaps) {
       ${elems}
       <line class="anno-line" x1="${xR + 110}" y1="${yS(3.07)}" x2="${xR + 84}" y2="${yS(3.07)}"/>
       <text class="anno-text emph" x="${xR + 116}" y="${yS(3.07) + 4}">EWS — short by 7 points</text>
-      <text class="anno-text" x="${xR + 110}" y="${yS(58.5) + 4}" style="fill:#444">General — captures the surplus</text>
+      <text class="anno-text" x="${xR + 110}" y="${yS(58.5) + 4}" style="fill:var(--muted)">General — captures the surplus</text>
     </svg>`;
 
   return chartCard({
@@ -3441,7 +3414,7 @@ function realisationSlopeChart(snaps) {
       <line class="annotation-arrow" x1="${xR + 110}" y1="${yScale(3.07)}" x2="${xR + 50}" y2="${yScale(3.07)}"/>
       <text class="annotation" x="${xR + 115}" y="${yScale(3.07) + 4}">EWS — short by 7 percentage points</text>
       <line class="annotation-arrow" x1="${xR + 110}" y1="${yScale(58.5)}" x2="${xR + 50}" y2="${yScale(58.5)}"/>
-      <text class="annotation" x="${xR + 115}" y="${yScale(58.5) + 4}" style="fill:#666;">General — captures the surplus</text>
+      <text class="annotation" x="${xR + 115}" y="${yScale(58.5) + 4}" style="fill:var(--muted);">General — captures the surplus</text>
     </svg>
     <div class="chart-source"><strong>Source:</strong> Lok Sabha Q. 5842, 30 Mar 2026 (first cumulative-by-category disclosure, surfaced after the Supreme Court's Article 142 order). Total faculty filled across all CFHEIs: ${total.toLocaleString('en-IN')}. Mandate: SC 15%, ST 7.5%, OBC 27%, EWS 10%; GEN-residual 40.5% post-103rd Amendment.</div>
   </div>`;
