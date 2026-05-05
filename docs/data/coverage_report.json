@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-05T05:08:53.255425+00:00",
+  "generated_at": "2026-05-05T17:17:39.984997+00:00",
   "institutions_attempted": 78,
-  "institutions_succeeded": 51,
-  "institutions_with_ads": 46,
-  "ads_found_total": 335,
+  "institutions_succeeded": 52,
+  "institutions_with_ads": 48,
+  "ads_found_total": 339,
   "rows": [
     {
       "institution_id": "iit-kharagpur",
@@ -82,7 +82,7 @@
       "parser": "generic",
       "fetch_status": "ok",
       "http_status": 200,
-      "ads_found": 57,
+      "ads_found": 58,
       "note": ""
     },
     {
@@ -90,7 +90,7 @@
       "parser": "generic",
       "fetch_status": "ok",
       "http_status": 200,
-      "ads_found": 0,
+      "ads_found": 1,
       "note": ""
     },
     {
@@ -288,10 +288,10 @@
     {
       "institution_id": "iim-udaipur",
       "parser": "iim_recruit",
-      "fetch_status": "ok",
-      "http_status": 404,
+      "fetch_status": "stale-archive",
+      "http_status": 403,
       "ads_found": 1,
-      "note": ""
+      "note": "http-error; carried forward 1 previous listing(s)"
     },
     {
       "institution_id": "iim-amritsar",
@@ -506,7 +506,7 @@
       "parser": "private_university",
       "fetch_status": "ok",
       "http_status": 200,
-      "ads_found": 31,
+      "ads_found": 32,
       "note": "TLS verification disabled for official source; robots override"
     },
     {
@@ -628,6 +628,14 @@
       "http_status": null,
       "ads_found": 0,
       "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "_manual_overrides",
+      "parser": "manual_override",
+      "fetch_status": "ok",
+      "http_status": null,
+      "ads_found": 1,
+      "note": "Merged 1 hand-transcribed entry/entries from manual_overrides.json"
     }
   ]
 }
