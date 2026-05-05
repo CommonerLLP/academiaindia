@@ -412,31 +412,49 @@ export function renderAd(ad) {
   // explanation sits behind a click/keyboard disclosure so it works on
   // touch devices too; browser-native title tooltips are too fragile for
   // decision-critical context.
-  let reservPillsHTML = "";
-  const reservInfo = (tip) => `
-    <details class="reserv-info">
-      <summary aria-label="Explain reservation status"><span aria-hidden="true">?</span></summary>
-      <div class="reserv-info-pop">${escapeHTML(tip)}</div>
-    </details>`;
+  let art16Color = "grey";
+  let art16Tip = "";
+  let detailsContent = "";
+  let breakdown = "";
+
   if (isPrivate && !catBits.length) {
-    reservPillsHTML = "";
+    art16Color = "red";
+    art16Tip = "Private universities are currently exempt from constitutional reservation mandates.";
   } else if (catBits.length) {
-    reservPillsHTML = `<div class="row-reserv reserv-disclosed"><span class="reserv-status-icon roster-ok" aria-hidden="true">✓</span><span class="reserv-label roster-ok">Roster disclosed</span>${
-      catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")
-    }</div>`;
+    art16Color = "green";
+    art16Tip = "Institution has published post-wise reservation breakdown.";
+    breakdown = catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("");
   } else if (isSRD) {
-    const tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
-    reservPillsHTML = `<div class="row-reserv reserv-srd"><span class="reserv-label good">Special Recruitment Drive</span>${reservInfo(tip)}</div>`;
+    art16Color = "green";
+    art16Tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
+    breakdown = `<span class="reserv-label good">✓ Special Recruitment Drive</span>`;
   } else if (isCompositeAd) {
-    const tip = "Composite or rolling faculty call. The ad may list many departments/areas under one recruitment PDF, but it does not disclose which roster category each selection point maps to.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing"><span class="reserv-status-icon roster-missing" aria-hidden="true">×</span><span class="reserv-label warn">Roster not disclosed</span><span class="reserv-missing-msg">Composite / rolling recruitment</span>${reservInfo(tip)}</div>`;
+    art16Color = "grey";
+    art16Tip = "Composite or rolling faculty call. The ad may list many departments/areas under one recruitment PDF, but it does not disclose which roster category each selection point maps to.";
   } else if (isExplicitSinglePostAd) {
-    const tip = "This public-institution ad appears to be for one post/position, but the roster category for that appointment is not disclosed in the advertisement.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-status-icon roster-missing" aria-hidden="true">×</span><span class="reserv-label warn">Roster not disclosed</span><span class="reserv-missing-msg">Single post</span>${reservInfo(tip)}</div>`;
+    art16Color = "grey";
+    art16Tip = "This public-institution ad appears to be for one post/position, but the roster category for that appointment is not disclosed in the advertisement.";
   } else {
-    const tip = "This public-institution ad does not disclose enough post-wise roster information to tell whether the recruitment is single-post or bulk, or which UR/SC/ST/OBC/EWS/PwBD roster point is being used.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-status-icon roster-missing" aria-hidden="true">×</span><span class="reserv-label warn">Roster not disclosed</span><span class="reserv-missing-msg">Roster point absent from ad</span>${reservInfo(tip)}</div>`;
+    art16Color = "grey";
+    art16Tip = "This public-institution ad does not disclose enough post-wise roster information to tell whether the recruitment is single-post or bulk, or which UR/SC/ST/OBC/EWS/PwBD roster point is being used.";
   }
+
+  const art16PillHTML = `
+    <details class="reserv-info art16-details">
+      <summary class="art16-btn art16-${art16Color} ${art16Color === 'red' ? 'art16-strike' : ''}" aria-label="Explain Article 16 status">
+        Article 16 <span aria-hidden="true">▾</span>
+      </summary>
+      <div class="reserv-info-pop">
+        <strong>Article 16 Status:</strong> ${escapeHTML(art16Tip)}
+      </div>
+    </details>
+  `;
+
+  const reservPillsHTML = breakdown ? `
+    <div class="row-reserv">
+      <div class="reserv-breakdown">${breakdown}</div>
+    </div>
+  ` : "";
   // Hiring-language traps — surface known exclusion phrases that the ad
   // contains, so candidates can see the structural barriers up front.
   const traps = extractTraps(ad);
@@ -548,7 +566,7 @@ export function renderAd(ad) {
       <div class="tier-bar"></div>
       <div class="card-body">
         <div class="card-headline">
-          <h3 class="card-institution">${escapeHTML(instName)}${cityPart}</h3>
+          <h3 class="card-institution">${escapeHTML(instName)}${cityPart} ${art16PillHTML}</h3>
           <p class="card-subhead">
             <span class="card-rank">${escapeHTML(rankLine)}, </span>
             <span class="card-discipline">${escapeHTML(discipline)}</span>
