@@ -404,10 +404,35 @@ function sanitizeExcerpt(text) {
   return out;
 }
 
+// URL allowlist. Renderer is fed third-party scrape data; an `apply_url`
+// of "javascript:alert(1)" or "data:text/html,…" would otherwise execute
+// or smuggle content on click. Validate every rendered href: only http,
+// https, mailto, and file (for local dev) are honoured. Anything else is
+// neutralised to "#" — the link still renders, but cannot navigate.
+function safeUrl(u) {
+  if (u == null) return "#";
+  const s = String(u).trim();
+  if (!s) return "#";
+  if (s.startsWith("#")) return s;       // in-page anchor
+  if (s.startsWith("/") || s.startsWith("./") || s.startsWith("../")) return s; // same-origin
+  try {
+    const parsed = new URL(s, window.location.origin);
+    const scheme = parsed.protocol.toLowerCase();
+    if (scheme === "http:" || scheme === "https:" || scheme === "mailto:" || scheme === "file:") {
+      return parsed.toString();
+    }
+  } catch (_) { /* fall through */ }
+  return "#";
+}
+
 function resolveUrl(u) {
   if (!u) return "#";
-  if (u.startsWith("http") || u.startsWith("file://")) return u;
-  return "../" + u;
+  // Resolve legacy relative paths to scraped PDF cache (../foo.pdf style)
+  // first, then sanitise the scheme.
+  const resolved = (u.startsWith("http") || u.startsWith("file://") || u.startsWith("/") || u.startsWith("#"))
+    ? u
+    : "../" + u;
+  return safeUrl(resolved);
 }
 
 function parseDate(s) {
@@ -2007,10 +2032,10 @@ function renderAd(ad) {
   const actionLinks = [];
   actionLinks.push(`<a href="${escapeAttr(resolveUrl(ad.original_url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(sourceLinkLabel(ad))}</a>`);
   if (ad.annexure_pdf_url) {
-    actionLinks.push(`<a href="${escapeAttr(ad.annexure_pdf_url)}" target="_blank" rel="noopener noreferrer">Annexure →</a>`);
+    actionLinks.push(`<a href="${escapeAttr(safeUrl(ad.annexure_pdf_url))}" target="_blank" rel="noopener noreferrer">Annexure →</a>`);
   }
   if (ad.info_url && ad.info_url !== ad.original_url) {
-    actionLinks.push(`<a href="${escapeAttr(ad.info_url)}" target="_blank" rel="noopener noreferrer">Listing page →</a>`);
+    actionLinks.push(`<a href="${escapeAttr(safeUrl(ad.info_url))}" target="_blank" rel="noopener noreferrer">Listing page →</a>`);
   }
   // Fall back to the institution-level apply URL when the ad doesn't
   // carry one. Some ad PDFs (IIT Indore, etc.) just point at the PDF and
@@ -2018,7 +2043,7 @@ function renderAd(ad) {
   // portal separately; the registry holds that portal URL.
   const applyUrl = ad.apply_url || inst.apply_url;
   if (applyUrl) {
-    actionLinks.push(`<a href="${escapeAttr(applyUrl)}" target="_blank" rel="noopener noreferrer">Apply portal →</a>`);
+    actionLinks.push(`<a href="${escapeAttr(safeUrl(applyUrl))}" target="_blank" rel="noopener noreferrer">Apply portal →</a>`);
   }
 
   // Areas excerpt (quiet body; no accent border, no "AREAS / NOTES" label).
@@ -4548,7 +4573,7 @@ function renderResources() {
   const renderItem = (i) => `
     <li>
       ${i.url && i.url !== "#"
-        ? `<a href="${escapeAttr(i.url)}" target="_blank" rel="noopener">${escapeHTML(i.name)} <span class="ext">↗</span></a>`
+        ? `<a href="${escapeAttr(safeUrl(i.url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(i.name)} <span class="ext">↗</span></a>`
         : `<span class="res-name">${escapeHTML(i.name)}</span>`}${regionChip(i.region)}${eligChip(i.elig)}
       <div class="res-note">${escapeHTML(i.note)}</div>
     </li>`;
@@ -4773,8 +4798,8 @@ function updateMapMarkers(filteredAds) {
     const coverageUrl = inst.career_page_url_guess || "#";
     const hssLine = fieldMatched > 0 ? `<div class="popup-hss">▲ ${fieldMatched} field-matched ad${fieldMatched > 1 ? "s" : ""}</div>` : "";
     const totalLine = total > 0
-      ? `${total} ad${total !== 1 ? "s" : ""} match filters &nbsp;·&nbsp; <a class="popup-link" href="${escapeAttr(coverageUrl)}" target="_blank" rel="noopener">career page →</a>`
-      : `no ads match current filters &nbsp;·&nbsp; <a class="popup-link" href="${escapeAttr(coverageUrl)}" target="_blank" rel="noopener">career page →</a>`;
+      ? `${total} ad${total !== 1 ? "s" : ""} match filters &nbsp;·&nbsp; <a class="popup-link" href="${escapeAttr(safeUrl(coverageUrl))}" target="_blank" rel="noopener noreferrer">career page →</a>`
+      : `no ads match current filters &nbsp;·&nbsp; <a class="popup-link" href="${escapeAttr(safeUrl(coverageUrl))}" target="_blank" rel="noopener noreferrer">career page →</a>`;
     marker.bindPopup(`
       <strong>${escapeHTML(inst.name)}</strong><br/>
       <span style="color:var(--muted)">${escapeHTML(inst.type)} · ${escapeHTML([inst.city, inst.state].filter(Boolean).join(", "))}</span>
