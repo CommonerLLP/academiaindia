@@ -586,11 +586,11 @@
      the headline. */
   .listing .card-subhead {
     margin: 5px 0 0;
-    font-family: var(--serif); font-size: 16px; line-height: 1.4;
-    color: var(--ink); font-style: italic;
+    font-family: var(--sans); font-size: 15px; line-height: 1.45;
+    color: var(--muted); font-style: normal;
   }
   .listing .card-subhead .card-discipline {
-    color: var(--alarm); font-weight: 600; font-style: normal;
+    color: var(--ink); font-weight: 650; font-style: normal;
   }
   .listing .card-subhead .card-sep {
     color: var(--muted); margin: 0 6px; font-style: normal;
@@ -867,45 +867,14 @@
   }
   .listing .card-cue-label {
     flex: 0 0 auto;
-    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--alarm);
+    font-size: 12px; font-weight: 700; text-transform: none;
+    letter-spacing: 0; color: var(--muted);
     min-width: 154px; padding-top: 1px;
   }
   .listing .card-cue-value {
-    font-size: 13.5px; color: var(--ink); line-height: 1.45;
-    font-style: italic;
-  }
-  /* Description "see more / see less" — line-clamp + button toggle.
-     The full text stays in the DOM at all times; only the clamp class
-     flips. Single text node grows in place: no jump, no duplication.
-     Previous <details>/<summary> approach kept the truncated preview
-     inside <summary>, so when expanded both preview and full text
-     rendered — duplicate text, ugly. This pattern is the standard
-     web one (clamp + toggle) and reads naturally. */
-  .listing .card-cue-description .card-desc-body {
-    min-width: 0;
-  }
-  .listing .card-cue-description .card-desc-text {
-    margin: 0;
-    font-family: var(--serif); font-size: 13.5px;
-    color: var(--ink); line-height: 1.5; font-style: italic;
-  }
-  .listing .card-cue-description .card-desc-body[data-expanded="false"] .card-desc-text {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    line-clamp: 3;
-    overflow: hidden;
-  }
-  .listing .card-cue-description .card-desc-toggle {
-    background: none; border: 0; padding: 0;
-    margin-top: 4px;
-    font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-    color: var(--accent); cursor: pointer;
-    display: inline-block;
-  }
-  .listing .card-cue-description .card-desc-toggle:hover {
-    text-decoration: underline;
+    font-family: var(--sans);
+    font-size: 14.5px; color: var(--ink); line-height: 1.55;
+    font-style: normal;
   }
   /* Areas: tag chips. Wrap freely; don't make a candidate hunt across
      a wall of comma-separated text. */
@@ -913,8 +882,8 @@
   .listing .card-area-chip {
     display: inline-flex; align-items: center;
     padding: 2px 9px; border-radius: 4px;
-    font-size: 12.5px; font-weight: 500; line-height: 1.4;
-    background: var(--chip-bg); color: var(--ink);
+    font-size: 12.5px; font-weight: 600; line-height: 1.4;
+    background: color-mix(in srgb, var(--chip-bg) 72%, transparent); color: var(--ink);
     border: 1px solid var(--border);
   }
   /* Empty state: when the recruiting department has not enunciated the
