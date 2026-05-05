@@ -117,9 +117,13 @@ def _contract(title: str) -> str:
 
 def _make_ad(title: str, url: str, fetched_at: datetime, excerpt: str,
              closing: Optional[str] = None, apply_url: Optional[str] = None,
-             confidence: float = 0.55) -> dict:
+             confidence: float = 0.55, excerpt_cap: int = 700) -> dict:
     title = _clean(title)[:220]
-    excerpt = _clean(excerpt)[:700]
+    # Default 700-char cap is defensive for index-page extracts that
+    # may include cross-listing noise. Parsers with structured per-position
+    # bodies (FLAME, APU per-position, ...) can pass a larger cap so the
+    # full hiring brief survives into the dashboard.
+    excerpt = _clean(excerpt)[:excerpt_cap]
     return {
         "id": _stable_id("private", url, title, closing or ""),
         "institution_id": "__placeholder__",
@@ -303,7 +307,11 @@ def _flame_table_ad(table, base_url: str, fetched_at: datetime) -> Optional[dict
     )
     department = _clean(dept_m.group(1)).rstrip(",.;& ") if dept_m else None
     closing = _parse_date(body)
-    ad = _make_ad(title, base_url, fetched_at, body, closing, base_url, 0.72)
+    # FLAME bodies are structured (boilerplate stripped, position-specific
+    # only). Allow a longer excerpt so the full hiring brief survives —
+    # candidates need the area-of-specialisation language and the
+    # qualifications statement to decide whether to apply.
+    ad = _make_ad(title, base_url, fetched_at, body, closing, base_url, 0.72, excerpt_cap=2400)
     if department:
         ad["department"] = department[:120]
     return ad

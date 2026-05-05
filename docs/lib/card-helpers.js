@@ -418,8 +418,16 @@ export function cleanNumberedCueItem(s) {
 }
 
 export function extractNumberedCueItems(text) {
+  // Anchor required. Without an explicit "areas of specialisation"
+  // (or similar) cue, we have no signal that the numbered list that
+  // follows is *topical areas* rather than responsibilities,
+  // expectations, or eligibility bullets. Earlier this fell through
+  // to extracting from the whole text, which surfaced FLAME hiring-
+  // expectation items ("1. Undertake independent research…") as
+  // topical-fit chips on cards.
   const anchor = text.search(/\b(?:specific\s+areas?\s+of|areas?\s+of\s+speciali[sz]ation|following\s+(?:areas?|speciali[sz]ations?))\b/i);
-  const windowText = anchor >= 0 ? text.slice(anchor) : text;
+  if (anchor < 0) return [];
+  const windowText = text.slice(anchor);
   // Marker grammar: parenthesised token (i), (ii), (1), (1a), (1-iii),
   // (a), (b)  OR  unparenthesised "1." / "1)" / "a." Roman numerals
   // (i…iv etc.) are essential here — many Indian academic ads
