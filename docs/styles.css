@@ -554,7 +554,10 @@
   }
   .listing.tier-critical .tier-bar { background: var(--alarm); }
   .listing.tier-soon     .tier-bar { background: var(--warn); }
-  .listing.tier-ok       .tier-bar { background: var(--good); }
+  /* tier-ok (31+ days) is "not urgent" — a neutral signal, not a positive
+     one. Use muted-soft instead of green; the candidate's eye is drawn
+     to the urgent cards (alarm/warn), not away from far-out ones. */
+  .listing.tier-ok       .tier-bar { background: var(--muted-soft); }
 
   /* Headline grid: discipline + rank + inst on the left, deadline column
      on the right, star button in its own column. */
@@ -689,9 +692,27 @@
      the same palette as the per-position pills. */
   .listing .row-reserv { display: flex; flex-wrap: wrap; gap: 5px 6px; align-items: center; margin: 8px 0 0; grid-column: 2 / span 3; }
   .listing .row-reserv .reserv-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
-  .listing .row-reserv.reserv-missing { background: #fdf2f2; border: 1px solid #f5c5c5; border-left: 3px solid var(--alarm); border-radius: 6px; padding: 6px 10px; }
-  .listing .row-reserv .reserv-label.warn { color: var(--alarm); }
-  .listing .row-reserv .reserv-missing-msg { font-size: 11.5px; color: #6b2020; line-height: 1.4; }
+  /* Roster-not-disclosed banner: previously rendered with a pink/red
+     tint that read as alarm. Recoloured into the warm-amber editorial
+     palette — the absence is a *finding* (warn), not an emergency. */
+  .listing .row-reserv.reserv-missing {
+    background: #fbf3e3;
+    border: 1px solid #e8d5a8;
+    border-left: 3px solid var(--warn);
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  html[data-theme="dark"] .listing .row-reserv.reserv-missing {
+    background: rgba(194, 140, 80, 0.08);
+    border-color: rgba(194, 140, 80, 0.30);
+  }
+  .listing .row-reserv .reserv-label.warn { color: var(--warn); }
+  .listing .row-reserv .reserv-missing-msg {
+    font-size: 11.5px; color: #5a3a18; line-height: 1.4;
+  }
+  html[data-theme="dark"] .listing .row-reserv .reserv-missing-msg {
+    color: #d8c099;
+  }
   /* Info-icon affordance: a real click/keyboard disclosure. */
   .listing .row-reserv .reserv-info {
     position: relative;
@@ -939,7 +960,7 @@
      matters: "this closes soon, act on it." */
   .listing.tier-critical .deadline-num { color: var(--alarm); font-weight: 800; font-size: 24px; }
   .listing.tier-soon     .deadline-num { color: #8a5403; }
-  .listing.tier-ok       .deadline-num { color: var(--good); }
+  .listing.tier-ok       .deadline-num { color: var(--muted); }
   .listing .deadline-num.small { font-size: 12px; font-weight: 500; color: var(--muted); }
   .listing .deadline-unit { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-top: 3px; }
   .listing .deadline-date { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
