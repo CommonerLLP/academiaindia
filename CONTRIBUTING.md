@@ -127,14 +127,16 @@ institution or institution-family.
 - **No live calls in tests.** All HTTP is mocked at the `requests`
   level; parsers receive raw HTML strings.
 
-Run the suite:
+Run the suites:
 
 ```bash
-make test
+make test    # Python scraper tests (119)
+npm test     # Vitest tests for docs/lib/*.js (81)
 ```
 
-119 tests pass at the time of writing; new parsers should not break
-the count.
+Both suites should be green before you open a PR. New parsers should
+not break the Python count; changes to anything under `docs/lib/`
+should not break the Vitest count.
 
 ## Hall of forbidden moves
 

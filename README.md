@@ -70,8 +70,11 @@ make scrape ARGS='--limit 5'
 # wipe the PDF cache before scraping (for ads that were updated upstream)
 make scrape-fresh
 
-# run the test suite (119 tests)
+# run the Python scraper test suite (119 tests)
 make test
+
+# run the frontend test suite (81 tests, Vitest)
+npm test
 
 # serve docs/ locally for development
 make serve   # → http://localhost:8766/
@@ -93,7 +96,19 @@ whoseuniversity/
 ├── docs/                ← what GitHub Pages serves
 │   ├── index.html       ← markup + theme-flash script
 │   ├── styles.css       ← all stylesheets
-│   ├── app.js           ← all SPA logic
+│   ├── app.js           ← orchestration: imports, loadData, render(), tab routing, event wiring
+│   ├── lib/             ← ESM modules used by app.js + each other
+│   │   ├── sanitize.js     ← escapeHTML / safeUrl / URL allowlist (tested)
+│   │   ├── schema.js       ← Zod schemas for runtime + test validation
+│   │   ├── classify.js     ← field tags / position rank / quality (tested)
+│   │   ├── excerpt.js      ← raw_text_excerpt sanitiser (tested)
+│   │   ├── charts.js       ← Vacancies tab + The Gap charts + resources data
+│   │   ├── state.js        ← shared mutable state holder
+│   │   ├── card-helpers.js ← per-card cue extractors and rank/discipline formatters
+│   │   ├── render-card.js  ← renderAd() + hiring-trap detection + card wiring
+│   │   ├── filters.js      ← filter/sort/search + reactive facet counts
+│   │   ├── map.js          ← Leaflet init + marker updates
+│   │   └── render-tabs.js  ← Resources / Saved / Coverage tab renderers
 │   ├── favicon.svg      ← oxblood "?" mark
 │   ├── og.svg / og.png  ← social-share card
 │   ├── ARCHITECTURE.md  ← scraper-pipeline architecture
@@ -102,6 +117,8 @@ whoseuniversity/
 │       ├── coverage_report.json      ← which parsers worked
 │       ├── institutions_registry.json
 │       └── vacancy_snapshots.json    ← the parliamentary corpus's structured data
+│
+├── tests/               ← Vitest test suites for docs/lib/* modules
 │
 ├── scraper/             ← Python; runs locally or on Actions
 │   ├── run.py           ← orchestrator
