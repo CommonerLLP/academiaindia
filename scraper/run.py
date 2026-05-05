@@ -565,6 +565,29 @@ def run(registry_path: Path, out_dir: Path, cache_dir: Path, limit: Optional[int
             note="; ".join(note_parts),
         )
 
+    # Manual overrides — hand-transcribed records that the scrapers
+    # cannot reach (WhatsApp circulars, mailing-list forwards, paper
+    # cards). These live in `docs/data/manual_overrides.json` and are
+    # merged into `ads` after the main registry loop. Without this
+    # merge, manual entries placed directly in `current.json` would be
+    # clobbered by every nightly sweep — that's how we lost the Ashoka
+    # Sociology & Anthropology Visiting Faculty record on 2026-05-04.
+    manual_path = out_dir / "manual_overrides.json"
+    from parsers.manual_override import load_manual_overrides
+    manual_records = load_manual_overrides(manual_path)
+    if manual_records:
+        for rec in manual_records:
+            ensure_unique_ad_id(rec, used_ad_ids)
+            ads.append(rec)
+        coverage.append(CoverageRow(
+            institution_id="_manual_overrides",
+            parser="manual_override",
+            fetch_status="ok",
+            http_status=None,
+            ads_found=len(manual_records),
+            note=f"Merged {len(manual_records)} hand-transcribed entry/entries from manual_overrides.json",
+        ))
+
     # Serialize
     now = datetime.now(timezone.utc)
     out_dir.mkdir(parents=True, exist_ok=True)
