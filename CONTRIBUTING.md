@@ -127,16 +127,14 @@ institution or institution-family.
 - **No live calls in tests.** All HTTP is mocked at the `requests`
   level; parsers receive raw HTML strings.
 
-Run the suites:
+Run the suite:
 
 ```bash
-make test    # Python scraper tests (119)
-npm test     # Vitest tests for docs/lib/*.js (81)
+make test
 ```
 
-Both suites should be green before you open a PR. New parsers should
-not break the Python count; changes to anything under `docs/lib/`
-should not break the Vitest count.
+119 tests pass at the time of writing; new parsers should not break
+the count.
 
 ## Hall of forbidden moves
 
@@ -189,3 +187,30 @@ When a card displays incorrect information, the order of severity is:
 
 Fix in this order; don't rebuild the heuristic-parser hierarchy because
 of a cosmetic bug.
+
+
+## Document history
+
+This section is append-only. The body above is preserved as the
+original contract; dated entries below record what changed afterwards.
+
+### 2026-05-05 — Frontend test floor stood up
+
+The "Run the suite" block above mentions only `make test` (the Python
+scraper suite, 119 tests). As of commit `2d50c7c`, the project also
+has a **frontend Vitest suite** under `tests/`: 81 tests covering 4 of
+the 9 modules in `docs/lib/` (`sanitize`, `classify`, `excerpt`,
+`schema`).
+
+If your PR touches anything under `docs/lib/` or `docs/app.js`, run:
+
+```bash
+npm test
+```
+
+…in addition to `make test`. Both should be green. The Python count
+is the gate for parser changes; the Vitest count is the gate for
+frontend changes. The remaining 5 lib modules (`card-helpers`,
+`render-card`, `filters`, `map`, `render-tabs`) do not yet have
+backfilled test coverage — adding tests for them when you're working
+in those files is welcome.
