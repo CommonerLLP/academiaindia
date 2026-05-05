@@ -2052,8 +2052,37 @@ function renderAd(ad) {
   };
   const NS_TIP = "The source ad did not disclose this clearly enough to extract.";
   const empty = `<span class="card-cue-empty" title="${NS_TIP}">Not disclosed in source ad</span>`;
-  const areasValue = cues.areas
-    ? `<span class="card-cue-tags">${cues.areas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>`
+  // Topical-fit chips should be scannable in 1-2 seconds. Source extractions
+  // sometimes pack many sub-topics into one comma/semicolon-separated string;
+  // split those into atomic chips, drop parenthetical qualifiers, dedupe,
+  // and cap chip length so the row reads like tags rather than paragraphs.
+  const atomizeAreas = (raws) => {
+    if (!Array.isArray(raws)) return [];
+    const out = [];
+    const seen = new Set();
+    for (const raw of raws) {
+      const s = String(raw || "").trim();
+      if (!s) continue;
+      // Split first on em/en-dash followed by an explanation (keep only the
+      // headline before the dash), then on semicolons, then on commas.
+      const headline = s.split(/\s*[—–]\s+/)[0];
+      const parts = headline
+        .split(/\s*;\s*|\s*,\s*(?=[A-Z(])|\s+and\s+(?=[A-Z(])|\s*\(\s*including\s*[^)]*\)/)
+        .flatMap(p => p.split(/\s*,\s*(?=[A-Z(])/)) // double-pass on stubborn commas
+        .map(p => p.replace(/^\((.+)\)$/, "$1").replace(/\s*\([^)]*\)\s*$/, "").trim())
+        .filter(p => p && p.length > 1);
+      for (const p of parts) {
+        let chip = p.replace(/^(?:and|with|including|such as|e\.g\.,?)\s+/i, "").trim();
+        if (chip.length > 64) chip = chip.slice(0, 60).replace(/[\s,;.]+$/, "") + "…";
+        const k = chip.toLowerCase();
+        if (k && !seen.has(k)) { seen.add(k); out.push(chip); }
+      }
+    }
+    return out.slice(0, 12);
+  };
+  const atomicAreas = atomizeAreas(cues.areas);
+  const areasValue = atomicAreas.length
+    ? `<span class="card-cue-tags">${atomicAreas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>`
     : empty;
   const areasHTML = `
     <div class="card-cues">
