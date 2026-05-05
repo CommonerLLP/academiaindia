@@ -44,6 +44,11 @@ export function currentFilterState() {
 export function filterHaystack(ad, inst = {}) {
   const sp = getStructuredPosition(ad);
   return [
+    // Geographic terms first — searching "Pune" should find FLAME (city
+    // is "Pune" but not in the institution name) and IISER Pune (city
+    // and name both have it). Previously city/state were absent from
+    // the haystack so location queries silently missed.
+    inst.city, inst.state,
     ad.title, ad.department, ad.discipline, inst.name, inst.short_name,
     ad.raw_text_excerpt, ad.pdf_excerpt, ad.unit_eligibility,
     ad.publications_required, ad.general_eligibility,
