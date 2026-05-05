@@ -17,6 +17,8 @@
 // global names). Don't add helpers, computed values, or derived state
 // here — those live in their own modules.
 
+const SAVED_KEY = "hei-tracker-saved";
+
 export const state = {
   /** Array of ad records loaded from data/current.json. */
   ADS: [],
@@ -24,4 +26,11 @@ export const state = {
   COVERAGE: null,
   /** institution_id → registry-entry map from data/institutions_registry.json. */
   INSTITUTIONS: {},
+  /** Set<id> of ads the user has starred. Mutable; mirrored to localStorage. */
+  SAVED: new Set(JSON.parse(localStorage.getItem(SAVED_KEY) || "[]")),
 };
+
+/** Mirror state.SAVED to localStorage. Call after every add/delete. */
+export function persistSaved() {
+  localStorage.setItem(SAVED_KEY, JSON.stringify([...state.SAVED]));
+}
