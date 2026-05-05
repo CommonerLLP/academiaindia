@@ -694,7 +694,26 @@ let renderLimit = RENDER_PAGE_SIZE;
 function renderAdList(filtered) {
   const host = document.getElementById("feed-items");
   if (filtered.length === 0) {
-    host.innerHTML = `<div class="empty-state">No advertisements match your filters.</div>`;
+    // When the user has the Reserved-posts quick-chip on and the result
+    // is zero, the empty state is not "no match" — it's a finding. None
+    // of the scraped ads disclose per-post reservation rosters; that
+    // absence IS the political point. Surface it as such and link to
+    // The Gap rather than silently rendering a generic empty.
+    if (window._reservedOnly) {
+      host.innerHTML = `
+        <div class="empty-state empty-state-reserved">
+          <div class="big">⚑</div>
+          <div class="empty-state-headline">No advertisements currently disclose reservation breakdown.</div>
+          <div class="empty-state-body">
+            Most institutions cite the statutory reservation policy without operationalising it — no per-post category counts, no rosters published with the advertisement. This isn't a filter bug; it's the project's central finding about disclosure.
+          </div>
+          <div class="empty-state-cta">
+            <a href="#gap" data-tab-link="gap">See The Gap →</a>
+          </div>
+        </div>`;
+    } else {
+      host.innerHTML = `<div class="empty-state">No advertisements match your filters.</div>`;
+    }
     return;
   }
   const cap = Math.min(renderLimit, filtered.length);
