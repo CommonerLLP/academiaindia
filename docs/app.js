@@ -1044,6 +1044,10 @@ const NON_HSS_FIELD_TAGS = new Set([
   "Chemistry", "Biology / Biotech / Biomedical",
   "Earth / Ocean Sciences", "Energy / Sustainability",
   "Industrial / Operations", "Medical / Pharmacy",
+  // Finance / Management / Business sit outside the HSS framing for this
+  // dashboard's primary user. Without this exclusion, any IIT engineering
+  // ad whose areas mention "supply chain" or "finance" was flagged HSS.
+  "Finance / Capital Markets", "Management / Business",
 ]);
 
 function relevanceTag(ad) {
@@ -2053,27 +2057,45 @@ function renderAd(ad) {
   const NS_TIP = "The source ad did not disclose this clearly enough to extract.";
   const empty = `<span class="card-cue-empty" title="${NS_TIP}">Not disclosed in source ad</span>`;
   // Topical-fit chips should be scannable in 1-2 seconds. Source extractions
-  // sometimes pack many sub-topics into one comma/semicolon-separated string;
-  // split those into atomic chips, drop parenthetical qualifiers, dedupe,
-  // and cap chip length so the row reads like tags rather than paragraphs.
+  // sometimes pack many sub-topics into one string. Strategy:
+  //   1. Strip any parenthetical (the headline before "(" is what's
+  //      scannable; the parenthetical examples don't fit in a chip).
+  //   2. Strip any em/en-dash explanation tail.
+  //   3. Split remainder on semicolons, then capitalised commas, then
+  //      "and" between Capital tokens.
+  //   4. Dedupe, cap length, cap count.
   const atomizeAreas = (raws) => {
     if (!Array.isArray(raws)) return [];
     const out = [];
     const seen = new Set();
+    // Greedy-strip ALL parenthetical pairs (handles nested paren by simple
+    // depth count) — leaves headlines like "Quantitative Macroeconomics"
+    // instead of "Quantitative Macroeconomics (microfounded ... models; ...)".
+    const stripParens = (s) => {
+      let out = "";
+      let depth = 0;
+      for (const ch of s) {
+        if (ch === "(") depth++;
+        else if (ch === ")") { if (depth > 0) depth--; }
+        else if (depth === 0) out += ch;
+      }
+      return out.replace(/\s{2,}/g, " ").replace(/\s+([,;.])/g, "$1").trim();
+    };
     for (const raw of raws) {
       const s = String(raw || "").trim();
       if (!s) continue;
-      // Split first on em/en-dash followed by an explanation (keep only the
-      // headline before the dash), then on semicolons, then on commas.
-      const headline = s.split(/\s*[—–]\s+/)[0];
+      const noParens = stripParens(s);
+      const headline = noParens.split(/\s*[—–]\s+/)[0];
       const parts = headline
-        .split(/\s*;\s*|\s*,\s*(?=[A-Z(])|\s+and\s+(?=[A-Z(])|\s*\(\s*including\s*[^)]*\)/)
-        .flatMap(p => p.split(/\s*,\s*(?=[A-Z(])/)) // double-pass on stubborn commas
-        .map(p => p.replace(/^\((.+)\)$/, "$1").replace(/\s*\([^)]*\)\s*$/, "").trim())
+        .split(/\s*;\s*|\s*,\s*(?=[A-Z])|\s+and\s+(?=[A-Z])/)
+        .flatMap(p => p.split(/\s*,\s*(?=[A-Z])/))
+        .map(p => p.trim())
         .filter(p => p && p.length > 1);
       for (const p of parts) {
-        let chip = p.replace(/^(?:and|with|including|such as|e\.g\.,?)\s+/i, "").trim();
-        if (chip.length > 64) chip = chip.slice(0, 60).replace(/[\s,;.]+$/, "") + "…";
+        let chip = p.replace(/^(?:and|with|including|such as|e\.g\.,?)\s+/i, "")
+                    .replace(/[\s,;.]+$/, "")
+                    .trim();
+        if (chip.length > 60) chip = chip.slice(0, 56).replace(/[\s,;.]+$/, "") + "…";
         const k = chip.toLowerCase();
         if (k && !seen.has(k)) { seen.add(k); out.push(chip); }
       }
