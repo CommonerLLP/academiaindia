@@ -3,6 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Content Security Policy: last-line browser-side defence against
+     stored XSS through poisoned scrape data. Allowlists scripts to self
+     + Leaflet@unpkg, styles to self + Leaflet/Google Fonts CSS +
+     inline styles (the dashboard currently uses ~140 inline
+     style="..." attributes; can be tightened later by replacing with
+     classes). Connections locked to self + OSM tile hosts. Frames
+     blocked (clickjacking guard). base-uri locked, form-action
+     blocked, object-src blocked. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://*.tile.openstreetmap.org; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'" />
 <title>Whose University? · A public-interest tracker of academic work in India</title>
 <meta name="description" content="A public-interest tracker of academic work in India — faculty, visiting, and postdoctoral positions across central HEIs, IIMs, IITs, AIIMS, and major private universities. Compiled from publicly available recruitment notices for research and reference; verify with the issuing institution before applying." />
 <link rel="canonical" href="https://whoseuniversity.org/" />
