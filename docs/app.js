@@ -37,9 +37,12 @@ import {
 } from "./lib/charts.js";
 
 // ---------- state ----------
-let ADS = [];
-let COVERAGE = null;
-let INSTITUTIONS = {};
+// Mutable shared state lives in lib/state.js as a single `state` object.
+// This module reads/writes via state.ADS / state.COVERAGE / state.INSTITUTIONS;
+// other modules (lib/card-helpers.js, etc.) import the same `state` and see
+// the same object. Reassignment goes through state.X = newValue; mutation
+// goes through state.X[key] = ... as before.
+import { state } from "./lib/state.js";
 const TYPE_ORDER = ["IIT","IIM","PrivateUniversity","IISc","IISER","CentralUniversity","NIT","IIIT"];
 const TYPE_COLORS = {
   IIT: "#1F4E79", IIM: "#2d6a4f", IISc: "#6b21a8", IISER: "#b45309",
@@ -325,7 +328,7 @@ function normalizeRecruitingUnitName(unit, ad = {}) {
 
   const key = clean.toLowerCase();
   const instId = String(ad.institution_id || "");
-  const instType = String((INSTITUTIONS[instId] || {}).type || "");
+  const instType = String((state.INSTITUTIONS[instId] || {}).type || "");
   const isPublicTechnical = /^(?:iit|nit|iiit|iiser)-/i.test(instId)
     || /^(?:IIT|NIT|IIIT|IISER|IISc|CentralUniversity)$/i.test(instType);
   if (isPublicTechnical && DEPARTMENT_UNIT_OVERRIDES.has(key)) {
@@ -707,13 +710,13 @@ async function loadData() {
       fetch("data/coverage_report.json", opts).then(r => r.json()).catch(() => null),
       fetch("data/institutions_registry.json", opts).then(r => r.json()),
     ]);
-    ADS = (current.ads || []).filter(ad => {
+    state.ADS = (current.ads || []).filter(ad => {
       const sp = getStructuredPosition(ad);
       const pt = sp ? sp.post_type : ad.post_type;
       return pt !== "NonFaculty";
     });
-    COVERAGE = coverage;
-    for (const inst of registry) INSTITUTIONS[inst.id] = inst;
+    state.COVERAGE = coverage;
+    for (const inst of registry) state.INSTITUTIONS[inst.id] = inst;
     // Footer colophon — surface the data freshness as a human-readable
     // date so visitors can judge whether the site is being maintained.
     const updatedEl = document.getElementById("colophon-updated");
@@ -721,7 +724,7 @@ async function loadData() {
       try {
         const d = new Date(current.generated_at);
         const fmt = d.toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
-        updatedEl.textContent = `${fmt} · ${ADS.length} listings tracked`;
+        updatedEl.textContent = `${fmt} · ${state.ADS.length} listings tracked`;
       } catch { updatedEl.textContent = current.generated_at; }
     }
   } catch (e) {
@@ -791,8 +794,8 @@ function populateFilters() {
   if (search) search.value = "";
   const typeCounts = {}, stateCounts = {}, fieldCounts = {}, qualityCounts = { hss: 0, "non-hss": 0, other: 0 };
   let facultyTotal = 0, associateTotal = 0, fullTotal = 0, researchTotal = 0, visitingTotal = 0;
-  for (const ad of ADS) {
-    const inst = INSTITUTIONS[ad.institution_id] || {};
+  for (const ad of state.ADS) {
+    const inst = state.INSTITUTIONS[ad.institution_id] || {};
     if (inst.type) typeCounts[inst.type] = (typeCounts[inst.type] || 0) + 1;
     if (inst.state) stateCounts[inst.state] = (stateCounts[inst.state] || 0) + 1;
     for (const field of fieldTags(ad)) fieldCounts[field] = (fieldCounts[field] || 0) + 1;
@@ -1168,8 +1171,8 @@ function filterHaystack(ad, inst = {}) {
 }
 
 function applyFilters(st) {
-  return ADS.filter(ad => {
-    const inst = INSTITUTIONS[ad.institution_id] || {};
+  return state.ADS.filter(ad => {
+    const inst = state.INSTITUTIONS[ad.institution_id] || {};
     if (st.fields.size && !fieldTags(ad).some(f => st.fields.has(f))) return false;
     if (st.statuses.size && !st.statuses.has(listingStatus(ad))) return false;
     if (st.types.size && !st.types.has(inst.type)) return false;
@@ -1287,7 +1290,7 @@ function applySort(ads, sort) {
     return n === -1 ? FIELD_ORDER.length : n;
   };
   const byDeadline = (a, b) => deadlineRank(a) - deadlineRank(b);
-  const byInstitution = (a, b) => (INSTITUTIONS[a.institution_id]?.name || "").localeCompare(INSTITUTIONS[b.institution_id]?.name || "");
+  const byInstitution = (a, b) => (state.INSTITUTIONS[a.institution_id]?.name || "").localeCompare(state.INSTITUTIONS[b.institution_id]?.name || "");
   const byField = (a, b) => fieldRank(a) - fieldRank(b) || primaryField(a).localeCompare(primaryField(b));
   const cmp = {
     closing: (a, b) => byDeadline(a, b) || byField(a, b) || byInstitution(a, b),
@@ -1303,7 +1306,7 @@ function applySort(ads, sort) {
 // is the standard faceted-search pattern: toggling one dimension never makes its
 // own options disappear, but narrows what the others can show.
 function adPassesFilter(ad, st, skipDim) {
-  const inst = INSTITUTIONS[ad.institution_id] || {};
+  const inst = state.INSTITUTIONS[ad.institution_id] || {};
   if (skipDim !== "hss" && st.fields.size && !fieldTags(ad).some(f => st.fields.has(f))) return false;
   if (skipDim !== "quality" && st.statuses.size && !st.statuses.has(listingStatus(ad))) return false;
   if (skipDim !== "type" && st.types.size && !st.types.has(inst.type)) return false;
@@ -1335,8 +1338,8 @@ function updateReactiveCounts(st) {
     state: {},
     posgroup: { faculty: 0, associate: 0, full: 0, research: 0, visiting: 0 },
   };
-  for (const ad of ADS) {
-    const inst = INSTITUTIONS[ad.institution_id] || {};
+  for (const ad of state.ADS) {
+    const inst = state.INSTITUTIONS[ad.institution_id] || {};
     if (adPassesFilter(ad, st, "hss")) {
       for (const field of fieldTags(ad)) counts.hss[field] = (counts.hss[field] || 0) + 1;
     }
@@ -1458,7 +1461,7 @@ function renderActiveFilters(st) {
 }
 
 function renderSummary(filtered, st) {
-  const total = ADS.length;
+  const total = state.ADS.length;
   const active = st.fields.size + st.statuses.size + st.types.size + st.posGroups.size + st.states.size + (st.query ? 1 : 0);
   const el = document.getElementById("summary-row");
   el.innerHTML =
@@ -1538,7 +1541,7 @@ function renderAdList(filtered) {
 }
 
 function renderAd(ad) {
-  const inst = INSTITUTIONS[ad.institution_id] || { name: ad.institution_id };
+  const inst = state.INSTITUTIONS[ad.institution_id] || { name: ad.institution_id };
   const instType = String(inst.type || "");
   const isPrivateInstitution = instType.toLowerCase().includes("private");
   const institutionScope = isPrivateInstitution ? "private" : "public";
@@ -1816,7 +1819,7 @@ function renderAd(ad) {
   const _adText = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
   const shapeText = `${_adText} ${ad.original_url || ""} ${ad.ad_number || ""} ${ad._source_method || ""}`.toLowerCase();
   const sourcePeerCount = ad.original_url
-    ? ADS.filter(x => x.original_url === ad.original_url).length
+    ? state.ADS.filter(x => x.original_url === ad.original_url).length
     : 0;
   const isCompositeAd = (() => {
     if (structuredPos?.is_composite_call) return true;
@@ -2188,7 +2191,7 @@ function renderResources() {
 // ---------- saved tab ----------
 function renderSaved() {
   const host = document.getElementById("saved-tab");
-  const savedAds = ADS.filter(a => SAVED.has(a.id));
+  const savedAds = state.ADS.filter(a => SAVED.has(a.id));
   if (savedAds.length === 0) {
     host.innerHTML = `<div class="empty-state"><div class="big">☆</div><div>No saved advertisements yet.</div><div style="font-size:13px; margin-top:4px;">Click the star on any ad to add it to your watchlist.</div></div>`;
     return;
@@ -2202,11 +2205,11 @@ function renderSaved() {
 
 // ---------- coverage ----------
 function renderCoverage() {
-  if (!COVERAGE) {
+  if (!state.COVERAGE) {
     document.getElementById("coverage-summary").innerHTML = `<p style="color:var(--muted)">No coverage report available yet.</p>`;
     return;
   }
-  const s = COVERAGE;
+  const s = state.COVERAGE;
   const ok = (s.rows || []).filter(r => r.fetch_status === "ok").length;
   const stub = (s.rows || []).filter(r => r.fetch_status === "rolling-stub").length;
   const stale = (s.rows || []).filter(r => r.fetch_status === "stale-archive").length;
@@ -2225,7 +2228,7 @@ function renderCoverage() {
   const statusRank = { "parser-error": 0, "network-error": 1, "http-error": 2, "robots-blocked": 3, "no-url": 4, "stale-archive": 5, "rolling-stub": 6, "manual": 7, "ok": 8 };
   const shown = [...(s.rows || [])].sort((a,b) => (statusRank[a.fetch_status] ?? 4) - (statusRank[b.fetch_status] ?? 4));
   tbody.innerHTML = shown.map(r => {
-    const inst = INSTITUTIONS[r.institution_id] || { name: r.institution_id };
+    const inst = state.INSTITUTIONS[r.institution_id] || { name: r.institution_id };
     const cls = r.fetch_status === "ok" ? "status-ok" : (r.fetch_status === "manual" || r.fetch_status === "rolling-stub" || r.fetch_status === "stale-archive" || r.fetch_status === "no-url" ? "status-no" : "status-err");
     return `<tr>
       <td>${escapeHTML(inst.name || r.institution_id)}</td>
@@ -2251,7 +2254,7 @@ function initMap() {
   }).addTo(MAP);
 
   const typeSeen = new Set();
-  for (const inst of Object.values(INSTITUTIONS)) {
+  for (const inst of Object.values(state.INSTITUTIONS)) {
     if (!inst.lat || !inst.lon) continue;
     const color = TYPE_COLORS[inst.type] || "#888";
     const marker = L.circleMarker([inst.lat, inst.lon], {
@@ -2278,7 +2281,7 @@ function updateMapMarkers(filteredAds) {
     if (!fieldTags(ad).includes("Other")) fieldCount[iid] = (fieldCount[iid] || 0) + 1;
   }
   for (const [id, marker] of Object.entries(MARKERS)) {
-    const inst = INSTITUTIONS[id];
+    const inst = state.INSTITUTIONS[id];
     const fieldMatched = fieldCount[id] || 0;
     const total = totalCount[id] || 0;
     const color = TYPE_COLORS[inst.type] || "#888";
