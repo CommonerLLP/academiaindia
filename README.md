@@ -70,11 +70,8 @@ make scrape ARGS='--limit 5'
 # wipe the PDF cache before scraping (for ads that were updated upstream)
 make scrape-fresh
 
-# run the Python scraper test suite (119 tests)
+# run the test suite (119 tests)
 make test
-
-# run the frontend test suite (81 tests, Vitest)
-npm test
 
 # serve docs/ locally for development
 make serve   # → http://localhost:8766/
@@ -96,19 +93,7 @@ whoseuniversity/
 ├── docs/                ← what GitHub Pages serves
 │   ├── index.html       ← markup + theme-flash script
 │   ├── styles.css       ← all stylesheets
-│   ├── app.js           ← orchestration: imports, loadData, render(), tab routing, event wiring
-│   ├── lib/             ← ESM modules used by app.js + each other
-│   │   ├── sanitize.js     ← escapeHTML / safeUrl / URL allowlist (tested)
-│   │   ├── schema.js       ← Zod schemas for runtime + test validation
-│   │   ├── classify.js     ← field tags / position rank / quality (tested)
-│   │   ├── excerpt.js      ← raw_text_excerpt sanitiser (tested)
-│   │   ├── charts.js       ← Vacancies tab + The Gap charts + resources data
-│   │   ├── state.js        ← shared mutable state holder
-│   │   ├── card-helpers.js ← per-card cue extractors and rank/discipline formatters
-│   │   ├── render-card.js  ← renderAd() + hiring-trap detection + card wiring
-│   │   ├── filters.js      ← filter/sort/search + reactive facet counts
-│   │   ├── map.js          ← Leaflet init + marker updates
-│   │   └── render-tabs.js  ← Resources / Saved / Coverage tab renderers
+│   ├── app.js           ← all SPA logic
 │   ├── favicon.svg      ← oxblood "?" mark
 │   ├── og.svg / og.png  ← social-share card
 │   ├── ARCHITECTURE.md  ← scraper-pipeline architecture
@@ -117,8 +102,6 @@ whoseuniversity/
 │       ├── coverage_report.json      ← which parsers worked
 │       ├── institutions_registry.json
 │       └── vacancy_snapshots.json    ← the parliamentary corpus's structured data
-│
-├── tests/               ← Vitest test suites for docs/lib/* modules
 │
 ├── scraper/             ← Python; runs locally or on Actions
 │   ├── run.py           ← orchestrator
@@ -191,3 +174,42 @@ disclaimers that aren't sourced — will be declined.
 - **Data and corpus**: Creative Commons Attribution-ShareAlike 4.0
   International (CC BY-SA 4.0). Cite as: *Whose University?,
   whoseuniversity.org, accessed YYYY-MM-DD.*
+
+
+## Document history
+
+This section is append-only. The body of the README above is preserved
+as the original description; each dated entry below records what
+changed in the project between then and the entry date.
+
+### 2026-05-05 — Phase 2 frontend refactor
+
+The "Repository layout" block above describes `docs/app.js` as "all
+SPA logic" — that was true at the time of writing. As of commit
+`2d50c7c`, `app.js` is **728 lines of orchestration only** (imports,
+`loadData`, `render()`, tab routing, event wiring); the bulk of the
+SPA logic now lives in **9 ESM modules under `docs/lib/`**:
+
+| Module | Purpose |
+|---|---|
+| `lib/sanitize.js` | `escapeHTML` / `safeUrl` / URL allowlist *(tested)* |
+| `lib/schema.js` | Zod schemas for runtime + test-time validation *(tested)* |
+| `lib/classify.js` | Field tags / position rank / listing quality *(tested)* |
+| `lib/excerpt.js` | `raw_text_excerpt` sanitiser *(tested)* |
+| `lib/charts.js` | Vacancies tab + The Gap charts + resources data |
+| `lib/state.js` | Shared mutable state holder (`state.ADS`, `state.SAVED`, etc.) |
+| `lib/card-helpers.js` | Per-card cue extractors and rank/discipline formatters |
+| `lib/render-card.js` | `renderAd()` + hiring-trap detection + card wiring |
+| `lib/filters.js` | Filter / sort / search + reactive facet counts |
+| `lib/map.js` | Leaflet init + marker updates |
+| `lib/render-tabs.js` | Resources / Saved / Coverage tab renderers |
+
+Frontend tests live under `tests/` (Vitest); 81 tests across 4 files
+covering `sanitize`, `classify`, `excerpt`, and `schema`. Run with
+`npm test`. The remaining 5 lib modules ship without unit tests yet —
+backfilling those is deliberate next-step work.
+
+The "Running it locally" `make test` command above runs the 119-test
+**Python** scraper suite. Frontend tests run separately via `npm test`.
+Both should be green before opening a PR that touches their respective
+trees.
