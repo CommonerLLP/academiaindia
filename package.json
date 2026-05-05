@@ -1,0 +1,15 @@
+{
+  "name": "whoseuniversity-dashboard",
+  "private": true,
+  "type": "module",
+  "description": "Static SPA for whoseuniversity.org. JS lives under docs/; this package.json exists only to host dev-time tooling (Vitest, Zod for runtime validation). The site itself ships zero npm packages — only docs/* is deployed.",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0",
+    "zod": "^3.23.8",
+    "happy-dom": "^15.7.4"
+  }
+}
