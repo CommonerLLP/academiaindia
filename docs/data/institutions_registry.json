@@ -1148,5 +1148,75 @@
     "state": "Punjab",
     "source_url": "https://www.thapar.edu/page/sub/Job_Openings",
     "apply_url": "https://www.thapar.edu/page/sub/Job_Openings"
+  },
+  {
+    "id": "jnu-delhi",
+    "name": "Jawaharlal Nehru University",
+    "short_name": "JNU",
+    "type": "CentralUniversity",
+    "city": "Delhi",
+    "state": "Delhi",
+    "source_url": "https://www.jnu.ac.in/career",
+    "apply_url": "https://www.jnu.ac.in/career"
+  },
+  {
+    "id": "jamia-millia-islamia",
+    "name": "Jamia Millia Islamia",
+    "short_name": "Jamia Millia Islamia",
+    "type": "CentralUniversity",
+    "city": "Delhi",
+    "state": "Delhi",
+    "source_url": "https://jmi.ac.in/career",
+    "apply_url": "https://jmi.ac.in/career"
+  },
+  {
+    "id": "bhu-varanasi",
+    "name": "Banaras Hindu University",
+    "short_name": "BHU Varanasi",
+    "type": "CentralUniversity",
+    "city": "Varanasi",
+    "state": "Uttar Pradesh",
+    "source_url": "https://www.bhu.ac.in/Site/RTHome/2_2_2042_Recruitment",
+    "apply_url": "https://www.bhu.ac.in/Site/RTHome/2_2_2042_Recruitment"
+  },
+  {
+    "id": "amu-aligarh",
+    "name": "Aligarh Muslim University",
+    "short_name": "AMU Aligarh",
+    "type": "CentralUniversity",
+    "city": "Aligarh",
+    "state": "Uttar Pradesh",
+    "source_url": "https://www.amu.ac.in/employment-news",
+    "apply_url": "https://www.amu.ac.in/employment-news"
+  },
+  {
+    "id": "delhi-university",
+    "name": "University of Delhi",
+    "short_name": "Delhi University",
+    "type": "CentralUniversity",
+    "city": "Delhi",
+    "state": "Delhi",
+    "source_url": "https://du.ac.in/category/work-with-us/",
+    "apply_url": "https://du.ac.in/category/work-with-us/"
+  },
+  {
+    "id": "tiss-mumbai",
+    "name": "Tata Institute of Social Sciences",
+    "short_name": "TISS Mumbai",
+    "type": "StateUniversity",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "source_url": "https://tiss.edu/job-openings",
+    "apply_url": "https://tiss.edu/job-openings"
+  },
+  {
+    "id": "visva-bharati",
+    "name": "Visva-Bharati University",
+    "short_name": "Visva-Bharati",
+    "type": "CentralUniversity",
+    "city": "Santiniketan",
+    "state": "West Bengal",
+    "source_url": "https://www.visvabharati.ac.in/Recruitment.html",
+    "apply_url": "https://www.visvabharati.ac.in/Recruitment.html"
   }
 ]
