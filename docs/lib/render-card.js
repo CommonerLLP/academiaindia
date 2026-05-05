@@ -157,23 +157,23 @@ export function renderAd(ad) {
     ? `<span class="deadline-pill">${escapeHTML(formatCountdown(ad))} <span class="dl-date">· ${escapeHTML(formatDate(ad.closing_date))}</span></span>`
     : `<span class="deadline-pill no-dl">rolling, no deadline</span>`;
 
-  // Action links: PDF + apply portal + listing page (in that order — original PDF first)
-  const actionLinks = [];
-  actionLinks.push(`<a href="${escapeAttr(resolveUrl(ad.original_url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(sourceLinkLabel(ad))}</a>`);
+  // Action links — apply portal is the primary CTA, all other source
+  // links are secondary. The candidate's first decision is "click to
+  // apply"; "look at the original PDF / listing page" is a verification
+  // step, useful but quieter.
+  const sourceLinks = [];
+  sourceLinks.push(`<a href="${escapeAttr(resolveUrl(ad.original_url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(sourceLinkLabel(ad))}</a>`);
   if (ad.annexure_pdf_url) {
-    actionLinks.push(`<a href="${escapeAttr(safeUrl(ad.annexure_pdf_url))}" target="_blank" rel="noopener noreferrer">Annexure →</a>`);
+    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.annexure_pdf_url))}" target="_blank" rel="noopener noreferrer">Annexure →</a>`);
   }
   if (ad.info_url && ad.info_url !== ad.original_url) {
-    actionLinks.push(`<a href="${escapeAttr(safeUrl(ad.info_url))}" target="_blank" rel="noopener noreferrer">Listing page →</a>`);
+    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.info_url))}" target="_blank" rel="noopener noreferrer">Listing page →</a>`);
   }
   // Fall back to the institution-level apply URL when the ad doesn't
   // carry one. Some ad PDFs (IIT Indore, etc.) just point at the PDF and
   // expect the candidate to find the institute's faculty-recruitment
   // portal separately; the registry holds that portal URL.
   const applyUrl = ad.apply_url || inst.apply_url;
-  if (applyUrl) {
-    actionLinks.push(`<a href="${escapeAttr(safeUrl(applyUrl))}" target="_blank" rel="noopener noreferrer">Apply portal →</a>`);
-  }
 
   // Areas excerpt (quiet body; no accent border, no "AREAS / NOTES" label).
   // Sanitised because some institution pages embed UI widgets that bleed
@@ -256,17 +256,20 @@ export function renderAd(ad) {
     }
     return out.slice(0, 12);
   };
+  // Topical-fit row: when the source ad disclosed area chips, render them
+  // inline as quiet labels. When it didn't, drop the entire row — the
+  // "Not disclosed in source ad" label was repetitive noise across most
+  // cards and didn't help the candidate decide. The collapsed-details
+  // disclosure further down still surfaces the source's full topical fit
+  // when one exists.
   const atomicAreas = atomizeAreas(cues.areas);
-  const areasValue = atomicAreas.length
-    ? `<span class="card-cue-tags">${atomicAreas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>`
-    : empty;
-  const areasHTML = `
-    <div class="card-cues">
-      <div class="card-cue card-cue-areas${cues.areas ? "" : " is-empty"}">
-        <span class="card-cue-label">Topical fit</span>
-        ${areasValue}
-      </div>
-    </div>`;
+  const areasHTML = atomicAreas.length
+    ? `<div class="card-cues">
+         <div class="card-cue card-cue-areas">
+           <span class="card-cue-tags">${atomicAreas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>
+         </div>
+       </div>`
+    : "";
 
   // Collapsible details — short label, button-ish
   const hasDetails = ad.unit_eligibility || ad.publications_required || ad.general_eligibility || ad.reservation_note || ad.process_note || ad.contact || ad._source_note;
@@ -334,14 +337,24 @@ export function renderAd(ad) {
   if (ad.publication_date) {
     flags.push(`<span class="card-flag dim">posted ${escapeHTML(formatDate(ad.publication_date))}</span>`);
   }
-  // Large deadline column: "66 / DAYS / 30 Jun 2026" or "rolling" or "—".
+  // Deadline column — two-tier display:
+  //   0–60 days: big number + "days · 30 May 2026" muted underneath.
+  //   61+ days: drop the big number; show only "Closes 30 Nov 2026"
+  //     muted and small. The big number stops earning its size at that
+  //     range — the candidate just needs the planning anchor (the date),
+  //     and quietening these cards lets the urgent ones dominate scan.
+  // Closed and rolling are handled separately.
   let deadlineHTML;
   if (ad.closing_date) {
     const d = daysUntil(ad.closing_date);
     if (d == null || d < 0) {
-      deadlineHTML = `<div class="deadline-num small">closed</div><div class="deadline-date">${escapeHTML(formatDate(ad.closing_date))}</div>`;
+      deadlineHTML = `<div class="deadline-num small">closed</div><div class="deadline-meta">${escapeHTML(formatDate(ad.closing_date))}</div>`;
+    } else if (d > 60) {
+      deadlineHTML = `<div class="deadline-future">Closes <span class="deadline-future-date">${escapeHTML(formatDate(ad.closing_date))}</span></div>`;
     } else {
-      deadlineHTML = `<div class="deadline-num">${d}</div><div class="deadline-unit">days</div><div class="deadline-date">${escapeHTML(formatDate(ad.closing_date))}</div>`;
+      // "days" sits inline next to the number so the unit is anchored to
+      // "25" rather than orphaned on the left of the date line below.
+      deadlineHTML = `<div class="deadline-num">${d} <span class="deadline-unit-inline">days</span></div><div class="deadline-meta">${escapeHTML(formatDate(ad.closing_date))}</div>`;
     }
   } else {
     deadlineHTML = `<div class="deadline-num small">rolling</div>`;
@@ -427,11 +440,15 @@ export function renderAd(ad) {
       }</div></details>`
     : "";
 
-  // Always-visible apply/source links — replaces the buried "how to apply"
-  // disclosure. Original PDF first (the source-of-truth), then Apply portal
-  // (where you actually submit), then Listing page / Annexure if present.
-  const applyLinksHTML = actionLinks.length
-    ? `<div class="row-actions-inline">${actionLinks.join('')}</div>`
+  // Always-visible apply/source links. Apply portal anchors the row on
+  // the left as the filled-button CTA (consistent position card-to-card
+  // so the eye finds it without scanning). Source-of-truth links sit
+  // beside it as quiet text — verification flow.
+  const applyButton = applyUrl
+    ? `<a class="btn-apply" href="${escapeAttr(safeUrl(applyUrl))}" target="_blank" rel="noopener noreferrer">Apply →</a>`
+    : "";
+  const applyLinksHTML = (applyButton || sourceLinks.length)
+    ? `<div class="row-actions-inline">${applyButton}${sourceLinks.length ? `<span class="quiet-links">${sourceLinks.join("")}</span>` : ""}</div>`
     : "";
 
   const detailsBlocks = [];
