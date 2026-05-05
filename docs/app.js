@@ -655,6 +655,12 @@ function normalizeDisciplineName(discipline) {
 
 function inferRecruitingUnitFromText(ad = {}) {
   const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""}`.replace(/\s+/g, " ");
+  // If the text lists 3+ "School of X" patterns, it's almost certainly a
+  // navigation breadcrumb dump (Ahmedabad University, JGU, etc. enumerate
+  // every school on the careers page). Don't pick one of them as THE
+  // recruiting unit — none is correct.
+  const schoolMatches = text.match(/\b(?:School|Faculty|Centre|Center)\s+of\s+[A-Z][A-Za-z]+/g) || [];
+  if (schoolMatches.length >= 3) return "";
   const m = text.match(/\b((?:School|Faculty|Centre|Center)\s+of\s+[A-Z][A-Za-z &]+?)(?=\s+(?:has|is|offers|provides|for|We|Campus|Location|$)|[.,;])/);
   return m ? normalizeRecruitingUnitName(m[1], ad) : "";
 }

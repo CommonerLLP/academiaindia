@@ -952,7 +952,7 @@
   {
     "id": "ashoka-university",
     "name": "Ashoka University",
-    "short_name": "Ashoka",
+    "short_name": "Ashoka University",
     "type": "PrivateUniversity",
     "state": "Haryana",
     "city": "Sonipat",
@@ -969,7 +969,7 @@
   {
     "id": "jgu-sonipat",
     "name": "O.P. Jindal Global University",
-    "short_name": "JGU",
+    "short_name": "Jindal Global University",
     "type": "PrivateUniversity",
     "state": "Haryana",
     "city": "Sonipat",
@@ -1068,5 +1068,85 @@
     "notes": "Current jobs page includes liberal education positions across humanities, languages, social sciences, international studies, and adjacent fields. TLS verification is disabled only for this official Salesforce-hosted jobs page because the local CA bundle cannot verify its certificate chain.",
     "lat": 18.525,
     "lon": 73.728
+  },
+  {
+    "id": "plaksha-university",
+    "name": "Plaksha University",
+    "short_name": "Plaksha University",
+    "type": "PrivateUniversity",
+    "city": "Mohali",
+    "state": "Punjab",
+    "source_url": "https://plaksha.edu.in/careers",
+    "apply_url": "https://plaksha.edu.in/careers"
+  },
+  {
+    "id": "kautilya-school-public-policy",
+    "name": "Kautilya School of Public Policy",
+    "short_name": "Kautilya School of Public Policy",
+    "type": "PrivateUniversity",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "source_url": "https://kautilya.org.in/careers",
+    "apply_url": "https://kautilya.org.in/careers"
+  },
+  {
+    "id": "ambedkar-university-delhi",
+    "name": "Dr. B.R. Ambedkar University Delhi",
+    "short_name": "Ambedkar University Delhi",
+    "type": "StateUniversity",
+    "city": "Delhi",
+    "state": "Delhi",
+    "source_url": "https://aud.ac.in/recruitments",
+    "apply_url": "https://aud.ac.in/recruitments"
+  },
+  {
+    "id": "hyderabad-central-university",
+    "name": "University of Hyderabad",
+    "short_name": "University of Hyderabad",
+    "type": "CentralUniversity",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "source_url": "https://uohyd.ac.in/index.php/recruitment-uoh",
+    "apply_url": "https://uohyd.ac.in/index.php/recruitment-uoh"
+  },
+  {
+    "id": "isb-bharti-public-policy",
+    "name": "Bharti Institute of Public Policy, ISB Mohali",
+    "short_name": "ISB Bharti School of Public Policy",
+    "type": "PrivateUniversity",
+    "city": "Mohali",
+    "state": "Punjab",
+    "source_url": "https://www.isb.edu/en/research-thought-leadership/institutes-of-excellence/centre-of-excellence/bharti-institute-of-public-policy.html",
+    "apply_url": "https://www.isb.edu/en/about-isb/careers-at-isb.html"
+  },
+  {
+    "id": "manipal-academy-higher-education",
+    "name": "Manipal Academy of Higher Education",
+    "short_name": "MAHE Manipal",
+    "type": "PrivateUniversity",
+    "city": "Manipal",
+    "state": "Karnataka",
+    "source_url": "https://manipal.edu/mu/career.html",
+    "apply_url": "https://manipal.edu/mu/career.html"
+  },
+  {
+    "id": "bits-pilani",
+    "name": "Birla Institute of Technology and Science Pilani",
+    "short_name": "BITS Pilani",
+    "type": "PrivateUniversity",
+    "city": "Pilani",
+    "state": "Rajasthan",
+    "source_url": "https://www.bits-pilani.ac.in/careers/",
+    "apply_url": "https://www.bits-pilani.ac.in/careers/"
+  },
+  {
+    "id": "thapar-institute",
+    "name": "Thapar Institute of Engineering and Technology",
+    "short_name": "Thapar Institute",
+    "type": "PrivateUniversity",
+    "city": "Patiala",
+    "state": "Punjab",
+    "source_url": "https://www.thapar.edu/page/sub/Job_Openings",
+    "apply_url": "https://www.thapar.edu/page/sub/Job_Openings"
   }
 ]
