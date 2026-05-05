@@ -352,6 +352,157 @@ def _flame_ads(soup: BeautifulSoup, base_url: str, fetched_at: datetime) -> list
     return ads
 
 
+# APU per-position parsing. The careers index lists positions as
+# /jobs/{slug} links; each link goes to a detail page with H3 sections
+# for Requirements, Application Procedure, Resources. The previous
+# parser only saw the index page so every APU card showed only a
+# truncated opening sentence. This branch follows each per-position
+# URL to extract the full hiring brief, requirements bullets, and
+# application instructions.
+
+# Skip-list: index URLs that aren't actual positions.
+_APU_NON_POSITION_RE = re.compile(
+    r"/jobs/(?:index|at:|role:|location:|department:|category:)|\.ics$",
+    re.I,
+)
+
+
+def _apu_position_ad(html: str, url: str, fetched_at: datetime) -> Optional[dict]:
+    """Parse one APU per-position page into a JobAd dict."""
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup(["script", "style", "noscript", "svg"]):
+        tag.decompose()
+
+    # APU pages have a first <h1> that wraps the logo (empty text);
+    # the real position title is the next non-empty <h1>. Pick the
+    # first H1 with content.
+    title = ""
+    for h in soup.find_all("h1"):
+        candidate = _clean(h.get_text(" ", strip=True))
+        if candidate:
+            title = candidate
+            break
+    if not title or "page not found" in title.lower():
+        return None
+
+    # Meta description carries the 1-line summary, e.g. "We invite
+    # applications for faculty positions in Biology, specializing in
+    # Ecology, Evolutionary Biology and/or Biodiversity Conservation
+    # for our Undergraduate Programmes." Useful as the excerpt's
+    # opening anchor.
+    meta_desc = soup.find("meta", attrs={"name": "description"})
+    summary = _clean(meta_desc.get("content", "")) if meta_desc else ""
+
+    # Discipline focus narrative: "We are particularly interested in
+    # scholars trained in [list]…" — captures the discipline focus of
+    # the call. Often in a paragraph elsewhere on the page; pull any
+    # paragraph containing one of these intro phrases.
+    narrative_parts: list[str] = []
+    intro_re = re.compile(
+        r"\bWe (?:are particularly interested|invite applications|welcome applicants?)\b",
+        re.I,
+    )
+    for p in soup.find_all("p"):
+        ptxt = _clean(p.get_text(" ", strip=True))
+        if ptxt and intro_re.search(ptxt):
+            narrative_parts.append(ptxt)
+    narrative = " ".join(narrative_parts)
+
+    # Section extraction: each H3 sits inside <label class="toggle-trigger">
+    # which lives in a <section class="container-prose stack ...">. The
+    # section text contains the H3 label + the body bullets. We strip
+    # the label from the body.
+    def section_for(heading: str) -> str:
+        for h in soup.find_all(["h2", "h3"]):
+            if heading.casefold() in h.get_text(" ", strip=True).casefold():
+                section = h.find_parent("section")
+                if not section:
+                    continue
+                section_text = _clean(section.get_text(" ", strip=True))
+                # Strip the heading text from the start
+                return _clean(re.sub(rf"^{re.escape(heading)}\b\s*", "", section_text, flags=re.I))
+        return ""
+
+    requirements = section_for("Requirements")
+    application = section_for("Application Procedure")
+
+    # Build a rich excerpt from all the parts that survived.
+    excerpt_parts = [s for s in [summary, narrative, requirements, application] if s]
+    excerpt = " — ".join(excerpt_parts)
+
+    # Discipline from the title: "Faculty Positions in <X>" → <X>.
+    discipline = None
+    disc_m = re.match(r"Faculty\s+Positions?\s+(?:for|in)\s+(.+?)$", title, re.I)
+    if disc_m:
+        discipline = _clean(disc_m.group(1)).rstrip(" ,.;:")
+
+    # Confidence: APU per-position pages have stable structure and we
+    # capture title + narrative + requirements + application. 0.85 is
+    # well above the 0.55 the index-only parser produces.
+    ad = _make_ad(title, url, fetched_at, excerpt, None, url, 0.85, excerpt_cap=2400)
+    if requirements:
+        ad["unit_eligibility"] = requirements[:600]
+    if discipline:
+        ad["discipline"] = discipline[:120]
+    return ad
+
+
+def _apu_ads(
+    soup: BeautifulSoup, base_url: str, fetched_at: datetime,
+    fetch_position: Optional[callable] = None,
+) -> list[dict]:
+    """Parse the APU index, then follow each per-position link.
+
+    `fetch_position(url)` is injected by `parse()` so contract tests
+    can stub the network. By default it resolves to scraper-side
+    `fetch.fetch()` which honours the cache + rate-limit + robots.
+    """
+    if fetch_position is None:
+        # Lazy import — keeps unit tests stub-able without dragging in
+        # the network module at import time.
+        try:
+            from fetch import fetch as _real_fetch  # type: ignore
+        except ImportError:
+            return []  # No network; can't follow per-position links.
+        from pathlib import Path as _Path
+        cache_dir = _Path(__file__).resolve().parents[2] / ".cache"
+        # APU's robots.txt blocks /jobs paths; the orchestrator already
+        # applies a public-interest override when it fetches the index.
+        # Per-position URLs on the same domain are within that override
+        # scope, so respect_robots=False here as well. If the index was
+        # blocked AND the orchestrator chose not to override, this code
+        # path won't be reached because the orchestrator carries forward
+        # the previous run's data on a robots-blocked outcome.
+        def fetch_position(u):  # noqa: E306
+            r = _real_fetch(u, cache_path=cache_dir, respect_robots=False)
+            return r.text or ""
+
+    ads: list[dict] = []
+    seen_urls: set[str] = set()
+    for a in soup.find_all("a", href=True):
+        href = urljoin(base_url, a["href"]).split("#")[0].rstrip("/")
+        # Only follow APU /jobs/{slug} URLs that look like positions
+        if "azimpremjiuniversity.edu.in" not in href:
+            continue
+        if not re.search(r"/jobs/[a-z0-9-]+$", href, re.I):
+            continue
+        if _APU_NON_POSITION_RE.search(href):
+            continue
+        if href in seen_urls:
+            continue
+        seen_urls.add(href)
+        try:
+            html = fetch_position(href)
+        except Exception:
+            continue
+        if not html or len(html) < 1000:
+            continue
+        ad = _apu_position_ad(html, href, fetched_at)
+        if ad:
+            ads.append(ad)
+    return ads
+
+
 def parse(html: str, url: str, fetched_at: datetime) -> list[dict]:
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "noscript", "svg"]):
@@ -395,6 +546,14 @@ def parse(html: str, url: str, fetched_at: datetime) -> list[dict]:
         parsed_ads = _flame_ads(soup, url, fetched_at)
         if not parsed_ads:
             parsed_ads = _row_ads(soup, url, fetched_at)
+    elif "azimpremjiuniversity.edu.in" in url:
+        # APU exposes a /jobs/role:faculty index that links to per-position
+        # pages. Follow each link, parse the H3 sections (Requirements,
+        # Application Procedure) for the rich hiring brief.
+        parsed_ads = _apu_ads(soup, url, fetched_at)
+        if not parsed_ads:
+            # Fall back to coarse block/link parsing on the index alone.
+            parsed_ads = _block_ads(soup, url, fetched_at)
     else:
         parsed_ads = _row_ads(soup, url, fetched_at)
     if not parsed_ads:

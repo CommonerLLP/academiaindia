@@ -363,7 +363,12 @@ export function renderAd(ad) {
       deadlineHTML = `<div class="deadline-num">${d} <span class="deadline-unit-inline">days</span></div><div class="deadline-meta">${escapeHTML(formatDate(ad.closing_date))}</div>`;
     }
   } else {
-    deadlineHTML = `<div class="deadline-num small">rolling</div>`;
+    // Rolling deadlines need visible weight — they're a candidate's
+    // signal that they can apply at any time, not that the post is
+    // closed/inactive. Render as a distinct pill rather than as a
+    // small muted "rolling" word so it carries the same visual
+    // gravity as a numeric countdown.
+    deadlineHTML = `<div class="deadline-rolling">⟳ Rolling</div>`;
   }
 
   // Reservation operates at the cadre/institutional-roster level under the
