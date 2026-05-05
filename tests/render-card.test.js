@@ -98,7 +98,7 @@ describe("renderAd", () => {
     state.ADS = [publicAd, privateAd, rosterAd];
 
     expect(renderCard.renderAd(publicAd)).toContain("does not disclose enough post-wise roster information");
-    expect(renderCard.renderAd(privateAd)).toContain("exempt from constitutional reservation mandates");
+    expect(renderCard.renderAd(privateAd)).toContain("not known to implement affirmative action provisions");
     expect(renderCard.renderAd(rosterAd)).toContain("SC-1");
     expect(renderCard.renderAd(rosterAd)).toContain("OBC-2");
   });
