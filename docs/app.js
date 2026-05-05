@@ -2033,52 +2033,6 @@ function renderAd(ad) {
   const areasValue = cues.areas
     ? `<span class="card-cue-tags">${cues.areas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>`
     : empty;
-  const eligibilityValue = (cues.eligibility || cues.methods)
-    ? `<span class="card-cue-value">${escapeHTML(cues.eligibility || cues.methods)}</span>`
-    : empty;
-  const evaluationValue = (cues.evaluation || cues.approach)
-    ? `<span class="card-cue-value">${escapeHTML(cues.evaluation || cues.approach)}</span>`
-    : empty;
-  // The actual job description, in the institution's own words. Cues
-  // distill the high-signal pieces for fast scan; the description gives
-  // a candidate the exact language to pick up for a cover letter, the
-  // specific wording about teaching duties, and any context the
-  // structured cues miss.
-  //
-  // Long descriptions render with a CSS line-clamp (3 lines) and a
-  // separate "see more" button. The previous <details>/<summary>
-  // implementation kept the truncated preview inside <summary> so when
-  // expanded BOTH the preview and the full text appeared — duplicate
-  // text, awkward jump. Line-clamp + button keeps the FULL text in
-  // the DOM the whole time; the only thing that changes is whether
-  // the clamp is applied. No layout jump, no duplication, the same
-  // text grows in place.
-  let descriptionRow = "";
-  if (cleanedExcerpt) {
-    const SHORT = 280;
-    if (cleanedExcerpt.length > SHORT) {
-      descriptionRow = `
-        <div class="card-cue card-cue-description">
-          <span class="card-cue-label">Source language</span>
-          <div class="card-desc-body" data-expanded="false">
-            <p class="card-desc-text">${escapeHTML(cleanedExcerpt)}</p>
-            <button type="button" class="card-desc-toggle" aria-expanded="false">see more</button>
-          </div>
-        </div>`;
-    } else {
-      descriptionRow = `
-        <div class="card-cue card-cue-description">
-          <span class="card-cue-label">Source language</span>
-          <span class="card-cue-value">${escapeHTML(cleanedExcerpt)}</span>
-        </div>`;
-    }
-  } else {
-    descriptionRow = `
-      <div class="card-cue card-cue-description is-empty">
-        <span class="card-cue-label">Source language</span>
-        <span class="card-cue-empty" title="${NS_TIP}">Not provided in the advertisement</span>
-      </div>`;
-  }
 
   const areasHTML = `
     <div class="card-cues">
@@ -2086,15 +2040,6 @@ function renderAd(ad) {
         <span class="card-cue-label">Topical fit</span>
         ${areasValue}
       </div>
-      <div class="card-cue card-cue-methods${(cues.eligibility || cues.methods) ? "" : " is-empty"}">
-        <span class="card-cue-label">Eligibility snapshot</span>
-        ${eligibilityValue}
-      </div>
-      <div class="card-cue card-cue-approach${(cues.evaluation || cues.approach) ? "" : " is-empty"}">
-        <span class="card-cue-label">Evaluation criteria</span>
-        ${evaluationValue}
-      </div>
-      ${descriptionRow}
     </div>`;
 
   // ---- Card layout (institution-first) --------------------------------
@@ -2209,28 +2154,45 @@ function renderAd(ad) {
     ? `<div class="row-actions-inline">${actionLinks.join('')}</div>`
     : "";
 
-  // Substantive details still get a disclosure — but only when there's
-  // actually substantive content beyond reservation/links. Eligibility +
-  // publications + general-eligibility are the meat; everything else is
-  // either inline above or noise.
-  const structuredDetails = structuredPos ? [
-    structuredPos.general_eligibility ? `<div class="detail-block"><span class="k">PDF general eligibility</span><div class="v">${escapeHTML(structuredPos.general_eligibility)}</div></div>` : "",
-    structuredPos.specific_eligibility ? `<div class="detail-block"><span class="k">PDF specific eligibility</span><div class="v">${escapeHTML(structuredPos.specific_eligibility)}</div></div>` : "",
-    structuredPos.qualifications?.publications_required ? `<div class="detail-block"><span class="k">PDF publication requirements</span><div class="v">${escapeHTML(structuredPos.qualifications.publications_required)}</div></div>` : "",
-    structuredPos.pay_scale ? `<div class="detail-block"><span class="k">PDF pay scale</span><div class="v">${escapeHTML(structuredPos.pay_scale)}</div></div>` : "",
-    structuredPos.extraction_confidence != null ? `<div class="detail-block"><span class="k">PDF extraction</span><div class="v">${escapeHTML(structuredPos.extraction_method || "structured extraction")} · confidence ${Math.round(Number(structuredPos.extraction_confidence || 0) * 100)}%</div></div>` : "",
-  ].join("") : "";
-  const hasSubstantiveDetails = structuredDetails || ad.unit_eligibility || ad.publications_required || ad.general_eligibility || ad.process_note || ad.contact || ad._source_note;
-  const detailsHTML2 = hasSubstantiveDetails
+  const detailsBlocks = [];
+  if (cues.eligibility || cues.methods) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Eligibility</span><div class="v">${escapeHTML(cues.eligibility || cues.methods)}</div></div>`);
+  }
+  if (cues.evaluation || cues.approach) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Evaluation criteria</span><div class="v">${escapeHTML(cues.evaluation || cues.approach)}</div></div>`);
+  }
+  if (cleanedExcerpt) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Description</span><div class="v">${escapeHTML(cleanedExcerpt)}</div></div>`);
+  }
+
+  // Substantive details live in one disclosure. Topical fit stays visible;
+  // everything else is available but not competing with the first scan.
+  // Internal extraction-method/confidence is maintainer metadata, not
+  // candidate-facing content.
+  const publicationDetailsRaw = structuredPos?.qualifications?.publications_required || ad.publications_required || "";
+  const evaluationText = String(cues.evaluation || cues.approach || "");
+  const publicationAlreadyVisible = publicationDetailsRaw
+    && evaluationText.toLowerCase().includes(String(publicationDetailsRaw).toLowerCase());
+  const publicationDetails = publicationAlreadyVisible ? "" : publicationDetailsRaw;
+  if (publicationDetails) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(publicationDetails)}</div></div>`);
+  }
+  if (structuredPos?.pay_scale) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Pay scale</span><div class="v">${escapeHTML(structuredPos.pay_scale)}</div></div>`);
+  }
+  if (ad._source_note) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Source note</span><div class="v">${escapeHTML(ad._source_note)}</div></div>`);
+  }
+  if (ad.process_note) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Process</span><div class="v">${escapeHTML(ad.process_note)}</div></div>`);
+  }
+  if (ad.contact) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Contact</span><div class="v">${escapeHTML(ad.contact)}</div></div>`);
+  }
+  const detailsHTML2 = detailsBlocks.length
     ? `<details class="details">
-        <summary>Eligibility &amp; publication requirements ▾</summary>
-        ${structuredDetails}
-        ${ad._source_note ? `<div class="detail-block"><span class="k">Source note</span><div class="v">${escapeHTML(ad._source_note)}</div></div>` : ""}
-        ${ad.unit_eligibility ? `<div class="detail-block"><span class="k">Unit eligibility</span><div class="v">${escapeHTML(ad.unit_eligibility)}</div></div>` : ""}
-        ${ad.publications_required ? `<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(ad.publications_required)}</div></div>` : ""}
-        ${ad.general_eligibility ? `<div class="detail-block"><span class="k">General eligibility</span><div class="v">${escapeHTML(ad.general_eligibility)}</div></div>` : ""}
-        ${ad.process_note ? `<div class="detail-block"><span class="k">Process</span><div class="v">${escapeHTML(ad.process_note)}</div></div>` : ""}
-        ${ad.contact ? `<div class="detail-block"><span class="k">Contact</span><div class="v">${escapeHTML(ad.contact)}</div></div>` : ""}
+        <summary>See details ▾</summary>
+        ${detailsBlocks.join("")}
       </details>`
     : "";
 
@@ -2269,19 +2231,6 @@ function wireAdActions(host) {
       btn.textContent = SAVED.has(id) ? "★" : "☆";
       btn.setAttribute("aria-pressed", SAVED.has(id));
       document.getElementById("count-saved").textContent = SAVED.size > 0 ? SAVED.size : "";
-    });
-  });
-  // Description "see more / see less" toggle. The text node stays in
-  // the DOM the whole time; only the line-clamp class flips. No layout
-  // jump, no duplicate text — the same paragraph just grows in place.
-  host.querySelectorAll(".card-desc-toggle").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const body = btn.closest(".card-desc-body");
-      if (!body) return;
-      const expanded = body.getAttribute("data-expanded") === "true";
-      body.setAttribute("data-expanded", expanded ? "false" : "true");
-      btn.setAttribute("aria-expanded", expanded ? "false" : "true");
-      btn.textContent = expanded ? "see more" : "see less";
     });
   });
 }
