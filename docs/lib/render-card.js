@@ -263,10 +263,16 @@ export function renderAd(ad) {
   // disclosure further down still surfaces the source's full topical fit
   // when one exists.
   const atomicAreas = atomizeAreas(cues.areas);
+  const visibleAreas = atomicAreas.slice(0, 4);
+  const hiddenAreas = atomicAreas.slice(visibleAreas.length);
+  const hiddenAreaCount = Math.max(0, atomicAreas.length - visibleAreas.length);
   const areasHTML = atomicAreas.length
     ? `<div class="card-cues">
          <div class="card-cue card-cue-areas">
-           <span class="card-cue-tags">${atomicAreas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>
+           <span class="card-cue-tags">
+             ${visibleAreas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}
+             ${hiddenAreaCount ? `<details class="card-area-more-wrap"><summary class="card-area-more">+${hiddenAreaCount} more</summary><span class="card-area-more-list">${hiddenAreas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span></details>` : ""}
+           </span>
          </div>
        </div>`
     : "";
@@ -330,7 +336,7 @@ export function renderAd(ad) {
   if (contractStr === "Permanent") contractStr = "";
   // A small flag-row for non-blocking but worth-knowing signals.
   const flags = [];
-  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private" : "Public"}</span>`);
+  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private university" : "Public institution"}</span>`);
   if (effectivePostCount) {
     flags.push(`<span class="card-flag">${effectivePostCount} ${effectivePostCount === 1 ? "post" : "posts"}</span>`);
   }
@@ -415,21 +421,21 @@ export function renderAd(ad) {
   if (isPrivate && !catBits.length) {
     reservPillsHTML = "";
   } else if (catBits.length) {
-    reservPillsHTML = `<div class="row-reserv"><span class="reserv-label">Reserved seats</span>${
+    reservPillsHTML = `<div class="row-reserv reserv-disclosed"><span class="reserv-status-icon roster-ok" aria-hidden="true">✓</span><span class="reserv-label roster-ok">Roster disclosed</span>${
       catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")
     }</div>`;
   } else if (isSRD) {
     const tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
-    reservPillsHTML = `<div class="row-reserv reserv-srd"><span class="reserv-label good">✓ Special Recruitment Drive</span>${reservInfo(tip)}</div>`;
+    reservPillsHTML = `<div class="row-reserv reserv-srd"><span class="reserv-label good">Special Recruitment Drive</span>${reservInfo(tip)}</div>`;
   } else if (isCompositeAd) {
     const tip = "Composite or rolling faculty call. The ad may list many departments/areas under one recruitment PDF, but it does not disclose which roster category each selection point maps to.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing"><span class="reserv-label warn">⚠ Composite / rolling recruitment</span>${reservInfo(tip)}</div>`;
+    reservPillsHTML = `<div class="row-reserv reserv-missing"><span class="reserv-status-icon roster-missing" aria-hidden="true">×</span><span class="reserv-label warn">Roster not disclosed</span><span class="reserv-missing-msg">Composite / rolling recruitment</span>${reservInfo(tip)}</div>`;
   } else if (isExplicitSinglePostAd) {
     const tip = "This public-institution ad appears to be for one post/position, but the roster category for that appointment is not disclosed in the advertisement.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Single post: roster point not disclosed</span>${reservInfo(tip)}</div>`;
+    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-status-icon roster-missing" aria-hidden="true">×</span><span class="reserv-label warn">Roster not disclosed</span><span class="reserv-missing-msg">Single post</span>${reservInfo(tip)}</div>`;
   } else {
     const tip = "This public-institution ad does not disclose enough post-wise roster information to tell whether the recruitment is single-post or bulk, or which UR/SC/ST/OBC/EWS/PwBD roster point is being used.";
-    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Roster point not disclosed</span>${reservInfo(tip)}</div>`;
+    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-status-icon roster-missing" aria-hidden="true">×</span><span class="reserv-label warn">Roster not disclosed</span><span class="reserv-missing-msg">Roster point absent from ad</span>${reservInfo(tip)}</div>`;
   }
   // Hiring-language traps — surface known exclusion phrases that the ad
   // contains, so candidates can see the structural barriers up front.
@@ -440,10 +446,9 @@ export function renderAd(ad) {
       }</div></details>`
     : "";
 
-  // Always-visible apply/source links. Apply portal anchors the row on
-  // the left as the filled-button CTA (consistent position card-to-card
-  // so the eye finds it without scanning). Source-of-truth links sit
-  // beside it as quiet text — verification flow.
+  // Always-visible apply/source links. In the classified-row design these
+  // remain text actions: the card is a public hiring record first, and an
+  // application affordance second.
   const applyButton = applyUrl
     ? `<a class="btn-apply" href="${escapeAttr(safeUrl(applyUrl))}" target="_blank" rel="noopener noreferrer">Apply →</a>`
     : "";
@@ -581,4 +586,3 @@ export function wireAdActions(host) {
     });
   });
 }
-

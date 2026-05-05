@@ -34,13 +34,24 @@ export function renderResources() {
   const regionChip = (r) => r
     ? `<span class="region">${escapeHTML(r)}</span>`
     : "";
-  const renderItem = (i) => `
-    <li>
+  const getDiscipline = (str) => {
+    const s = str.toLowerCase();
+    if (s.includes('stem') || s.includes('lab sciences') || s.includes('life sciences') || s.includes('theoretical sciences') || s.includes('engineering')) return 'STEM';
+    if (s.includes('humanities') || s.includes('liberal arts') || s.includes('philosophy') || s.includes('literature') || s.includes('humanistic')) return 'Humanities';
+    if (s.includes('social') || s.includes('ssh') || s.includes('anthropology') || s.includes('sociology') || s.includes('policy') || s.includes('development') || s.includes('political') || s.includes('area studies') || s.includes('international relations') || s.includes('economics') || s.includes('law')) return 'Social Sciences';
+    return 'All';
+  };
+
+  const renderItem = (i) => {
+    const disc = getDiscipline((i.name + " " + (i.note || "")));
+    return `
+    <li class="postdoc-item" data-region="${escapeAttr(i.region || 'Any')}" data-elig="${escapeAttr(i.elig?.status || 'any')}" data-discipline="${escapeAttr(disc)}">
       ${i.url && i.url !== "#"
         ? `<a href="${escapeAttr(safeUrl(i.url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(i.name)} <span class="ext">↗</span></a>`
         : `<span class="res-name">${escapeHTML(i.name)}</span>`}${regionChip(i.region)}${eligChip(i.elig)}
       <div class="res-note">${escapeHTML(i.note)}</div>
     </li>`;
+  };
 
   // Postdocs-abroad block — sub-grouped, with raw HTML in the intro
   // (controlled, hand-authored — not user input — so the manual <p> and
@@ -48,38 +59,70 @@ export function renderResources() {
   // recommendation to Bahujan PhDs is explicitly to apply abroad rather
   // than wait for the Indian state to administer the constitution.
   const postdocBlock = `
-    <div class="res-block ${escapeAttr(POSTDOC_ABROAD.cls)}">
-      <h3>${escapeHTML(POSTDOC_ABROAD.title)}</h3>
-      <div class="res-block-intro">${POSTDOC_ABROAD.intro}</div>
-      <div class="elig-legend">
-        <span class="leg-label">Eligibility key:</span>
-        <span class="elig elig-open">Indian PhDs eligible</span>
-        <span class="elig elig-caveat">Open with caveat</span>
-        <span class="elig elig-restricted">Restricted</span>
-        <span class="elig elig-varies">Varies / verify per call</span>
+    <details class="res-accordion ${escapeAttr(POSTDOC_ABROAD.cls)}">
+      <summary>
+        <span class="acc-title">I am looking for postdoctoral fellowships abroad</span>
+        <span class="acc-icon">▾</span>
+      </summary>
+      <div class="acc-content">
+        <div class="res-block-intro">${POSTDOC_ABROAD.intro}</div>
+        <div class="elig-legend">
+          <span class="leg-label">Eligibility key:</span>
+          <span class="elig elig-open">Indian PhDs eligible</span>
+          <span class="elig elig-caveat">Open with caveat</span>
+          <span class="elig elig-restricted">Restricted</span>
+          <span class="elig elig-varies">Varies / verify per call</span>
+        </div>
+        <div class="elig-legend">
+          <span class="leg-label">Region:</span>
+          <span class="region">North America</span>
+          <span class="region">Europe & UK</span>
+          <span class="region">Asia & Oceania</span>
+          <span class="region">Multi</span>
+        </div>
+        <div class="elig-legend" style="background: rgba(180,120,30,0.04); border-color: rgba(180,120,30,0.30); color: var(--ink); align-items: flex-start; line-height: 1.55;">
+          <strong style="color: var(--alarm); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;">Regional norms ↘</strong>
+          <span style="font-size: 11.5px;">
+            <strong>UK / EU / Australia:</strong> PhD must be in hand at the application deadline (some allow a written submission date, but not "expected"). Time-since-PhD limits are common (often 4–8 years).
+            <strong style="margin-left: 4px;">US / Canada:</strong> several programmes accept final-year PhDs whose dissertation will be defended before the fellowship start date — verify per call.
+            <strong style="margin-left: 4px;">Mobility rules:</strong> Marie Curie (EU) and Newton International (UK) require the applicant not to have resided in the host country for &gt;12 months in the prior 36 — Indian PhDs in India satisfy this by default.
+            <strong style="margin-left: 4px;">Letters:</strong> 3 letters of recommendation is the standard; the savarna letter-writing chokepoint is real, plan early.
+          </span>
+        </div>
+        <div class="postdoc-filters">
+          <label>Filter by Region: 
+            <select id="filter-region">
+              <option value="All">All Regions</option>
+              <option value="North America">North America</option>
+              <option value="Europe & UK">Europe & UK</option>
+              <option value="Asia & Oceania">Asia & Oceania</option>
+              <option value="Multi">Multi-Region</option>
+            </select>
+          </label>
+          <label>Discipline: 
+            <select id="filter-discipline">
+              <option value="All">All Disciplines</option>
+              <option value="Humanities">Humanities</option>
+              <option value="Social Sciences">Social Sciences</option>
+              <option value="STEM">STEM</option>
+            </select>
+          </label>
+          <label>Eligibility: 
+            <select id="filter-elig">
+              <option value="All">Any Eligibility</option>
+              <option value="open">Indian PhDs Eligible</option>
+              <option value="caveat">Open with Caveat</option>
+              <option value="restricted">Restricted</option>
+            </select>
+          </label>
+        </div>
+        ${POSTDOC_ABROAD.subgroups.map(g => `
+          <div class="postdoc-subgroup">
+            <h4>${escapeHTML(g.title)}</h4>
+            <ul>${g.items.map(renderItem).join("")}</ul>
+          </div>`).join("")}
       </div>
-      <div class="elig-legend">
-        <span class="leg-label">Region:</span>
-        <span class="region">North America</span>
-        <span class="region">Europe & UK</span>
-        <span class="region">Asia & Oceania</span>
-        <span class="region">Multi</span>
-      </div>
-      <div class="elig-legend" style="background: rgba(180,120,30,0.04); border-color: rgba(180,120,30,0.30); color: var(--ink); align-items: flex-start; line-height: 1.55;">
-        <strong style="color: var(--alarm); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;">Regional norms ↘</strong>
-        <span style="font-size: 11.5px;">
-          <strong>UK / EU / Australia:</strong> PhD must be in hand at the application deadline (some allow a written submission date, but not "expected"). Time-since-PhD limits are common (often 4–8 years).
-          <strong style="margin-left: 4px;">US / Canada:</strong> several programmes accept final-year PhDs whose dissertation will be defended before the fellowship start date — verify per call.
-          <strong style="margin-left: 4px;">Mobility rules:</strong> Marie Curie (EU) and Newton International (UK) require the applicant not to have resided in the host country for &gt;12 months in the prior 36 — Indian PhDs in India satisfy this by default.
-          <strong style="margin-left: 4px;">Letters:</strong> 3 letters of recommendation is the standard; the savarna letter-writing chokepoint is real, plan early.
-        </span>
-      </div>
-      ${POSTDOC_ABROAD.subgroups.map(g => `
-        <div class="postdoc-subgroup">
-          <h4>${escapeHTML(g.title)}</h4>
-          <ul>${g.items.map(renderItem).join("")}</ul>
-        </div>`).join("")}
-    </div>`;
+    </details>`;
 
   // Combined Indian-institutions block — practical-infrastructure
   // links and RTI templates are conceptually the same thing (both
@@ -87,41 +130,51 @@ export function renderResources() {
   // unified block with two subsections under a single heading.
   const indianBlockData = RESOURCES_BLOCKS[0];
   const indianBlock = `
-    <div class="res-block rti-block">
-      <h3>If you're applying to Indian institutions</h3>
-      <p class="res-block-intro">Practical infrastructure for Indian-institution applications — certificate authorities, parliamentary-question search, the statutory bodies that handle reservation-violation complaints — paired with ready-to-paste RTI templates for the data the institutions don't publish. The two are one toolkit: links above, templates below.</p>
-      <h4 class="rti-subhead">Practical infrastructure</h4>
-      <ul class="indian-link-list">${indianBlockData.items.map(renderItem).join("")}</ul>
-      <h4 class="rti-subhead">RTI templates — when the government won't disclose, you generate the data</h4>
-      <p class="rti-subnote">Four ready-to-paste Right to Information Act requests covering the most common institutional opacity patterns. Replace bracketed placeholders, send to the Public Information Officer of the relevant institution. Costs ₹10 per RTI; institutions are obligated to respond within 30 days.</p>
-      <div class="rti-grid">
-        ${RTI_TEMPLATES.map((t, i) => `
-          <details class="rti-card">
-            <summary>
-              <span class="rti-title">${escapeHTML(t.title)}</span>
-              <span class="rti-expand">show template ▾</span>
-            </summary>
-            <div class="rti-body">
-              <p class="rti-scenario">${escapeHTML(t.scenario)}</p>
-              <div class="rti-target"><strong>To:</strong> ${escapeHTML(t.target)}</div>
-              <textarea class="rti-text" id="rti-text-${i}" readonly rows="14">${escapeHTML(t.body)}</textarea>
-              <div class="rti-actions">
-                <button class="rti-copy" data-target="rti-text-${i}" type="button">Copy template</button>
-                <a class="rti-online" href="https://rtionline.gov.in/" target="_blank" rel="noopener">File on RTI Online ↗</a>
+    <details class="res-accordion rti-block">
+      <summary>
+        <span class="acc-title">I am applying to Indian institutions (infrastructure & RTI templates)</span>
+        <span class="acc-icon">▾</span>
+      </summary>
+      <div class="acc-content">
+        <p class="res-block-intro">Practical infrastructure for Indian-institution applications — certificate authorities, parliamentary-question search, the statutory bodies that handle reservation-violation complaints — paired with ready-to-paste RTI templates for the data the institutions don't publish. The two are one toolkit: links above, templates below.</p>
+        <h4 class="rti-subhead">Practical infrastructure</h4>
+        <ul class="indian-link-list">${indianBlockData.items.map(renderItem).join("")}</ul>
+        <h4 class="rti-subhead">RTI templates — when the government won't disclose, you generate the data</h4>
+        <p class="rti-subnote">Four ready-to-paste Right to Information Act requests covering the most common institutional opacity patterns. Replace bracketed placeholders, send to the Public Information Officer of the relevant institution. Costs ₹10 per RTI; institutions are obligated to respond within 30 days.</p>
+        <div class="rti-grid">
+          ${RTI_TEMPLATES.map((t, i) => `
+            <details class="rti-card">
+              <summary>
+                <span class="rti-title">${escapeHTML(t.title)}</span>
+                <span class="rti-expand">show template ▾</span>
+              </summary>
+              <div class="rti-body">
+                <p class="rti-scenario">${escapeHTML(t.scenario)}</p>
+                <div class="rti-target"><strong>To:</strong> ${escapeHTML(t.target)}</div>
+                <textarea class="rti-text" id="rti-text-${i}" readonly rows="14">${escapeHTML(t.body)}</textarea>
+                <div class="rti-actions">
+                  <button class="rti-copy" data-target="rti-text-${i}" type="button">Copy template</button>
+                  <a class="rti-online" href="https://rtionline.gov.in/" target="_blank" rel="noopener">File on RTI Online ↗</a>
+                </div>
               </div>
-            </div>
-          </details>`).join("")}
+            </details>`).join("")}
+        </div>
       </div>
-    </div>`;
+    </details>`;
 
-  // Render remaining (non-Indian-applications) blocks after the unified
-  // Indian-institutions block.
   const renderBlock = (b) => `
-    <div class="res-block">
-      <h3>${escapeHTML(b.title)}</h3>
-      <ul>${b.items.map(renderItem).join("")}</ul>
-    </div>`;
-  const remainingBlocks = RESOURCES_BLOCKS.slice(1).map(renderBlock).join("");
+    <details class="res-accordion res-block">
+      <summary>
+        <span class="acc-title">I am exploring ${escapeHTML(b.title.toLowerCase().replace("if you're tracking ", "").replace("networks ", "networks ").replace("networks and associations", "networks and associations"))}</span>
+        <span class="acc-icon">▾</span>
+      </summary>
+      <div class="acc-content">
+        <ul>${b.items.map(renderItem).join("")}</ul>
+      </div>
+    </details>`;
+
+  const networksBlock = renderBlock(RESOURCES_BLOCKS[1]);
+  const accountabilityBlock = renderBlock(RESOURCES_BLOCKS[2]);
 
   host.innerHTML = `
     <div class="res-intro">
@@ -129,8 +182,9 @@ export function renderResources() {
       <p>Tools and references for Bahujan PhD scholars navigating the Indian academic job market — and the international fellowship circuit that runs alongside it. The page leads with postdoctoral routes abroad because, on the evidence of the <a href="#vacancies" data-tab-link="vacancies" style="color:var(--accent); font-weight:600;">Vacancies tab</a>, applying within India alone is not a strategy. Indian-institution infrastructure and broader networks follow.</p>
     </div>
     ${postdocBlock}
+    ${networksBlock}
     ${indianBlock}
-    ${remainingBlocks}
+    ${accountabilityBlock}
   `;
 
   // Wire copy-to-clipboard for each template.
@@ -150,6 +204,35 @@ export function renderResources() {
       }
     });
   });
+
+  // Wire up scaffolding filters for Postdocs
+  const filterPostdocs = () => {
+    const reg = host.querySelector("#filter-region")?.value || "All";
+    const disc = host.querySelector("#filter-discipline")?.value || "All";
+    const elig = host.querySelector("#filter-elig")?.value || "All";
+    
+    host.querySelectorAll(".postdoc-subgroup").forEach(sub => {
+      let visibleCount = 0;
+      sub.querySelectorAll(".postdoc-item").forEach(item => {
+        const matchReg = reg === "All" || item.dataset.region === reg || item.dataset.region === "Multi";
+        const matchDisc = disc === "All" || item.dataset.discipline === disc || item.dataset.discipline === "All";
+        const matchElig = elig === "All" || item.dataset.elig === elig;
+        
+        if (matchReg && matchDisc && matchElig) {
+          item.style.display = "";
+          visibleCount++;
+        } else {
+          item.style.display = "none";
+        }
+      });
+      // Hide subgroup if all items are hidden
+      sub.style.display = visibleCount === 0 ? "none" : "";
+    });
+  };
+
+  host.querySelector("#filter-region")?.addEventListener("change", filterPostdocs);
+  host.querySelector("#filter-discipline")?.addEventListener("change", filterPostdocs);
+  host.querySelector("#filter-elig")?.addEventListener("change", filterPostdocs);
 }
 
 export function renderSaved() {
