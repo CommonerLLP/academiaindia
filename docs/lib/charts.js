@@ -2093,17 +2093,23 @@ export const RESOURCES_BLOCKS = [
   {
     title: "Networks and associations",
     items: [
-      { name: "Insight Foundation", url: "https://insightfoundation.in/", note: "Bahujan-led research and advocacy on caste in education and employment. Long history of documentation on faculty hiring at central HEIs." },
-      { name: "Birsa Ambedkar Phule Students Association (BAPSA)", url: "#", note: "JNU-origin student association with chapters at multiple HEIs; networks for Bahujan PhD students moving toward faculty applications." },
-      { name: "Ambedkar Students Association (ASA)", url: "#", note: "Active at HCU, IITs, and several central universities. Mentor-network channel for navigating PhD-to-faculty transitions." },
-      { name: "Association of Indian Labour Historians (AILH) / faculty caucuses", url: "#", note: "Discipline-specific caucuses at academic associations sometimes maintain Bahujan-specific support networks. Worth contacting your discipline's main association directly." },
+      { name: "Ambedkar International Center (AIC)", url: "https://ambedkarinternationalcenter.org/", note: "Based in Washington DC, the AIC offers scholarships and runs mentorship networks connecting Bahujan students with academics and professionals in North America." },
+      { name: "Ambedkar King Study Circle (AKSC)", url: "https://akscusa.org/", note: "A diaspora organization in the US and Canada running academic mentorship, study circles, and advocacy for caste equity in North American higher education." },
+      { name: "Project EduAccess", url: "https://projecteduaccess.com/", note: "Provides direct mentorship, application support, and fee waivers for marginalized students from South Asia applying for higher education in the UK, Europe, and North America." },
+      { name: "Bahujan Scholars International", url: "#", note: "A collective providing advocacy, mentorship, and a vital support network for Bahujan scholars navigating academia globally." },
+      { name: "Forum for Anti-Caste Activism at Tkaronto (FACT)", url: "#", note: "A collective of scholars and activists based in Tkaronto (University of Toronto and across the Canadian academic network), providing critical peer support, advocacy, and community building." },
+      { name: "Academic Caucuses & Disciplinary Networks", url: "#", note: "Discipline-specific groups like the Dalit Studies networks within the American Anthropological Association (AAA) or the Association for Asian Studies (AAS) often maintain informal mentorship channels. Reach out directly." },
     ],
   },
   {
     title: "If you're tracking institutional accountability",
     items: [
-      { name: "DOPT (Department of Personnel and Training) reservation orders", url: "https://dopt.gov.in/", note: "Most authoritative source for reservation procedure circulars, including roster maintenance, certificate validity, and de-reservation/dereservation rules." },
-      { name: "UGC reservation circulars", url: "https://www.ugc.gov.in/", note: "Institution-specific guidance on roster computation. The 13-point roster controversy and its 2019 reversal are documented in the circulars archive." },
+      { name: "The 'Not Found Suitable' (NFS) Mechanism", url: "#", note: "The pervasive administrative practice where selection committees at IITs and central universities repeatedly leave SC/ST/OBC faculty posts vacant by declaring all candidates 'None Found Suitable', leading to eventual de-reservation." },
+      { name: "The 13-Point Roster Controversy (2018–2019)", url: "https://thewire.in/education/13-point-roster-system-university-faculty", note: "A court ruling temporarily shifted reservation calculations from the university level to the department level, effectively eliminating SC/ST/OBC faculty lines in small departments. Mass Bahujan protests forced the government to pass an ordinance restoring the 200-point university-wide roster." },
+      { name: "Thorat Committee Report (2007)", url: "#", note: "The landmark government committee report documenting systemic, deeply entrenched caste discrimination against students and doctors from marginalized backgrounds at AIIMS Delhi." },
+      { name: "The Central Educational Institutions (Reservation in Teachers' Cadre) Act, 2019", url: "https://egazette.gov.in/", note: "The legislative intervention fought for by student movements to legally mandate that a university be treated as a single unit (rather than individual departments) for computing the reservation roster." },
+      { name: "Karnataka's 'Rohith Vemula Act' Initiative", url: "#", note: "The landmark anti-discrimination legislation drafted by the Karnataka state government to explicitly prohibit and penalize caste-based discrimination against students and faculty in higher education institutions. This is the first major state-level implementation of the nationwide demand for a 'Rohith Act'." },
+      { name: "UGC De-reservation Draft Guidelines Controversy (2024)", url: "#", note: "The massive nationwide backlash against draft UGC guidelines that proposed allowing unfilled SC, ST, and OBC faculty vacancies to be 'de-reserved' and opened to general category candidates. Widespread student protests forced the Ministry of Education to retract the proposal and reiterate that constitutional reservation mandates cannot be bypassed." },
     ],
   },
 ];
