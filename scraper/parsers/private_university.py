@@ -221,6 +221,109 @@ def _link_ads(soup: BeautifulSoup, base_url: str, fetched_at: datetime) -> list[
     return ads
 
 
+# FLAME-specific helpers. Each position lives inside its own <table> on
+# jobs.flame.edu.in/FLAME_Current_Jobs_page; there are no per-position
+# URLs. Default tr-based parsing flattens 87 tables into one body and
+# the institutional pitch eats the position-specific content. This
+# extracts per-table.
+
+# Phrases that mark the start of position-specific content. Tried in
+# order; the first match wins. Captures (title) where possible.
+_FLAME_INVITE_PATTERNS = [
+    # "We are inviting applications [from X] for [the positions of] [full-time] TITLE."
+    re.compile(
+        r"\b(?:we\s+(?:are\s+)?invit(?:e|ing)|is\s+inviting|are\s+invited|are\s+looking)"
+        r"(?:\s+applications?)?"
+        r"(?:\s+from\s+[^.]{0,150}?)?"
+        r"\s+for\s+"
+        r"(?:the\s+)?(?:positions?\s+of\s+)?(?:a\s+)?(?:full[- ]time\s+)?"
+        r"([^.]{3,180})\.",
+        re.I,
+    ),
+    # "We welcome applications from all subfields of TITLE"
+    re.compile(
+        r"\bwe\s+welcome\s+applications?\s+from\s+(?:all\s+subfields\s+of\s+)?([^.]{3,160})\.",
+        re.I,
+    ),
+]
+
+# End markers — position content ends here.
+_FLAME_END_RE = re.compile(
+    r"\b(?:To know more about our|For informal enquiries|"
+    r"FLAME University is an affirmative)\b",
+    re.I,
+)
+
+
+def _flame_clean_title(raw: str) -> str:
+    """Strip filler from a FLAME title capture."""
+    t = raw.strip()
+    t = re.sub(r"^(?:the\s+|full[- ]time\s+|positions?\s+of\s+|a\s+)+", "", t, flags=re.I)
+    t = re.sub(r"\s+positions?$", "", t, flags=re.I)
+    # Trailing junk like "While we welcome..." sometimes leaks via greedy
+    # capture; cut at the first sentence-ish break.
+    t = re.split(r"\s+(?:While|Faculty|We are|The selected|Endowed|This|Candidates)\b", t, flags=re.I)[0]
+    return _clean(t).rstrip(",.;: ")
+
+
+def _flame_table_ad(table, base_url: str, fetched_at: datetime) -> Optional[dict]:
+    """Build one JobAd dict from one FLAME <table>. None if no position
+    marker can be found — caller can fall back to default parsing."""
+    text = _clean(table.get_text(" ", strip=True))
+    if len(text) < 200:
+        return None
+    invite_m = None
+    for p in _FLAME_INVITE_PATTERNS:
+        invite_m = p.search(text)
+        if invite_m:
+            break
+    if not invite_m:
+        return None
+    title = _flame_clean_title(invite_m.group(1) if invite_m.groups() else "")
+    if len(title) < 5:
+        return None
+    # Body: from the invite marker through to the end-marker (or table end).
+    pos_start = invite_m.start()
+    body = text[pos_start:]
+    end_m = _FLAME_END_RE.search(body)
+    if end_m:
+        body = body[: end_m.start()]
+    body = _clean(body)
+    # Department/faculty extraction. The boilerplate above the position
+    # body usually says "School of X" or "Faculty of Y" — that's where
+    # the school name lives, even though the position body itself
+    # rarely repeats it. So search the whole table text, but with a
+    # tight non-greedy capture and a strong end-anchor so we don't
+    # bleed into the surrounding prose.
+    dept_m = re.search(
+        r"\b(?:Faculty|School)\s+of\s+"
+        r"([A-Z][\w\s&]{2,40}?)"
+        r"(?=\s+(?:at\s+FLAME|has\s+|stands\s+|is\s+|offers?\s+|in\s+the\s+areas|—|invites?\s+))",
+        text,
+    )
+    department = _clean(dept_m.group(1)).rstrip(",.;& ") if dept_m else None
+    closing = _parse_date(body)
+    ad = _make_ad(title, base_url, fetched_at, body, closing, base_url, 0.72)
+    if department:
+        ad["department"] = department[:120]
+    return ad
+
+
+def _flame_ads(soup: BeautifulSoup, base_url: str, fetched_at: datetime) -> list[dict]:
+    ads: list[dict] = []
+    seen_titles: set[str] = set()
+    for table in soup.find_all("table"):
+        ad = _flame_table_ad(table, base_url, fetched_at)
+        if not ad:
+            continue
+        key = ad["title"].casefold()
+        if key in seen_titles:
+            continue
+        seen_titles.add(key)
+        ads.append(ad)
+    return ads
+
+
 def parse(html: str, url: str, fetched_at: datetime) -> list[dict]:
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "noscript", "svg"]):
@@ -257,6 +360,13 @@ def parse(html: str, url: str, fetched_at: datetime) -> list[dict]:
 
     if "ashoka.edu.in" in url:
         parsed_ads = [*_block_ads(soup, url, fetched_at), *_link_ads(soup, url, fetched_at)]
+    elif "flame.edu.in" in url:
+        # FLAME packs each position into its own <table> with no per-position
+        # URL. Use the table-aware extractor; fall back to the row-based one
+        # if it returns nothing (e.g., site rewrites the layout).
+        parsed_ads = _flame_ads(soup, url, fetched_at)
+        if not parsed_ads:
+            parsed_ads = _row_ads(soup, url, fetched_at)
     else:
         parsed_ads = _row_ads(soup, url, fetched_at)
     if not parsed_ads:
