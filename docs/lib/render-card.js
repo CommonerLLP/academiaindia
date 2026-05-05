@@ -419,7 +419,7 @@ export function renderAd(ad) {
 
   if (isPrivate && !catBits.length) {
     art16Color = "red";
-    art16Tip = "Private universities are currently exempt from constitutional reservation mandates.";
+    art16Tip = "Private Universities are not known to implement affirmative action provisions unless compelled to by the state.";
   } else if (catBits.length) {
     art16Color = "green";
     art16Tip = "Institution has published post-wise reservation breakdown.";

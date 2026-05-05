@@ -293,19 +293,37 @@ def _flame_table_ad(table, base_url: str, fetched_at: datetime) -> Optional[dict
     if end_m:
         body = body[: end_m.start()]
     body = _clean(body)
-    # Department/faculty extraction. The boilerplate above the position
-    # body usually says "School of X" or "Faculty of Y" — that's where
-    # the school name lives, even though the position body itself
-    # rarely repeats it. So search the whole table text, but with a
-    # tight non-greedy capture and a strong end-anchor so we don't
-    # bleed into the surrounding prose.
+    # School/Faculty extraction. The boilerplate above the position body
+    # usually says "School of X" or "Faculty of Y" — that's where the
+    # institutional unit lives. Capture the prefix verbatim ("School of
+    # Liberal Education", "Faculty of Communication") so cardDiscipline
+    # in the dashboard recognises it as a proper unit and renders as
+    # "School of Liberal Education — Public Policy".
     dept_m = re.search(
-        r"\b(?:Faculty|School)\s+of\s+"
-        r"([A-Z][\w\s&]{2,40}?)"
+        r"\b((?:Faculty|School)\s+of\s+"
+        r"[A-Z][\w\s&]{2,40}?)"
         r"(?=\s+(?:at\s+FLAME|has\s+|stands\s+|is\s+|offers?\s+|in\s+the\s+areas|—|invites?\s+))",
         text,
     )
     department = _clean(dept_m.group(1)).rstrip(",.;& ") if dept_m else None
+
+    # Discipline: the title is "[rank] in [discipline]". Pulling
+    # discipline out as a separate field lets the dashboard render
+    # "Assistant Prof., Public Policy" rather than echoing the title
+    # twice (rank-line + title-line both saying "in Public Policy").
+    discipline = None
+    disc_m = re.match(
+        r"(?:Chair\s+)?(?:Assistant|Associate|Visiting|Adjunct)?\s*"
+        r"(?:Distinguished\s+)?Professor"
+        r"(?:\s+of\s+Practice)?"
+        r"\s+in\s+(?:all\s+areas\s+of\s+)?(.+?)$",
+        title, re.I,
+    )
+    if disc_m:
+        discipline = _clean(disc_m.group(1)).rstrip(" ,.;:")
+        # "Visual Communication position" → drop trailing "position"
+        discipline = re.sub(r"\s+positions?$", "", discipline, flags=re.I).strip()
+
     closing = _parse_date(body)
     # FLAME bodies are structured (boilerplate stripped, position-specific
     # only). Allow a longer excerpt so the full hiring brief survives —
@@ -314,6 +332,8 @@ def _flame_table_ad(table, base_url: str, fetched_at: datetime) -> Optional[dict
     ad = _make_ad(title, base_url, fetched_at, body, closing, base_url, 0.72, excerpt_cap=2400)
     if department:
         ad["department"] = department[:120]
+    if discipline:
+        ad["discipline"] = discipline[:120]
     return ad
 
 
