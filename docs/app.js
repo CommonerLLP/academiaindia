@@ -720,7 +720,21 @@ function renderAdList(filtered) {
           </div>
         </div>`;
     } else {
-      host.innerHTML = `<div class="empty-state">No advertisements match your filters.</div>`;
+      host.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-headline">No advertisements match your filters.</div>
+          <div class="empty-state-body">Try clearing the search phrase first, then broaden discipline or position filters.</div>
+          <button type="button" class="empty-state-clear" id="empty-clear-filters">Clear filters</button>
+        </div>`;
+      document.getElementById("empty-clear-filters")?.addEventListener("click", () => {
+        document.getElementById("search").value = "";
+        ["filter-hss","filter-quality","filter-type","filter-posgroup","filter-state"].forEach(id =>
+          document.querySelectorAll(`#${id} input`).forEach(el => { el.checked = false; }));
+        window._fieldsExpanded = false;
+        window._reservedOnly = false;
+        document.getElementById("chip-reserved")?.setAttribute("aria-pressed", "false");
+        render();
+      });
     }
     return;
   }
