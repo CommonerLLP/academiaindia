@@ -1,0 +1,144 @@
+name: weekly-sweep
+
+# Runs the Indian HEI Job Tracker scraper on GitHub-hosted Ubuntu runners,
+# which have unblocked outbound internet. Produces docs/data/current.json,
+# an archive snapshot dated YYYY-MM-DD under docs/data/archive/, and
+# docs/data/coverage_report.json.
+#
+# Schedule: 03:30 IST Monday (22:00 UTC Sunday). The sweep opens a pull
+# request instead of pushing directly to main; current.json is validated
+# before the PR is created.
+
+on:
+  schedule:
+    - cron: "0 22 * * 0"  # 03:30 IST Monday; GH Actions cron is UTC
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Limit to first N institutions (for debugging)"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+    paths:
+      - "scripts/validate_current.py"
+      - "docs/data/current.json"
+      - ".github/workflows/weekly-sweep.yml"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: weekly-sweep
+  cancel-in-progress: false
+
+jobs:
+  validate-current:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Validate committed current.json
+        run: python3 scripts/validate_current.py --compare-ref HEAD^
+
+  sweep:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r requirements-scraper.txt
+
+      - name: Run scraper
+        id: scrape
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p docs/data/archive
+          LIMIT_ARG=""
+          if [[ -n "${{ github.event_name == 'workflow_dispatch' && inputs.limit || '' }}" ]]; then
+            LIMIT_ARG="--limit ${{ inputs.limit }}"
+          fi
+          # scraper/run.py defaults --out to docs/data so the SPA on
+          # GitHub Pages picks it up directly; no copy step needed.
+          python3 scraper/run.py $LIMIT_ARG | tee sweep-summary.txt
+          echo "--- scrape summary ---"
+          cat sweep-summary.txt
+        env:
+          PYTHONUNBUFFERED: "1"
+
+      - name: Show coverage report
+        if: always()
+        run: python3 scraper/hss_report.py coverage
+
+      - name: Summarise HSS-match records for the run log
+        if: always()
+        run: python3 scraper/hss_report.py hss
+
+      - name: Validate scraped current.json
+        run: python3 scripts/validate_current.py
+
+      - name: Count ads
+        id: count
+        run: |
+          COUNT=$(python3 -c "import json; print(json.load(open('docs/data/current.json')).get('ad_count', 0))")
+          echo "count=${COUNT}" >> "$GITHUB_OUTPUT"
+
+      - name: Create data update pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: bot/weekly-sweep
+          delete-branch: true
+          add-paths: docs/data/
+          commit-message: "weekly sweep: ${{ github.run_id }} · ${{ steps.count.outputs.count }} records"
+          title: "weekly sweep: ${{ steps.count.outputs.count }} records"
+          body: |
+            Automated weekly scrape output.
+
+            The workflow validated `docs/data/current.json` before opening this PR:
+            - JSON parses cleanly
+            - `ads` is a non-empty array
+            - ad count did not drop more than 20% from the previous committed copy
+            - rendered URL fields use the safe scheme allowlist
+            - records have non-empty `id` and `institution_id`
+            - string fields do not contain script-like payloads
+
+      - name: Request auto-merge
+        if: steps.cpr.outputs.pull-request-number
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge "${{ steps.cpr.outputs.pull-request-number }}" --squash --auto
+
+      - name: Archive run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweep-log-${{ github.run_id }}
+          path: |
+            sweep-summary.txt
+            docs/data/coverage_report.json
+          retention-days: 14
+          if-no-files-found: ignore
