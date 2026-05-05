@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T04:38:37.522361+00:00",
-  "institutions_attempted": 63,
+  "generated_at": "2026-05-05T05:08:53.255425+00:00",
+  "institutions_attempted": 78,
   "institutions_succeeded": 51,
   "institutions_with_ads": 46,
   "ads_found_total": 335,
@@ -508,6 +508,126 @@
       "http_status": 200,
       "ads_found": 31,
       "note": "TLS verification disabled for official source; robots override"
+    },
+    {
+      "institution_id": "plaksha-university",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "kautilya-school-public-policy",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "ambedkar-university-delhi",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "hyderabad-central-university",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "isb-bharti-public-policy",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "manipal-academy-higher-education",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "bits-pilani",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "thapar-institute",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "jnu-delhi",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "jamia-millia-islamia",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "bhu-varanasi",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "amu-aligarh",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "delhi-university",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "tiss-mumbai",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
+    },
+    {
+      "institution_id": "visva-bharati",
+      "parser": "generic",
+      "fetch_status": "no-url",
+      "http_status": null,
+      "ads_found": 0,
+      "note": "No career-page URL in registry."
     }
   ]
 }
