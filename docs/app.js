@@ -340,6 +340,29 @@ function sanitizeExcerpt(text) {
     .replace(/\s{2,}/g, " ")
     .trim();
 
+  // Azim Premji-style template: "Faculty Positions in X We invite
+  // applications for faculty positions in X[, specializing in Y] for our
+  // <Programme> Programmes. Deadline: <date> Campus <city>"
+  // The title already shows "Faculty Positions in X"; the deadline is in
+  // the deadline pill; the campus is in the institution headline. So
+  // collapse the whole template down to the substantive bit (the
+  // specialisation, if any, and the programme level).
+  const apu = out.match(/^Faculty Position[s]?\s+in\s+[^.]+?\s+We\s+invite\s+applications\s+for\s+faculty\s+position[s]?\s+in\s+([^.]+?)\s+for\s+our\s+([^.]+?)(?=\.|$)/i);
+  if (apu) {
+    const fieldPart = apu[1].trim();
+    const programme = apu[2].trim();
+    const specMatch = fieldPart.match(/,\s*(specializing\s+in\s+.+|with\s+specialization\s+.+|focusing\s+on\s+.+)$/i);
+    const spec = specMatch ? specMatch[1].trim() : "";
+    const tail = out.slice(out.indexOf(programme) + programme.length); // anything after "Programmes" (e.g. ". Deadline... Campus X")
+    out = (spec ? `${spec.charAt(0).toUpperCase()}${spec.slice(1)}; for our ${programme}.` : `For our ${programme}.`) + tail;
+  }
+  // Strip trailing "Deadline:?<anything until end-or-Campus>" — already
+  // shown as the deadline pill on the card.
+  out = out.replace(/[\s.]*Deadline\s*:?\s*[^.]*?(?=\s+Campus\s+[A-Z]|\.|$)/gi, "");
+  // Strip trailing "Campus <Word>" — already shown in the institution head.
+  out = out.replace(/[\s.]+Campus\s+[A-Z][a-zA-Z]+\s*\.?\s*$/i, "");
+  out = out.replace(/\s{2,}/g, " ").trim();
+
   // Repeated school/institution marketing copy is not job-specific
   // evidence. It can help infer the recruiting unit elsewhere, but it
   // should not appear as Description or feed Topical fit chips.
@@ -2167,14 +2190,55 @@ function renderAd(ad) {
     : "";
 
   const detailsBlocks = [];
-  if (cues.eligibility || cues.methods) {
-    detailsBlocks.push(`<div class="detail-block"><span class="k">Eligibility</span><div class="v">${escapeHTML(cues.eligibility || cues.methods)}</div></div>`);
+  // ---- Junk filters for the disclosure body ---------------------------
+  // Strip filler phrases that add no signal: "in one of the relevant
+  // areas", "in any of the relevant areas", "in relevant area" — they
+  // appear when the source advt has no real specialisation discipline
+  // and we end up echoing nothing useful.
+  const stripFiller = (s) => String(s || "")
+    .replace(/(?:^|;|\s)\s*Experience\s+in\s+(?:one\s+of\s+)?(?:any\s+of\s+)?the\s+relevant\s+area[s]?\.?\s*/gi, "$1 ")
+    .replace(/(?:^|;|\s)\s*Strong\s+academic\s+and\s+research\s+background\.?\s*/gi, "$1 ")
+    .replace(/\s*;\s*\.?\s*$/g, "")
+    .replace(/^\s*;\s*/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  const eligibilityText = stripFiller(cues.eligibility || cues.methods);
+  if (eligibilityText && eligibilityText.length > 4 && !/^PhD required\.?$/i.test(eligibilityText)) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Eligibility</span><div class="v">${escapeHTML(eligibilityText)}</div></div>`);
   }
-  if (cues.evaluation || cues.approach) {
-    detailsBlocks.push(`<div class="detail-block"><span class="k">Evaluation criteria</span><div class="v">${escapeHTML(cues.evaluation || cues.approach)}</div></div>`);
+  const evaluationText = stripFiller(cues.evaluation || cues.approach || "");
+  if (evaluationText && evaluationText.length > 4) {
+    detailsBlocks.push(`<div class="detail-block"><span class="k">Evaluation criteria</span><div class="v">${escapeHTML(evaluationText)}</div></div>`);
   }
+  // Description: drop when it's just an echo of institution + discipline
+  // (e.g. "IIT Bombay AP — Ashank Desai Centre for Policy Studies. Public
+  // Policy." adds no information beyond the headline). When a useful body
+  // exists but is preceded by a redundant header sentence (e.g. "Yardi
+  // School of Artificial Intelligence (ScAI). All areas of AI ..."), drop
+  // just the leading sentence and keep the substantive prose.
+  const _norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   if (cleanedExcerpt) {
-    detailsBlocks.push(`<div class="detail-block"><span class="k">Description</span><div class="v">${escapeHTML(cleanedExcerpt)}</div></div>`);
+    const shellN = _norm(`${instName} ${discipline}`);
+    const headTokens = _norm(`${discipline} ${instName}`);
+    let descBody = cleanedExcerpt;
+    // Strip a short leading sentence that mostly echoes the headline.
+    const leadMatch = descBody.match(/^(.{1,100}?)\.\s+(?=[A-Z(])/);
+    if (leadMatch && shellN.length > 6) {
+      const leadN = _norm(leadMatch[1]);
+      // The lead is "redundant" if its alphanumeric content is largely
+      // contained in the headline tokens, or vice versa.
+      const overlap = leadN && headTokens && (headTokens.includes(leadN) || leadN.length > 6 && leadN.split(/(?=[a-z])/).slice(0,3).join("") && headTokens.includes(leadN.slice(0, Math.min(20, leadN.length))));
+      if (overlap) {
+        descBody = descBody.slice(leadMatch[0].length).trim();
+      }
+    }
+    const descN = _norm(descBody);
+    const isCircular = descBody.length < 220
+      && shellN.length > 8
+      && (descN === shellN || descN.replace(/^(?:ap|aps|professor|associateprofessor|assistantprofessor)/, "") === shellN || shellN.length > 0 && descN.length - shellN.length < 30 && descN.includes(shellN));
+    if (descBody && !isCircular) {
+      detailsBlocks.push(`<div class="detail-block"><span class="k">Description</span><div class="v">${escapeHTML(descBody)}</div></div>`);
+    }
   }
 
   // Substantive details live in one disclosure. Topical fit stays visible;
@@ -2182,18 +2246,22 @@ function renderAd(ad) {
   // Internal extraction-method/confidence is maintainer metadata, not
   // candidate-facing content.
   const publicationDetailsRaw = structuredPos?.qualifications?.publications_required || ad.publications_required || "";
-  const evaluationText = String(cues.evaluation || cues.approach || "");
-  const publicationAlreadyVisible = publicationDetailsRaw
-    && evaluationText.toLowerCase().includes(String(publicationDetailsRaw).toLowerCase());
+  // Smarter dedup vs. evaluation criteria. Two strings about the same
+  // publication requirements often differ by minor phrasing ("8+
+  // publications" vs "minimum of 8 publications"); compare on
+  // alphanumeric-stripped or numeric-fingerprint instead of raw substring.
+  const numericFP = (s) => (String(s || "").match(/\d+/g) || []).slice(0, 6).join(",");
+  const publicationAlreadyVisible = publicationDetailsRaw && (
+    evaluationText.toLowerCase().includes(String(publicationDetailsRaw).toLowerCase())
+    || (_norm(publicationDetailsRaw).length > 30 && _norm(evaluationText).includes(_norm(publicationDetailsRaw)))
+    || (numericFP(publicationDetailsRaw).length > 0 && numericFP(publicationDetailsRaw) === numericFP(evaluationText))
+  );
   const publicationDetails = publicationAlreadyVisible ? "" : publicationDetailsRaw;
   if (publicationDetails) {
     detailsBlocks.push(`<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(publicationDetails)}</div></div>`);
   }
   if (structuredPos?.pay_scale) {
     detailsBlocks.push(`<div class="detail-block"><span class="k">Pay scale</span><div class="v">${escapeHTML(structuredPos.pay_scale)}</div></div>`);
-  }
-  if (ad._source_note) {
-    detailsBlocks.push(`<div class="detail-block"><span class="k">Source note</span><div class="v">${escapeHTML(ad._source_note)}</div></div>`);
   }
   if (ad.process_note) {
     detailsBlocks.push(`<div class="detail-block"><span class="k">Process</span><div class="v">${escapeHTML(ad.process_note)}</div></div>`);
