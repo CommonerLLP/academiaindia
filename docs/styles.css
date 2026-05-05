@@ -23,35 +23,35 @@
        text instead of cool charcoal. The cobalt stays — it's the
        Ambedkarite anti-caste color of the project — but goes deeper
        and less bureaucratic-bright. */
-    --bg: #f5f0e6;            /* ivory cream — broadsheet paper */
-    --panel: #ffffff;          /* card surfaces stay white for contrast */
-    --ink: #1a1612;            /* warm near-black, prints feel */
-    --muted: #6b5e50;          /* warm taupe-gray for secondary text */
-    --muted-soft: #a39584;     /* even softer warm gray */
-    --accent: #1a3a5e;         /* newspaper-navy / Ambedkar cobalt, deepened */
-    --accent-deep: #112944;    /* hover / pressed */
-    --warn: #8a5a18;           /* warmer amber */
+    --bg: #fbfaf7;             /* austere off-white, not khaki */
+    --panel: #ffffff;          /* record surfaces */
+    --ink: #171512;            /* near-black, print register */
+    --muted: #5f5f5a;          /* neutral secondary text */
+    --muted-soft: #888883;     /* neutral non-urgent signal */
+    --accent: #123f73;         /* Ambedkar cobalt/navy for actions */
+    --accent-deep: #0b2d55;    /* hover / pressed */
+    --warn: #8a5a18;           /* amber for disclosure absence */
     --alarm: #7a1620;          /* oxblood — Dalit Panther saturated red */
     --good: #1b5e20;
-    --border: #d4cdb8;         /* warmer cream-tan border */
-    --chip-bg: #ebe4d3;        /* warm cream chip background */
+    --border: #d8d6cf;         /* neutral rule */
+    --chip-bg: #efeee9;        /* quiet neutral chip background */
     --serif: "Newsreader", "Source Serif 4", Georgia, serif;
     --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
     color-scheme: light;
   }
   html[data-theme="dark"] {
-    --bg: #1a1918;             /* Deep warm grey, easy on the eyes */
-    --panel: #242220;          /* Slightly lighter warm grey */
-    --ink: #e0dcd3;            /* Softer ivory text */
-    --muted: #9c978e;
-    --muted-soft: #63605a;
-    --accent: #6f8ebf;         /* Dusty cobalt */
-    --accent-deep: #8eaae0;
-    --warn: #c28c50;           /* Soft amber */
-    --alarm: #cf5757;          /* Dusty red/oxblood */
+    --bg: #101113;             /* charcoal paper */
+    --panel: #17191c;          /* record surfaces */
+    --ink: #ede9df;            /* soft paper text */
+    --muted: #aaa69d;
+    --muted-soft: #6f716f;
+    --accent: #7ea7df;         /* luminous cobalt */
+    --accent-deep: #a4c3ee;
+    --warn: #d0a05e;           /* amber */
+    --alarm: #e05b63;          /* oxblood in dark mode */
     --good: #63ad78;
-    --border: #3d3a36;         /* Warm border */
-    --chip-bg: #2d2b28;
+    --border: #30343a;
+    --chip-bg: #22262b;
     color-scheme: dark;
   }
   /* Adjust signal-color tints for dark backgrounds */
@@ -99,7 +99,7 @@
      vertical rules above and below to feel like a publication
      nameplate. The 6px Dalit Panther red strip stays. */
   header.masthead {
-    background: var(--bg); /* ivory, not white — distinguishes masthead from cards */
+    background: var(--bg);
     border-top: 6px solid var(--alarm);
     border-bottom: 1px solid var(--border);
     padding: 28px 32px 32px;
@@ -335,15 +335,17 @@
      One dropdown open at a time; click-outside closes.
      ============================================================ */
   .filter-strip {
-    background: var(--panel); border-bottom: 1px solid var(--border);
-    padding: 10px 32px; display: flex; flex-wrap: wrap; gap: 8px;
+    background: color-mix(in srgb, var(--panel) 92%, var(--bg) 8%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 32px; display: flex; flex-wrap: wrap; gap: 8px;
     align-items: center; justify-content: center; position: sticky; top: 0; z-index: 30;
   }
   .filter-strip .strip-label { font-size: 12px; color: var(--muted); margin-right: 4px; font-weight: 500; }
   /* WCAG 2.5.5: 44 px minimum tap area. The visual chip stays compact via
      padding; the min-height pads the focusable rect to the AA target without
      visibly inflating the pill. */
-  .filter-strip .quick-chip { background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; min-height: 44px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, border-color .15s, color .15s; font-weight: 600; }
+  .filter-strip .quick-chip { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 7px 12px; min-height: 40px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, border-color .15s, color .15s; font-weight: 650; }
   .filter-strip .quick-chip:hover { background: var(--chip-bg); }
   .filter-strip .quick-chip .quick-chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .15s; }
   /* Reserved-posts chip pressed state uses Ambedkarite cobalt — affirmative
@@ -353,13 +355,13 @@
   .filter-strip .quick-chip[aria-pressed="true"] .sel-pill { background: rgba(255,255,255,0.25); color: #fff; }
   .filter-dd { position: relative; }
   .filter-dd > .filter-trigger {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 12px; min-height: 44px; font: inherit; font-size: 13px; color: var(--ink);
+    background: transparent; border: 1px solid var(--border); border-radius: 4px;
+    padding: 7px 12px; min-height: 40px; font: inherit; font-size: 13px; color: var(--ink);
     cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
     transition: border-color .15s, background .15s;
   }
   .filter-dd > .filter-trigger:hover { border-color: var(--accent); }
-  .filter-dd.has-active > .filter-trigger { border-color: var(--accent); background: var(--chip-bg); }
+  .filter-dd.has-active > .filter-trigger { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
   .filter-dd > .filter-trigger .sel-pill {
     font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 10px;
     background: var(--accent); color: var(--panel); margin-left: 2px;
@@ -368,7 +370,7 @@
   .filter-dd > .popover {
     position: absolute; top: calc(100% + 6px); left: 0;
     background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px; box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+    border-radius: 4px; box-shadow: 0 12px 32px rgba(15,23,42,0.14);
     padding: 12px; min-width: 240px; max-width: 320px;
     z-index: 40; display: none;
   }
@@ -432,10 +434,10 @@
   .summary-row select { border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 13px; background: var(--panel); color: var(--ink); cursor: pointer; }
 
   /* Disclaimer banner — quieter, single line, dismissible */
-  .banner { background: #fff7e8; border: 1px solid #e6ca8a; color: #6b4a10; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; display: flex; gap: 8px; align-items: center; }
+  .banner { background: color-mix(in srgb, var(--warn) 9%, var(--panel)); border: 1px solid color-mix(in srgb, var(--warn) 38%, var(--border)); color: color-mix(in srgb, var(--warn) 58%, var(--ink)); padding: 8px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 12px; display: flex; gap: 8px; align-items: center; }
   .banner .warn-ico { font-size: 14px; line-height: 1; }
   /* WCAG 2.5.5: 44x44 tap target. Padding expands the hitbox; glyph stays small. */
-  .banner button { margin-left: auto; background: transparent; border: none; color: #6b4a10; cursor: pointer; font-size: 16px; line-height: 1; padding: 14px 14px; opacity: 0.6; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .banner button { margin-left: auto; background: transparent; border: none; color: currentColor; cursor: pointer; font-size: 16px; line-height: 1; padding: 14px 14px; opacity: 0.6; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
   .banner button:hover { opacity: 1; }
 
   /* ============================================================
@@ -458,14 +460,14 @@
        The trick — width:100vw + margin-left:calc(-50vw + 50%) — keeps the
        element centered in its parent while spanning the entire window.
        Standard pattern in modern editorial design. */
-    background: linear-gradient(180deg, #efe5d0 0%, #f5f0e6 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 6%, var(--bg)) 0%, var(--bg) 100%);
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     margin-top: -18px;                /* eat the main top padding */
     margin-bottom: 24px;
-    padding: 36px 32px 32px;          /* tightened from 64/32/56 — was over-leading */
+    padding: 34px 32px 30px;          /* tightened from 64/32/56 — was over-leading */
     position: relative;
   }
   .vacancy-gap-banner::before {
@@ -504,7 +506,7 @@
   .vacancy-gap-banner .vgb-sub a { color: var(--accent); text-decoration: none; font-weight: 600; font-style: normal; border-bottom: 1px solid var(--accent); }
   .vacancy-gap-banner .vgb-sub a:hover { background: var(--accent); color: var(--bg); }
   html[data-theme="dark"] .vacancy-gap-banner {
-    background: linear-gradient(180deg, #1a1c26 0%, #0c0d11 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, var(--bg)) 0%, var(--bg) 100%);
   }
   .feed-list { display: flex; flex-direction: column; gap: 10px; }
   /* Load-more button — large, satisfying tap target. Cobalt to align with
@@ -531,26 +533,30 @@
    * span the full row width below the headline grid.
    */
   .listing {
-    background: var(--panel); border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 18px 22px;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 0; padding: 18px 22px 16px;
+    transition: border-color 0.15s, background 0.15s;
     position: relative; display: block;
   }
-  .listing.scope-public {
-    background: linear-gradient(90deg, rgba(34, 94, 84, 0.055), transparent 26%), var(--panel);
-    border-color: rgba(34, 94, 84, 0.24);
+  html[data-theme="dark"] .listing:hover {
+    background: color-mix(in srgb, var(--panel) 92%, var(--accent) 8%);
   }
+  .listing.scope-public,
   .listing.scope-private {
-    background: linear-gradient(90deg, rgba(184, 90, 28, 0.07), transparent 26%), var(--panel);
-    border-color: rgba(184, 90, 28, 0.30);
+    background: var(--panel);
+    border-color: var(--border);
   }
-  .listing:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(31,58,138,0.10); }
-  .listing.scope-private:hover { border-color: #b85a1c; box-shadow: 0 2px 8px rgba(184,90,28,0.12); }
+  .listing:hover { border-color: var(--accent); background: color-mix(in srgb, var(--panel) 96%, var(--accent) 4%); }
+  .listing.scope-private:hover { border-color: #b85a1c; background: color-mix(in srgb, var(--panel) 97%, #b85a1c 3%); }
+  html[data-theme="dark"] .listing.scope-private:hover {
+    border-color: var(--warn);
+    background: color-mix(in srgb, var(--panel) 94%, var(--warn) 6%);
+  }
   /* Tier bar: 4-px coloured strip on the left. Saturated colour reads as
      a deliberate UI element with political weight, not a soft accent. */
   .listing .tier-bar {
-    position: absolute; left: 0; top: 16px; bottom: 16px;
-    width: 4px; border-radius: 0 4px 4px 0; background: var(--border);
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; border-radius: 0; background: var(--border);
   }
   .listing.tier-critical .tier-bar { background: var(--alarm); }
   .listing.tier-soon     .tier-bar { background: var(--warn); }
@@ -564,7 +570,7 @@
   .listing .card-body {
     display: grid;
     grid-template-columns: 1fr auto auto;
-    gap: 24px;
+    gap: 18px;
     align-items: start;
   }
   .listing .card-headline { min-width: 0; }
@@ -575,8 +581,8 @@
      disambiguator without competing with the institution name. */
   .listing .card-institution {
     margin: 0;
-    font-family: var(--serif); font-size: 22px; font-weight: 700;
-    line-height: 1.2; color: var(--ink); letter-spacing: -0.014em;
+    font-family: var(--serif); font-size: 23px; font-weight: 750;
+    line-height: 1.18; color: var(--ink); letter-spacing: -0.012em;
   }
   .listing .card-institution .card-campus {
     font-family: var(--serif); font-weight: 500;
@@ -588,7 +594,7 @@
      register matches the publication aesthetic without competing with
      the headline. */
   .listing .card-subhead {
-    margin: 5px 0 0;
+    margin: 7px 0 0;
     font-family: var(--sans); font-size: 15px; line-height: 1.45;
     color: var(--muted); font-style: normal;
   }
@@ -610,9 +616,11 @@
   .listing .card-footer {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-top: 16px;
+    align-items: baseline;
+    margin-top: 14px;
+    padding-top: 12px;
     gap: 20px;
+    border-top: 1px dashed var(--border);
   }
   .listing .card-flags.bottom-right {
     margin: 0;
@@ -623,23 +631,23 @@
     color: var(--muted); font-weight: 500;
   }
   .listing .card-flag.scope {
-    border: 1px solid currentColor;
-    border-radius: 999px;
-    padding: 1px 7px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    font-size: 11.5px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
   }
-  .listing .card-flag.scope.public { color: #225e54; background: rgba(34, 94, 84, 0.08); }
-  .listing .card-flag.scope.private { color: #8a3a0a; background: rgba(184, 90, 28, 0.10); }
+  .listing .card-flag.scope.public { color: var(--muted); background: transparent; }
+  .listing .card-flag.scope.private { color: var(--muted); background: transparent; }
   .listing .card-flag.warn { color: #8a3a1a; font-weight: 600; }
   .listing .card-flag.manual { color: #78350f; font-weight: 600; }
   .listing .card-flag.dim { color: var(--muted); opacity: 0.85; }
   /* Deadline + actions retain their previous selectors so existing CSS
      rules below — .row-deadline, .row-actions, .star, etc. — keep
      applying. We rename the *containers* but keep the content classes. */
-  .listing .card-deadline { text-align: right; flex-shrink: 0; min-width: 96px; }
+  .listing .card-deadline { text-align: right; flex-shrink: 0; min-width: 106px; }
   .listing .card-actions { display: flex; flex-direction: column; gap: 4px; align-items: center; }
   /* Mobile: collapse the actions column (star moves under flags), drop
      the dedicated padding for a denser scroll. */
@@ -692,32 +700,50 @@
      the same palette as the per-position pills. */
   .listing .row-reserv { display: flex; flex-wrap: wrap; gap: 5px 6px; align-items: center; margin: 8px 0 0; grid-column: 2 / span 3; }
   .listing .row-reserv .reserv-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .listing .row-reserv .reserv-status-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 12px; font-weight: 850;
+    line-height: 1;
+    flex: 0 0 auto;
+  }
+  .listing .row-reserv .reserv-status-icon.roster-missing { color: var(--muted); background: color-mix(in srgb, var(--muted) 8%, transparent); }
+  .listing .row-reserv .reserv-status-icon.roster-ok { color: var(--good); background: color-mix(in srgb, var(--good) 9%, transparent); }
+  .listing .row-reserv .reserv-label.roster-ok { color: var(--good); }
   /* Roster-not-disclosed banner: previously rendered with a pink/red
      tint that read as alarm. Recoloured into the warm-amber editorial
      palette — the absence is a *finding* (warn), not an emergency. */
   .listing .row-reserv.reserv-missing {
-    background: #fbf3e3;
-    border: 1px solid #e8d5a8;
-    border-left: 3px solid var(--warn);
-    border-radius: 6px;
-    padding: 6px 10px;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid #e2c98f;
+    border-bottom: 1px solid #e2c98f;
+    border-radius: 0;
+    padding: 9px 0;
+  }
+  .listing .row-reserv.reserv-disclosed {
+    border-top: 1px solid color-mix(in srgb, var(--good) 34%, var(--border));
+    border-bottom: 1px solid color-mix(in srgb, var(--good) 34%, var(--border));
+    padding: 9px 0;
   }
   html[data-theme="dark"] .listing .row-reserv.reserv-missing {
-    background: rgba(194, 140, 80, 0.08);
-    border-color: rgba(194, 140, 80, 0.30);
+    background: transparent;
+    border-color: color-mix(in srgb, var(--warn) 44%, var(--border));
   }
   .listing .row-reserv .reserv-label.warn { color: var(--warn); }
   .listing .row-reserv .reserv-missing-msg {
-    font-size: 11.5px; color: #5a3a18; line-height: 1.4;
+    font-size: 13.5px; font-weight: 600; color: #5a3a18; line-height: 1.4;
   }
   html[data-theme="dark"] .listing .row-reserv .reserv-missing-msg {
-    color: #d8c099;
+    color: color-mix(in srgb, var(--warn) 72%, var(--ink));
   }
   /* Info-icon affordance: a real click/keyboard disclosure. */
   .listing .row-reserv .reserv-info {
     position: relative;
     display: inline-flex;
-    margin-left: 4px;
+    margin-left: 2px;
     color: var(--muted);
   }
   .listing .row-reserv .reserv-info > summary {
@@ -731,6 +757,9 @@
     cursor: pointer;
     list-style: none;
     background: var(--bg);
+  }
+  html[data-theme="dark"] .listing .row-reserv .reserv-info > summary {
+    background: var(--panel);
   }
   .listing .row-reserv .reserv-info > summary::-webkit-details-marker { display: none; }
   .listing .row-reserv .reserv-info[open] > summary {
@@ -764,7 +793,7 @@
   .listing .reserv-policy-text { font-size: 12px; color: var(--ink); font-family: var(--mono); }
   /* SRD callout in cobalt — Special Recruitment Drives are an
      anti-caste affirmative measure; the visual register honors that. */
-  .listing .row-reserv.reserv-srd { background: rgba(31,58,138,0.06); border: 1px solid rgba(31,58,138,0.3); border-left: 3px solid var(--accent); border-radius: 6px; padding: 6px 10px; }
+  .listing .row-reserv.reserv-srd { background: transparent; border: 0; border-top: 1px solid rgba(31,58,138,0.30); border-bottom: 1px solid rgba(31,58,138,0.30); border-radius: 0; padding: 9px 0; }
   .listing .row-reserv.reserv-srd .reserv-label.good { color: var(--accent); font-weight: 700; }
   .listing .row-reserv.reserv-srd .reserv-missing-msg { color: var(--accent-deep); }
   /* Hiring-language traps */
@@ -784,12 +813,28 @@
   #resources-tab { max-width: 980px; }
   #resources-tab .res-intro h2 { font-family: var(--serif); font-weight: 600; font-size: 22px; margin: 8px 0 8px; }
   #resources-tab .res-intro p { font-size: 14px; color: var(--ink); line-height: 1.6; max-width: 70ch; margin-bottom: 24px; }
+  #resources-tab .res-accordion { margin-bottom: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: box-shadow 0.2s ease, transform 0.2s ease; }
+  #resources-tab .res-accordion:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  html[data-theme="dark"] #resources-tab .res-accordion:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  #resources-tab .res-accordion > summary { list-style: none; padding: 22px 26px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; background: color-mix(in srgb, var(--chip-bg) 30%, transparent); transition: background 0.2s ease; }
+  #resources-tab .res-accordion > summary::-webkit-details-marker { display: none; }
+  #resources-tab .res-accordion > summary:hover { background: color-mix(in srgb, var(--chip-bg) 60%, transparent); }
+  #resources-tab .res-accordion > summary .acc-title { font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--ink); line-height: 1.3; border-left: 4px solid var(--accent); padding-left: 14px; }
+  #resources-tab .res-accordion > summary .acc-icon { font-size: 18px; color: var(--accent); font-weight: 600; padding: 4px 12px; background: color-mix(in srgb, var(--accent) 10%, transparent); border-radius: 12px; transition: transform 0.3s ease, background 0.2s ease; }
+  #resources-tab .res-accordion:hover > summary .acc-icon { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+  #resources-tab .res-accordion[open] > summary { border-bottom: 1px solid var(--border); background: var(--chip-bg); }
+  #resources-tab .res-accordion[open] > summary .acc-icon { transform: rotate(180deg); }
+  #resources-tab .res-accordion .acc-content { padding: 24px 28px; background: color-mix(in srgb, var(--bg) 50%, var(--panel)); }
+  #resources-tab .postdoc-block > summary .acc-title { border-left-color: var(--alarm); }
+  #resources-tab .rti-block > summary .acc-title { border-left-color: var(--accent); }
   #resources-tab .res-block { margin-bottom: 28px; }
-  #resources-tab .res-block h3 { font-family: var(--serif); font-weight: 700; font-size: 17px; margin: 0 0 12px; padding: 4px 0 8px 12px; border-left: 4px solid var(--alarm); border-bottom: 1px solid var(--border); }
-  #resources-tab .res-block ul { list-style: none; padding: 0; margin: 0; }
-  #resources-tab .res-block li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; }
-  #resources-tab .res-block li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; }
-  #resources-tab .res-block li a:hover { text-decoration: underline; }
+  #resources-tab .res-block h3 { display: none; }
+  #resources-tab .res-block ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  #resources-tab .res-block li { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+  #resources-tab .res-block li:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.06); border-color: var(--accent); }
+  html[data-theme="dark"] #resources-tab .res-block li:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  #resources-tab .res-block li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 4px; }
+  #resources-tab .res-block li a:hover { color: var(--accent-deep); }
   #resources-tab .res-block li .ext { font-size: 11px; color: var(--muted); margin-left: 2px; }
   #resources-tab .res-block li .res-name { font-weight: 600; font-size: 14px; color: var(--ink); }
   #resources-tab .res-block li .res-note { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
@@ -797,18 +842,27 @@
      Resources tab: a longer political introduction, sub-grouped lists
      so candidates can navigate by program type rather than scrolling
      through one flat list of 25 fellowships. */
-  #resources-tab .postdoc-block { background: rgba(180,30,40,0.025); border: 1px solid rgba(180,30,40,0.18); border-radius: 10px; padding: 20px 22px; margin-bottom: 32px; }
-  #resources-tab .postdoc-block h3 { border-left-color: var(--alarm); margin-top: 0; }
-  #resources-tab .postdoc-block .res-block-intro { font-size: 13.5px; line-height: 1.65; color: var(--ink); margin: 0 0 16px; max-width: 76ch; }
+  #resources-tab .postdoc-block { margin-bottom: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  html[data-theme="dark"] #resources-tab .postdoc-block { box-shadow: none; }
+  #resources-tab .postdoc-block h3 { display: none; }
+  #resources-tab .postdoc-block .res-block-intro { font-size: 13.5px; line-height: 1.65; color: var(--ink); margin: 0 0 16px; max-width: none; text-align: justify; }
   #resources-tab .postdoc-block .res-block-intro p { margin: 0 0 10px; }
   #resources-tab .postdoc-block .res-block-intro p:last-child { margin-bottom: 0; }
   #resources-tab .postdoc-block .res-block-intro em { color: var(--alarm); font-style: normal; font-weight: 600; }
+  #resources-tab .postdoc-filters { display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0 20px; padding: 16px 20px; background: color-mix(in srgb, var(--chip-bg) 40%, transparent); border: 1px dashed var(--border); border-radius: 12px; align-items: center; }
+  #resources-tab .postdoc-filters label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  #resources-tab .postdoc-filters select { padding: 8px 32px 8px 12px; font-size: 14px; font-weight: 600; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; appearance: none; cursor: pointer; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23666" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; }
+  html[data-theme="dark"] #resources-tab .postdoc-filters select { background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23999" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'); }
+  #resources-tab .postdoc-filters select:hover { border-color: var(--accent); }
+  #resources-tab .postdoc-filters select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
   #resources-tab .postdoc-subgroup { margin-top: 16px; }
-  #resources-tab .postdoc-subgroup h4 { font-family: var(--sans); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin: 0 0 10px; padding: 0; border: none; }
-  #resources-tab .postdoc-subgroup ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
-  #resources-tab .postdoc-subgroup li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
-  #resources-tab .postdoc-subgroup li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; }
-  #resources-tab .postdoc-subgroup li a:hover { text-decoration: underline; }
+  #resources-tab .postdoc-subgroup h4 { font-family: var(--sans); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin: 0 0 12px; padding: 0; border: none; }
+  #resources-tab .postdoc-subgroup ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  #resources-tab .postdoc-subgroup li { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; display: flex; flex-direction: column; justify-content: flex-start; }
+  #resources-tab .postdoc-subgroup li:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.06); border-color: var(--accent); }
+  html[data-theme="dark"] #resources-tab .postdoc-subgroup li:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  #resources-tab .postdoc-subgroup li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 15px; margin-bottom: 4px; display: inline-block; }
+  #resources-tab .postdoc-subgroup li a:hover { color: var(--accent-deep); }
   #resources-tab .postdoc-subgroup li .res-note { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-top: 6px; }
   #resources-tab .postdoc-subgroup li .ext { font-size: 11px; color: var(--muted); margin-left: 2px; }
   /* Eligibility chip — surfaces citizenship/residency restrictions per
@@ -835,44 +889,51 @@
   #resources-tab .elig-legend .leg-label { font-weight: 600; color: var(--ink); margin-right: 4px; }
   /* RTI templates block — distinct visual register from the link-list
      blocks: this is action infrastructure, not reading. */
-  #resources-tab .rti-block { background: rgba(31,58,138,0.04); border: 1px solid rgba(31,58,138,0.18); border-radius: 10px; padding: 18px 22px; margin-bottom: 28px; }
-  #resources-tab .rti-block h3 { border-left-color: var(--accent); margin-top: 0; }
-  #resources-tab .rti-block .res-block-intro { font-size: 13px; line-height: 1.55; color: var(--ink); margin: 0 0 14px; }
-  #resources-tab .rti-block .rti-subhead { font-family: var(--sans); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin: 22px 0 10px; padding: 0; border: none; }
-  #resources-tab .rti-block .rti-subhead:first-of-type { margin-top: 6px; }
-  #resources-tab .rti-block .rti-subnote { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin: 0 0 12px; font-style: italic; }
-  #resources-tab .rti-block .indian-link-list { list-style: none; padding: 0; margin: 0 0 4px; display: flex; flex-direction: column; gap: 6px; }
-  #resources-tab .rti-block .indian-link-list li { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
-  #resources-tab .rti-block .indian-link-list li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 13.5px; }
-  #resources-tab .rti-block .indian-link-list li a:hover { text-decoration: underline; }
+  #resources-tab .rti-block { margin-bottom: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  html[data-theme="dark"] #resources-tab .rti-block { box-shadow: none; }
+  #resources-tab .rti-block h3 { display: none; }
+  #resources-tab .rti-block .res-block-intro { font-size: 14px; line-height: 1.6; color: var(--ink); margin: 0 0 18px; }
+  #resources-tab .rti-block .rti-subhead { font-family: var(--sans); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin: 28px 0 12px; padding: 0; border: none; }
+  #resources-tab .rti-block .rti-subhead:first-of-type { margin-top: 8px; }
+  #resources-tab .rti-block .rti-subnote { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 0 16px; font-style: italic; }
+  #resources-tab .rti-block .indian-link-list { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  #resources-tab .rti-block .indian-link-list li { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+  #resources-tab .rti-block .indian-link-list li:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: var(--accent); }
+  html[data-theme="dark"] #resources-tab .rti-block .indian-link-list li:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  #resources-tab .rti-block .indian-link-list li a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14.5px; display: inline-block; margin-bottom: 2px; }
+  #resources-tab .rti-block .indian-link-list li a:hover { color: var(--accent-deep); }
   #resources-tab .rti-block .indian-link-list li .res-note { font-size: 12px; color: var(--muted); line-height: 1.55; margin-top: 4px; }
-  #resources-tab .rti-grid { display: grid; gap: 10px; }
-  #resources-tab .rti-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  #resources-tab .rti-card summary { padding: 12px 16px; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 14px; color: var(--ink); }
+  #resources-tab .rti-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  #resources-tab .rti-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: box-shadow 0.2s ease, transform 0.2s ease; }
+  #resources-tab .rti-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+  html[data-theme="dark"] #resources-tab .rti-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  #resources-tab .rti-card summary { padding: 16px 20px; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 15px; color: var(--ink); background: color-mix(in srgb, var(--chip-bg) 50%, transparent); transition: background 0.15s ease; }
   #resources-tab .rti-card summary::-webkit-details-marker { display: none; }
   #resources-tab .rti-card summary:hover { background: var(--chip-bg); }
   #resources-tab .rti-card[open] summary { border-bottom: 1px solid var(--border); background: var(--chip-bg); }
-  #resources-tab .rti-card .rti-expand { font-size: 12px; color: var(--accent); font-weight: 500; white-space: nowrap; }
-  #resources-tab .rti-card[open] .rti-expand { color: var(--muted); }
-  #resources-tab .rti-card[open] .rti-expand::before { content: "hide template ▴"; }
-  #resources-tab .rti-card[open] .rti-expand { font-size: 0; }
-  #resources-tab .rti-card[open] .rti-expand::before { font-size: 12px; }
-  #resources-tab .rti-card .rti-body { padding: 12px 16px 14px; }
-  #resources-tab .rti-card .rti-scenario { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin: 0 0 10px; font-style: italic; }
-  #resources-tab .rti-card .rti-target { font-size: 12.5px; color: var(--ink); margin-bottom: 8px; }
-  #resources-tab .rti-card .rti-text { width: 100%; min-height: 240px; padding: 12px; font-family: var(--mono); font-size: 12px; line-height: 1.55; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; resize: vertical; box-sizing: border-box; }
-  #resources-tab .rti-card .rti-actions { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
-  #resources-tab .rti-card .rti-copy { padding: 8px 16px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
-  #resources-tab .rti-card .rti-copy:hover { background: var(--accent-deep); }
+  #resources-tab .rti-card .rti-expand { font-size: 12.5px; color: var(--accent); font-weight: 600; white-space: nowrap; background: color-mix(in srgb, var(--accent) 10%, transparent); padding: 4px 10px; border-radius: 12px; transition: background 0.15s ease, color 0.15s ease; }
+  #resources-tab .rti-card:hover .rti-expand { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+  #resources-tab .rti-card[open] .rti-expand { color: var(--muted); background: transparent; }
+  #resources-tab .rti-card[open] .rti-expand::before { content: "Hide template ▴"; }
+  #resources-tab .rti-card[open] .rti-expand { font-size: 0; padding: 0; }
+  #resources-tab .rti-card[open] .rti-expand::before { font-size: 12.5px; font-weight: 500; }
+  #resources-tab .rti-card .rti-body { padding: 20px 24px; background: color-mix(in srgb, var(--panel) 98%, var(--border) 2%); }
+  #resources-tab .rti-card .rti-scenario { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 0 16px; font-style: italic; }
+  #resources-tab .rti-card .rti-target { font-size: 13.5px; color: var(--ink); margin-bottom: 12px; }
+  #resources-tab .rti-card .rti-text { width: 100%; min-height: 240px; padding: 16px; font-family: var(--mono); font-size: 13px; line-height: 1.6; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; resize: vertical; box-sizing: border-box; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+  #resources-tab .rti-card .rti-actions { display: flex; gap: 14px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  #resources-tab .rti-card .rti-copy { padding: 10px 20px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s ease, transform 0.1s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  #resources-tab .rti-card .rti-copy:hover { background: var(--accent-deep); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+  #resources-tab .rti-card .rti-copy:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   #resources-tab .rti-card .rti-copy.copied { background: var(--good); }
-  #resources-tab .rti-card .rti-online { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
-  #resources-tab .rti-card .rti-online:hover { text-decoration: underline; }
+  #resources-tab .rti-card .rti-online { font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; padding: 8px 12px; border-radius: 6px; transition: background 0.15s ease; }
+  #resources-tab .rti-card .rti-online:hover { text-decoration: none; background: color-mix(in srgb, var(--accent) 8%, transparent); }
 
   /* Always-visible action strip: PDF + Apply portal + Listing page +
      Annexure links sitting under the meta line. The user shouldn't have to
      expand a disclosure just to find out where to apply. */
-  .listing .row-actions-inline { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 12.5px; }
-  .listing .row-actions-inline a { color: var(--accent); font-weight: 500; text-decoration: none; }
+  .listing .row-actions-inline { display: flex; flex-wrap: wrap; gap: 18px; align-items: baseline; font-size: 13px; }
+  .listing .row-actions-inline a { color: var(--accent); font-weight: 650; text-decoration: none; }
   .listing .row-actions-inline a:hover { text-decoration: underline; }
 
   /* Areas excerpt: small body text below the meta line. Collapsible details
@@ -919,6 +980,19 @@
     background: color-mix(in srgb, var(--chip-bg) 72%, transparent); color: var(--ink);
     border: 1px solid var(--border);
   }
+  .listing .card-area-more {
+    display: inline-flex; align-items: center;
+    padding: 2px 0;
+    font-size: 12.5px; font-weight: 600; line-height: 1.4;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .listing .card-area-more:hover { color: var(--accent); text-decoration: underline; }
+  .listing .card-area-more-wrap { display: contents; }
+  .listing .card-area-more-wrap > summary { list-style: none; }
+  .listing .card-area-more-wrap > summary::-webkit-details-marker { display: none; }
+  .listing .card-area-more-list { display: contents; }
+  .listing .card-area-more-wrap[open] > summary { display: none; }
   /* Empty state: when the recruiting department has not enunciated the
      topical fit / eligibility / evaluation criteria in the advertisement, name that
      absence explicitly. Italic muted phrasing is visible without
@@ -937,7 +1011,7 @@
     .listing .card-cue { flex-direction: column; gap: 4px; }
     .listing .card-cue-label { min-width: 0; padding-top: 0; }
   }
-  .listing .details { font-size: 12.5px; color: var(--ink); margin: 6px 0 0; grid-column: 2 / span 3; }
+  .listing .details { font-size: 12.5px; color: var(--ink); margin: 8px 0 0; grid-column: 2 / span 3; }
   .listing .details > summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 4px 0; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
   .listing .details > summary:hover { color: var(--accent); }
   .listing .details[open] > summary { color: var(--accent); }
@@ -954,11 +1028,11 @@
   /* Large deadline column — the big "66 / DAYS / 30 Jun 2026" stack on
      the right of each row. Tier-coloured. Replaces the previous pill. */
   .listing .row-deadline { text-align: right; flex-shrink: 0; min-width: 96px; }
-  .listing .deadline-num { font-size: 22px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .listing .deadline-num { font-family: var(--serif); font-size: 27px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--muted); }
   /* Critical-tier deadlines (≤7 days) get heavier weight and a stronger
      red — the protest register applied to the moment that actually
      matters: "this closes soon, act on it." */
-  .listing.tier-critical .deadline-num { color: var(--alarm); font-weight: 800; font-size: 24px; }
+  .listing.tier-critical .deadline-num { color: var(--alarm); font-weight: 850; font-size: 29px; }
   .listing.tier-soon     .deadline-num { color: #8a5403; }
   .listing.tier-ok       .deadline-num { color: var(--muted); }
   .listing .deadline-num.small { font-size: 12px; font-weight: 500; color: var(--muted); }
@@ -1074,28 +1148,26 @@
   }
   .empty-state-reserved .empty-state-cta a:hover { opacity: 0.8; }
 
-  /* Apply portal — primary CTA, anchored on the left (consistent position
-     card-to-card so the candidate's eye lands without scanning). Quiet
-     source links flow to its right. Specificity is bumped above
-     .row-actions-inline a to override its var(--accent) text color. */
+  /* Classified-row action treatment: application is available, but no
+     longer dominates the public record with a filled conversion button. */
   .listing .row-actions-inline a.btn-apply {
     display: inline-flex; align-items: center; gap: 4px;
-    background: var(--accent); color: #fff;
-    padding: 6px 14px; border-radius: 6px;
-    font-size: 13px; font-weight: 600; text-decoration: none;
-    border: 1px solid var(--accent);
-    transition: opacity 0.15s ease, background 0.15s ease;
+    background: transparent; color: var(--accent);
+    padding: 0; border-radius: 0;
+    font-size: 14px; font-weight: 760; text-decoration: none;
+    border: 0;
+    transition: color 0.15s ease;
     flex-shrink: 0;
   }
   .listing .row-actions-inline a.btn-apply:hover {
-    opacity: 0.9; text-decoration: none; color: #fff;
+    text-decoration: underline; color: var(--accent-deep);
   }
   .listing .quiet-links {
-    display: inline-flex; flex-wrap: wrap; gap: 12px;
+    display: inline-flex; flex-wrap: wrap; gap: 16px;
     color: var(--muted); font-size: 12.5px;
   }
   .listing .row-actions-inline .quiet-links a {
-    color: var(--muted); font-weight: 500; text-decoration: none;
+    color: var(--muted); font-weight: 600; text-decoration: none;
   }
   .listing .row-actions-inline .quiet-links a:hover {
     color: var(--accent); text-decoration: underline;
@@ -1105,17 +1177,17 @@
      muted. Far-out deadlines (> 60 days) drop the big number and show
      only a quiet "Closes <date>" anchor. */
   .listing .deadline-num .deadline-unit-inline {
-    font-size: 11px; font-weight: 500; color: var(--muted);
+    font-family: var(--sans); font-size: 10.5px; font-weight: 760; color: var(--muted);
     text-transform: uppercase; letter-spacing: 0.04em;
     margin-left: 2px; vertical-align: 0.2em;
     font-variant-numeric: normal;
   }
   .listing .deadline-meta {
-    font-size: 11px; color: var(--muted); font-family: var(--mono);
+    font-size: 11.5px; color: var(--muted); font-family: var(--mono);
     margin-top: 3px; line-height: 1.3;
   }
   .listing .deadline-future {
-    font-size: 11px; color: var(--muted); font-family: var(--mono);
+    font-size: 11.5px; color: var(--muted); font-family: var(--mono);
     line-height: 1.4; padding-top: 4px;
   }
   .listing .deadline-future-date { color: var(--ink); font-weight: 500; }
