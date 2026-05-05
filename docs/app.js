@@ -61,6 +61,7 @@ import {
 import {
   renderResources, renderSaved, renderCoverage,
 } from "./lib/render-tabs.js";
+import { validateCurrentShape } from "./lib/current-validator.js";
 import {
   TYPE_COLORS,
   detectAdCampus, cityAlreadyInInstitutionName,
@@ -116,7 +117,14 @@ async function loadData() {
       fetch("data/coverage_report.json", opts).then(r => r.json()).catch(() => null),
       fetch("data/institutions_registry.json", opts).then(r => r.json()),
     ]);
-    state.ADS = (current.ads || []).filter(ad => {
+    const currentShape = validateCurrentShape(current);
+    if (!currentShape.ok) {
+      throw new Error(`current.json failed validation: ${currentShape.errors.join("; ")}`);
+    }
+    if (currentShape.invalid.length) {
+      console.warn("Dropped invalid ad records from current.json", currentShape.invalid);
+    }
+    state.ADS = currentShape.ads.filter(ad => {
       const sp = getStructuredPosition(ad);
       const pt = sp ? sp.post_type : ad.post_type;
       return pt !== "NonFaculty";

@@ -81,10 +81,11 @@ make prune-archive
 ```
 
 The scraper writes its output to `docs/data/`, which is what GitHub
-Pages serves; there is no copy step. The [daily-sweep
-workflow](.github/workflows/daily-sweep.yml) runs the same `make scrape`
-on a GitHub Actions cron at 03:30 IST and commits the diff back to
-`main`.
+Pages serves; there is no copy step. The [weekly-sweep
+workflow](.github/workflows/weekly-sweep.yml) runs the same `make scrape`
+on a GitHub Actions cron at 03:30 IST every Monday, validates
+`docs/data/current.json`, and opens a data-update PR instead of pushing
+directly to `main`.
 
 ## Repository layout
 
@@ -114,7 +115,7 @@ whoseuniversity/
 │   └── parsers/         ← one file per institution / institution-family
 │
 ├── scripts/             ← analytical helpers
-├── .github/workflows/   ← daily-sweep CI
+├── .github/workflows/   ← weekly-sweep CI
 ├── Makefile             ← entry points
 ├── requirements.txt     ← pinned
 ├── TECHDEBT.md          ← what's done; what's deferred and why
