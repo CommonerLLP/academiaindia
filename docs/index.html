@@ -104,8 +104,11 @@
      when computing `currentFilterState().query`.
      ============================================================ -->
 <div class="filter-strip" id="filter-strip">
-  <input id="search" type="hidden" value="" />
   <span class="strip-label">Filter:</span>
+  <label class="filter-search" for="search">
+    <span class="search-ico" aria-hidden="true">⌕</span>
+    <input id="search" type="search" value="" autocomplete="off" placeholder="Search ML, postdoc, STS, policy…" />
+  </label>
 
   <!-- Reserved posts toggle: a first-class chip for the dashboard's most
        politically loaded filter. When active, narrows to ads with explicit
