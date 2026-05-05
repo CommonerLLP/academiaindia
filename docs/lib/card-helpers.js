@@ -417,17 +417,20 @@ export function cleanNumberedCueItem(s) {
     .trim());
 }
 
+// Items starting with imperative responsibility verbs are not topical
+// areas — they're "what the appointed faculty will do." FLAME's
+// "Our expectation is that a successful applicant will: 1. Undertake
+// independent research… 2. Translate findings… 3. Remain committed…"
+// hits this every time. Genuine IIT area lists ("(1) Bioengineering
+// (2) Medical Signal Processing") never start with verbs. This
+// filter, combined with the anchor preference, keeps FLAME quiet
+// without blocking IIT extracts that don't carry an explicit
+// "areas of specialisation" header.
+const RESPONSIBILITY_VERB_RE = /^(?:Undertake|Translate|Remain|Engage|Participate|Develop|Deliver|Lead|Maintain|Perform|Demonstrate|Ensure|Support|Contribute|Help|Promote|Build|Foster|Create|Provide|Adopt|Take|Pursue|Conduct|Carry\s+out|Prepare|Mentor|Teach|Serve|Work|Deploy|Implement|Establish|Coordinate|Supervise|Guide|Advise|Communicate|Publish)\b/i;
+
 export function extractNumberedCueItems(text) {
-  // Anchor required. Without an explicit "areas of specialisation"
-  // (or similar) cue, we have no signal that the numbered list that
-  // follows is *topical areas* rather than responsibilities,
-  // expectations, or eligibility bullets. Earlier this fell through
-  // to extracting from the whole text, which surfaced FLAME hiring-
-  // expectation items ("1. Undertake independent research…") as
-  // topical-fit chips on cards.
   const anchor = text.search(/\b(?:specific\s+areas?\s+of|areas?\s+of\s+speciali[sz]ation|following\s+(?:areas?|speciali[sz]ations?))\b/i);
-  if (anchor < 0) return [];
-  const windowText = text.slice(anchor);
+  const windowText = anchor >= 0 ? text.slice(anchor) : text;
   // Marker grammar: parenthesised token (i), (ii), (1), (1a), (1-iii),
   // (a), (b)  OR  unparenthesised "1." / "1)" / "a." Roman numerals
   // (i…iv etc.) are essential here — many Indian academic ads
@@ -443,6 +446,7 @@ export function extractNumberedCueItems(text) {
     if (!item || item.length < 3 || item.length > 80) continue;
     if (/^(?:No|Page|Annexure|Sr|Academic Unit|Areas of Speciali[sz]ation)$/i.test(item)) continue;
     if (/\b(?:Grade|Publication Record|Academic Background|Teaching Requirement)\b/i.test(item)) continue;
+    if (RESPONSIBILITY_VERB_RE.test(item)) continue;
     items.push(item);
   }
   return [...new Set(items)];
@@ -561,8 +565,21 @@ export function extractCardCues(text, ad = {}) {
         .replace(/\([^)]*\)/g, ' ')                     // strip parentheticals
         .replace(/-\s+/g, '-')                          // "multi- species" -> "multi-species"
         .replace(/\s+/g, ' ')                           // collapse double spaces
-        .split(/\s*,\s*|\s*;\s*|\s+(?:and|or|&)\s+/)    // split on , ; and or &
-        .map(s => canonicalAreaLabel(s.trim().replace(/[.,;:]+$/, '')))
+        // FLAME-style introducers leak into the first chip otherwise:
+        // "expertise in areas such X, Y" → first chip is "areas such X".
+        // Strip "areas such (as)?", "topics such (as)?", "fields such" etc.
+        // before splitting.
+        .replace(/^(?:areas?|fields?|topics?|domains?|sub-?areas?|specialisations?|specializations?)\s+(?:such\s+(?:as\s+)?|like\s+|including\s+|of\s+)?/i, '')
+        // Split on ",", ";", " and ", " or ", " & ", "and/or", "/" between areas
+        .split(/\s*,\s*|\s*;\s*|\s+(?:and|or|&)\s+|\s*and\/or\s*|\s+\/\s+|(?<=\w)\/(?=[A-Z])/)
+        // Post-split cleanup: trim "and "/"or "/"& " left after splitting
+        // ", and X" or "; or Y" — the comma-split eats the comma but
+        // leaves the conjunction.
+        .map(s => canonicalAreaLabel(
+          s.trim()
+            .replace(/^(?:and|or|&)\s+/i, '')
+            .replace(/[.,;:]+$/, '')
+        ))
         .filter(s => {
           if (!s || s.length < 2 || s.length > 60) return false;
           // Drop low-content phrases that come from awkward source text
