@@ -100,7 +100,7 @@ describe("applyFilters", () => {
     st = { ...st, fields: new Set(), types: new Set(), states: new Set(), posGroups: new Set(["research"]) };
     expect(filters.applyFilters(st).map(ad => ad.id)).toEqual(["ml"]);
 
-    st = { ...st, posGroups: new Set(), query: "ai policy" };
+    st = { ...st, posGroups: new Set(), query: "ML policy" };
     expect(filters.applyFilters(st).map(ad => ad.id)).toEqual(["ml"]);
 
     window._reservedOnly = true;

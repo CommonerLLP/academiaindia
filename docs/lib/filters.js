@@ -22,6 +22,7 @@ import {
   isAsstProfMatch, isAssocProfMatch, isFullProfMatch,
   isResearchMatch, isVisitingMatch,
 } from "./card-helpers.js";
+import { matchesSearch } from "./search.js";
 
 /** Tiny DOM helper: collect the values of all checked inputs inside #id. */
 export function getChecked(id) {
@@ -44,6 +45,8 @@ export function filterHaystack(ad, inst = {}) {
   const sp = getStructuredPosition(ad);
   return [
     ad.title, ad.department, ad.discipline, inst.name, inst.short_name,
+    ad.raw_text_excerpt, ad.pdf_excerpt, ad.unit_eligibility,
+    ad.publications_required, ad.general_eligibility,
     sp?.department, sp?.discipline, sp?.school_or_centre,
     ...(sp?.areas || []), sp?.methods_preference, sp?.approach,
   ].filter(Boolean).join(" ").toLowerCase();
@@ -71,7 +74,7 @@ export function applyFilters(st) {
       if (!any) return false;
     }
     if (st.query) {
-      if (!filterHaystack(ad, inst).includes(st.query)) return false;
+      if (!matchesSearch(filterHaystack(ad, inst), st.query)) return false;
     }
     // Phase-2 synthetic "closing this week" quick-filter — checks the
     // calendar rather than a checkbox group. Window-scoped so the state
@@ -150,7 +153,7 @@ export function adPassesFilter(ad, st, skipDim) {
     if (!any) return false;
   }
   if (st.query) {
-    if (!filterHaystack(ad, inst).includes(st.query)) return false;
+    if (!matchesSearch(filterHaystack(ad, inst), st.query)) return false;
   }
   if (window._reservedOnly && !isReservedPost(ad)) return false;
   return true;
