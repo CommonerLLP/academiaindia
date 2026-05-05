@@ -1152,19 +1152,24 @@
   }
   .empty-state-reserved .empty-state-cta a:hover { opacity: 0.8; }
 
-  /* Classified-row action treatment: application is available, but no
-     longer dominates the public record with a filled conversion button. */
+  /* Apply CTA — filled button in Krishna cobalt (#0047AB). Hardcoded
+     here rather than driven by --accent so the broader palette stays
+     untouched until the full Ambedkar/Left aesthetic redesign lands.
+     The earlier classified-row treatment (text-only, var(--accent))
+     is preserved in git history; restoring filled-button styling per
+     2026-05-05 maintainer call. */
   .listing .row-actions-inline a.btn-apply {
     display: inline-flex; align-items: center; gap: 4px;
-    background: transparent; color: var(--accent);
-    padding: 0; border-radius: 0;
-    font-size: 14px; font-weight: 760; text-decoration: none;
-    border: 0;
-    transition: color 0.15s ease;
+    background: #0047AB; color: #fff;
+    padding: 6px 14px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; text-decoration: none;
+    border: 1px solid #0047AB;
+    transition: background 0.15s ease, opacity 0.15s ease;
     flex-shrink: 0;
   }
   .listing .row-actions-inline a.btn-apply:hover {
-    text-decoration: underline; color: var(--accent-deep);
+    background: #003380; border-color: #003380;
+    color: #fff; opacity: 1; text-decoration: none;
   }
   .listing .quiet-links {
     display: inline-flex; flex-wrap: wrap; gap: 16px;
