@@ -138,6 +138,15 @@ const FIELD_ORDER = [
   "Industrial / Operations", "Medical / Pharmacy",
   "General / unspecified", "Other",
 ];
+const HSS_SUBJECT_FILTER_LABELS = new Set([
+  "Anthropology", "Sociology", "Political Science", "Public Policy",
+  "History", "Philosophy", "Literature", "Linguistics", "Psychology",
+  "Cognitive Science", "Education", "Development Studies", "Gender Studies",
+  "Media / Communication", "Journalism", "HCI / STS", "Design", "Law",
+  "Public Health", "Urban / Geography", "Heritage / Culture",
+  "Economics", "Finance / Capital Markets", "Management / Business",
+  "General / unspecified",
+]);
 const FIELD_RULES = [
   ["Anthropology", [/\banthropolog(y|ical|ist|ies)\b/i, /\bethnograph(y|ic|er)\b/i]],
   ["Sociology", [/\bsociolog(y|ical)\b/i, /\bsocial\s+theor(y|ies)\b/i]],
@@ -1673,6 +1682,12 @@ function updateReactiveCounts(st) {
       const v = input.value;
       const n = byValue[v] ?? 0;
       if (cnt) cnt.textContent = n;
+      const hideDeadSubject = containerId === "filter-hss" && n === 0 && !input.checked;
+      const hideNonHssSubject = containerId === "filter-hss"
+        && st.statuses.has("hss")
+        && !HSS_SUBJECT_FILTER_LABELS.has(v)
+        && !input.checked;
+      lbl.hidden = hideDeadSubject || hideNonHssSubject;
       lbl.style.opacity = (n === 0 && !input.checked) ? 0.4 : "";
     });
   };
