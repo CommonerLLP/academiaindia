@@ -162,7 +162,7 @@ const FIELD_RULES = [
   ["Psychology", [/\bpsycholog(y|ical)\b/i]],
   ["Cognitive Science", [/\bcognitive\s+scien/i, /\bcognitive\s+psycholog/i, /\bcognition\b/i]],
   ["Education", [/\beducation\b/i, /\bpedagog(y|ical)\b/i, /\bteaching\s+and\s+learning\b/i]],
-  ["Development Studies", [/\bdevelopment\s+stud(y|ies)\b/i, /\bdevelopment\s+(policy|practice|sector|domain|economics?|research)\b/i, /\brural\s+livelihoods?\b/i]],
+  ["Development Studies", [/\bdevelopment\s+stud(y|ies)\b/i, /\bdevelopment\s+(policy|practice|sector|domain|economics?|research)\b/i, /\brural\s+(livelihoods?|development)\b/i]],
   ["Gender Studies", [/\bgender\b/i, /\bwomen'?s\s+stud(y|ies)\b/i]],
   ["Media / Communication", [/\bmedia\s+stud(y|ies)\b/i, /\bcommunication\b/i, /\bfilm\s+(&|and)?\s*television\b/i, /\bdigital\s+media\b/i]],
   ["Journalism", [/\bjournalism\b/i]],
@@ -1033,7 +1033,11 @@ async function loadData() {
       fetch("data/coverage_report.json", opts).then(r => r.json()).catch(() => null),
       fetch("data/institutions_registry.json", opts).then(r => r.json()),
     ]);
-    ADS = current.ads || [];
+    ADS = (current.ads || []).filter(ad => {
+      const sp = getStructuredPosition(ad);
+      const pt = sp ? sp.post_type : ad.post_type;
+      return pt !== "NonFaculty";
+    });
     COVERAGE = coverage;
     for (const inst of registry) INSTITUTIONS[inst.id] = inst;
     // Footer colophon — surface the data freshness as a human-readable
@@ -1187,22 +1191,6 @@ function wireEvents() {
   }
   document.getElementById("search").addEventListener("input", render);
   document.getElementById("sort").addEventListener("change", render);
-
-  window._listingViewMode = localStorage.getItem("hei.listing-view") || "candidate";
-  const setListingViewMode = (mode) => {
-    window._listingViewMode = mode === "accountability" ? "accountability" : "candidate";
-    localStorage.setItem("hei.listing-view", window._listingViewMode);
-    document.body.dataset.listingView = window._listingViewMode;
-    document.querySelectorAll("[data-view-mode]").forEach(btn => {
-      const on = btn.dataset.viewMode === window._listingViewMode;
-      btn.classList.toggle("active", on);
-      btn.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-  };
-  setListingViewMode(window._listingViewMode);
-  document.querySelectorAll("[data-view-mode]").forEach(btn => {
-    btn.addEventListener("click", () => setListingViewMode(btn.dataset.viewMode));
-  });
 
   // ---- Phase-2 hero search ---------------------------------------------
   // The hero input is the user-facing field; the legacy `#search` (now a
@@ -1613,89 +1601,6 @@ function isReservedPost(ad) {
   return Boolean(sp?.is_special_recruitment_drive) || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(txt);
 }
 
-function recruitmentShape(ad, inst, structuredPos, effectivePostCount) {
-  const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.pdf_excerpt || ""} ${structuredPos?.raw_section_text || ""} ${ad.reservation_note || ""}`;
-  const shapeText = `${text} ${ad.original_url || ""} ${ad.ad_number || ""} ${ad._source_method || ""}`.toLowerCase();
-  const sourcePeerCount = ad.original_url
-    ? ADS.filter(x => x.original_url === ad.original_url).length
-    : 0;
-  const composite = Boolean(structuredPos?.is_composite_call)
-    || (typeof effectivePostCount === "number" && effectivePostCount >= 2)
-    || sourcePeerCount >= 2
-    || /\b(rolling|rol?lling|all\s+areas?|multiple\s+(areas?|disciplines?)|composite|cadre|various\s+academic\s+units?|department[\s-]?wise|departments?,\s*centres?,\s*(and\s*)?schools?)\b/.test(shapeText);
-  const single = !composite && (
-    effectivePostCount === 1
-    || /\b(?:one|1)\s+(?:post|position|vacancy)\b|\bsingle[\s-]+(?:post|position|vacancy)\b/i.test(text)
-  );
-  return {
-    composite,
-    single,
-    sourcePeerCount,
-    text,
-  };
-}
-
-function rosterVerdict(ad, inst, structuredPos, catBits, effectivePostCount) {
-  const instType = String(inst?.type || "");
-  const isPrivate = instType.toLowerCase().includes("private");
-  const shape = recruitmentShape(ad, inst, structuredPos, effectivePostCount);
-  const isSRD = Boolean(structuredPos?.is_special_recruitment_drive)
-    || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(shape.text);
-
-  if (isPrivate && !catBits.length) {
-    return {
-      tone: "private",
-      label: "Private institution",
-      title: "CEI roster not applicable",
-      why: "Private universities sit outside the CEI(RTC) Act, 2019 faculty-reservation roster. This card is therefore not marked as a roster-disclosure failure.",
-      shapeLabel: "Private recruitment",
-    };
-  }
-  if (catBits.length) {
-    return {
-      tone: "disclosed",
-      label: "Roster categories disclosed",
-      title: "Post-wise counts published",
-      why: "The advertisement publishes category-wise post counts, so candidates can see how UR/SC/ST/OBC/EWS/PwBD seats are being operationalised.",
-      shapeLabel: shape.composite ? "Composite call" : shape.single ? "Single post" : "Post-wise counts visible",
-    };
-  }
-  if (isSRD) {
-    return {
-      tone: "srd",
-      label: "Affirmative-action call",
-      title: "Special Recruitment Drive",
-      why: "This ad is framed as a Special Recruitment Drive for reserved-category candidates, typically to fill backlog SC/ST/OBC/PwBD posts.",
-      shapeLabel: "SRD / backlog drive",
-    };
-  }
-  if (shape.composite) {
-    return {
-      tone: "missing",
-      label: "Roster disclosure missing",
-      title: "Composite call, roster not mapped",
-      why: "This public-institution ad appears to combine multiple units, ranks, or areas, but does not map selections to UR/SC/ST/OBC/EWS/PwBD roster points.",
-      shapeLabel: "Composite / rolling call",
-    };
-  }
-  if (shape.single) {
-    return {
-      tone: "single",
-      label: "Roster disclosure missing",
-      title: "Single post, roster point not disclosed",
-      why: "This public-institution ad appears to be for one post, but the advertisement does not disclose the roster category attached to that appointment.",
-      shapeLabel: "Single-position ad",
-    };
-  }
-  return {
-    tone: "unknown",
-    label: "Roster unclear",
-    title: "Recruitment shape unclear",
-    why: "This public-institution ad does not disclose enough post-wise information to tell whether the recruitment is single-post or bulk, or which roster point is being used.",
-    shapeLabel: "Unclear from source",
-  };
-}
-
 function applySort(ads, sort) {
   const deadlineRank = (ad) => {
     const d = daysUntil(ad.closing_date);
@@ -1781,26 +1686,15 @@ function updateReactiveCounts(st) {
       const v = input.value;
       const n = byValue[v] ?? 0;
       if (cnt) cnt.textContent = n;
-      const hideDeadSubject = containerId === "filter-hss" && n === 0 && !input.checked;
-      const hideNonHssSubject = containerId === "filter-hss"
-        && st.statuses.has("hss")
-        && !HSS_SUBJECT_FILTER_LABELS.has(v)
-        && !input.checked;
-      lbl.hidden = hideDeadSubject || hideNonHssSubject;
       lbl.style.opacity = (n === 0 && !input.checked) ? 0.4 : "";
+      lbl.hidden = false;
     });
   };
   paint("filter-hss", counts.hss);
   paint("filter-quality", counts.quality);
   paint("filter-type", counts.type);
   paint("filter-state", counts.state);
-  // Posgroup uses dedicated `#cnt-<rank>` spans (not the `.cnt` inside the
-  // shared filter-group label markup). One per rank.
-  const setCnt = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
-  setCnt("cnt-faculty",   counts.posgroup.faculty);
-  setCnt("cnt-associate", counts.posgroup.associate);
-  setCnt("cnt-full",      counts.posgroup.full);
-  setCnt("cnt-research",  counts.posgroup.research);
+  paint("filter-posgroup", counts.posgroup);
 }
 
 // ---------- render ----------
@@ -1974,13 +1868,78 @@ function renderAd(ad) {
   const instType = String(inst.type || "");
   const isPrivateInstitution = instType.toLowerCase().includes("private");
   const institutionScope = isPrivateInstitution ? "private" : "public";
+  const cls = classifyAd(ad);
   const tier = urgencyTier(ad);
   const structuredPosForRender = getStructuredPosition(ad);
   const cat = structuredPosForRender?.reservation_breakdown || ad.category_breakdown || {};
   const effectivePostCount = structuredPosForRender?.number_of_posts ?? ad.number_of_posts;
   const catBits = ["UR","SC","ST","OBC","EWS","PwBD"].filter(k => cat[k] != null && cat[k] > 0).map(k => [k, cat[k]]);
+  const roster = catBits.length
+    ? `<div class="roster">Roster: ${catBits.map(([k,v],i) => `${i?'<span class="sep">·</span>':""}<span class="k">${k}</span>:${v}`).join("")}</div>`
+    : "";
+  const typeColor = TYPE_COLORS[inst.type] || "var(--muted)";
+  const fields = fieldTags(ad).filter(f => f !== "Other");
+  const hssFlag = fields.slice(0, 2).map(f => `<span class="hss-flag">${escapeHTML(f)}</span>`).join("");
+  const status = listingStatus(ad);
+
+  // Chips: post type + contract + posts + low-confidence flag
+  const chips = [];
+  if (status !== "ready") chips.push(`<span class="chip lowconf">${escapeHTML(QUALITY_LABELS[status])}</span>`);
+  if (ad.post_type && ad.post_type !== "Unknown") {
+    const label = ad.post_type === "Research" || ad.post_type === "Scientific" ? "Research/Postdoc"
+                : ad.post_type === "NonFaculty" ? "Non-Faculty" : ad.post_type;
+    chips.push(`<span class="chip">${label}</span>`);
+  }
+  if (ad.contract_status && ad.contract_status !== "Unknown") {
+    const cs = ad.contract_status === "TenureTrack" ? "Tenure-Track" : ad.contract_status;
+    chips.push(`<span class="chip muted">${escapeHTML(cs)}</span>`);
+  }
+  if (effectivePostCount) chips.push(`<span class="chip muted">${effectivePostCount} ${effectivePostCount===1?"post":"posts"}</span>`);
+  if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) chips.push(`<span class="chip lowconf">rough parse</span>`);
+  chips.push(`<span class="chip muted">${escapeHTML(sourceLabel(ad))}</span>`);
   const seenDays = daysSince(ad.snapshot_fetched_at);
+  if (seenDays != null) {
+    chips.push(`<span class="chip muted">checked ${seenDays === 0 ? "today" : seenDays + "d ago"}</span>`);
+    if (seenDays >= 14) chips.push(`<span class="chip lowconf">stale source</span>`);
+  }
+
   const saved = SAVED.has(ad.id);
+
+  // Title with optional sub-area appended (e.g. "Sociology" inside HSS unit).
+  // The title already contains "Faculty — <Dept>" or "Faculty — <Dept> — <Sub>";
+  // we render it as-is but split off the trailing sub-area in muted style.
+  const title = ad.title || "(untitled)";
+  const titleHTML = (() => {
+    const parts = title.split(/\s+—\s+/);
+    if (parts.length >= 3) {
+      // "Faculty — Dept — SubArea"
+      const [head, dept, ...rest] = parts;
+      return `${escapeHTML(head + " — " + dept)} <span class="field-spec">— ${escapeHTML(rest.join(" — "))}</span>`;
+    }
+    return escapeHTML(title);
+  })();
+
+  // Meta-line: dept (only if not already in title), discipline (only if differs from dept),
+  // posted-date. This is the fix for the redundant DEPT/FIELD problem.
+  const metaParts = [];
+  const inTitle = (s) => s && title.toLowerCase().includes(s.toLowerCase());
+  if (ad.department && !inTitle(ad.department)) {
+    metaParts.push(`<span class="dept">${escapeHTML(ad.department)}</span>`);
+  }
+  if (ad.discipline && ad.discipline !== ad.department && !inTitle(ad.discipline)) {
+    metaParts.push(`<span class="dept">${escapeHTML(ad.discipline)}</span>`);
+  }
+  if (ad.publication_date) {
+    metaParts.push(`<span class="posted">posted ${escapeHTML(formatDate(ad.publication_date))}</span>`);
+  }
+  const metaLine = (metaParts.length || chips.length)
+    ? `<div class="meta-line">${chips.join("")}${chips.length && metaParts.length ? '<span class="dot">·</span>' : ''}${metaParts.join('<span class="dot">·</span>')}</div>`
+    : "";
+
+  // Deadline pill
+  const deadlinePill = ad.closing_date
+    ? `<span class="deadline-pill">${escapeHTML(formatCountdown(ad))} <span class="dl-date">· ${escapeHTML(formatDate(ad.closing_date))}</span></span>`
+    : `<span class="deadline-pill no-dl">rolling, no deadline</span>`;
 
   // Action links: PDF + apply portal + listing page (in that order — original PDF first)
   const actionLinks = [];
@@ -1988,11 +1947,11 @@ function renderAd(ad) {
   if (ad.annexure_pdf_url) {
     actionLinks.push(`<a href="${escapeAttr(ad.annexure_pdf_url)}" target="_blank" rel="noopener noreferrer">Annexure →</a>`);
   }
-  if (ad.apply_url) {
-    actionLinks.push(`<a href="${escapeAttr(ad.apply_url)}" target="_blank" rel="noopener noreferrer">Apply portal →</a>`);
-  }
   if (ad.info_url && ad.info_url !== ad.original_url) {
     actionLinks.push(`<a href="${escapeAttr(ad.info_url)}" target="_blank" rel="noopener noreferrer">Listing page →</a>`);
+  }
+  if (ad.apply_url) {
+    actionLinks.push(`<a href="${escapeAttr(ad.apply_url)}" target="_blank" rel="noopener noreferrer">Apply portal →</a>`);
   }
 
   // Areas excerpt (quiet body; no accent border, no "AREAS / NOTES" label).
@@ -2033,7 +1992,6 @@ function renderAd(ad) {
   const areasValue = cues.areas
     ? `<span class="card-cue-tags">${cues.areas.map(a => `<span class="card-area-chip">${escapeHTML(a)}</span>`).join("")}</span>`
     : empty;
-
   const areasHTML = `
     <div class="card-cues">
       <div class="card-cue card-cue-areas${cues.areas ? "" : " is-empty"}">
@@ -2041,6 +1999,21 @@ function renderAd(ad) {
         ${areasValue}
       </div>
     </div>`;
+
+  // Collapsible details — short label, button-ish
+  const hasDetails = ad.unit_eligibility || ad.publications_required || ad.general_eligibility || ad.reservation_note || ad.process_note || ad.contact || ad._source_note;
+  const detailsHTML = hasDetails ? `
+    <details class="details">
+      <summary>Eligibility &amp; how to apply ▾</summary>
+      ${ad._source_note ? `<div class="detail-block"><span class="k">Source note</span><div class="v">${escapeHTML(ad._source_note)}</div></div>` : ""}
+      ${cues.areas && cues.areas.length > 3 ? `<div class="detail-block"><span class="k">Full topical fit</span><div class="v">${escapeHTML(cues.areas.join("; "))}</div></div>` : ""}
+      ${ad.unit_eligibility ? `<div class="detail-block"><span class="k">Unit eligibility</span><div class="v">${escapeHTML(ad.unit_eligibility)}</div></div>` : ""}
+      ${ad.publications_required ? `<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(ad.publications_required)}</div></div>` : ""}
+      ${ad.general_eligibility ? `<div class="detail-block"><span class="k">General eligibility</span><div class="v">${escapeHTML(ad.general_eligibility)}</div></div>` : ""}
+      ${ad.reservation_note ? `<div class="detail-block"><span class="k">Reservation</span><div class="v">${escapeHTML(ad.reservation_note)}</div></div>` : ""}
+      ${ad.process_note ? `<div class="detail-block"><span class="k">Process</span><div class="v">${escapeHTML(ad.process_note)}</div></div>` : ""}
+      ${ad.contact ? `<div class="detail-block"><span class="k">Contact</span><div class="v">${escapeHTML(ad.contact)}</div></div>` : ""}
+    </details>` : "";
 
   // ---- Card layout (institution-first) --------------------------------
   // Two-line headline scanned in <2 seconds:
@@ -2069,35 +2042,30 @@ function renderAd(ad) {
   const cityForDisplay = adCampus || inst.city;
   const cityInName = cityAlreadyInInstitutionName(instName, cityForDisplay);
   const cityPart = cityForDisplay && !cityInName ? ` <span class="card-campus">(${escapeHTML(cityForDisplay)})</span>` : "";
-  const discipline = cardDiscipline(ad);
-  const rankLine = cardRankLine(ad);
-  // A small flag-row for non-blocking but worth-knowing signals: low parse
-  // confidence, hand-transcribed entry, posts count, posted/checked dates.
+  
+  let rawDiscipline = cardDiscipline(ad);
+  let parts = rawDiscipline.split(" — ");
+  let discipline;
+  if (parts.length === 2) {
+    discipline = `${parts[1].trim()} - ${parts[0].replace(/^Department of\s+/i, "").trim()}`;
+  } else {
+    discipline = rawDiscipline.replace(/^Department of\s+/i, "");
+  }
+
+  const rankLineFull = cardRankLine(ad);
+  const rankParts = rankLineFull.split(" · ");
+  let rankLine = rankParts[0].replace(/Professor/g, "Prof.");
+  let contractStr = rankParts.length > 1 ? rankParts[1] : "";
+  if (contractStr === "Permanent") contractStr = "";
+  // A small flag-row for non-blocking but worth-knowing signals.
   const flags = [];
-  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private university" : "Public / CEI institution"}</span>`);
-  if (isPrivateInstitution && !catBits.length) {
-    flags.push(`<span class="card-flag dim" title="Private universities are outside the CEI(RTC) Act, 2019 faculty-reservation roster.">CEI roster n/a</span>`);
-  }
-  if (structuredPos?.source_pdf) {
-    flags.push(`<span class="card-flag dim" title="This card uses structured fields extracted from the linked PDF.">PDF extracted</span>`);
-  }
+  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private" : "Public"}</span>`);
   if (effectivePostCount) {
     flags.push(`<span class="card-flag">${effectivePostCount} ${effectivePostCount === 1 ? "post" : "posts"}</span>`);
   }
-  if (typeof ad.parse_confidence === "number" && ad.parse_confidence < 0.45) {
-    flags.push(`<span class="card-flag warn" title="Heuristically parsed; verify all details against the original notification.">⚠ rough parse</span>`);
+  if (ad.publication_date) {
+    flags.push(`<span class="card-flag dim">posted ${escapeHTML(formatDate(ad.publication_date))}</span>`);
   }
-  if (ad._manual_stub && /manual transcription/i.test(ad._source_method || "")) {
-    flags.push(`<span class="card-flag manual" title="Hand-transcribed from a circulated recruitment card; only the application URL is verifiable. Verify with the issuing institution before applying.">⚑ manual entry</span>`);
-  }
-  const dateBits = [];
-  if (ad.publication_date) dateBits.push(`posted ${escapeHTML(formatDate(ad.publication_date))}`);
-  if (seenDays != null) dateBits.push(`checked ${seenDays === 0 ? "today" : seenDays + "d ago"}`);
-  if (ad.ad_number) dateBits.push(`ad #${escapeHTML(ad.ad_number)}`);
-  if (dateBits.length) {
-    flags.push(`<span class="card-flag dim">${dateBits.join(" · ")}</span>`);
-  }
-
   // Large deadline column: "66 / DAYS / 30 Jun 2026" or "rolling" or "—".
   let deadlineHTML;
   if (ad.closing_date) {
@@ -2111,33 +2079,77 @@ function renderAd(ad) {
     deadlineHTML = `<div class="deadline-num small">rolling</div>`;
   }
 
-  const verdict = rosterVerdict(ad, inst, structuredPos, catBits, effectivePostCount);
-  const categoryHTML = catBits.length
-    ? `<div class="acct-cats">${catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")}</div>`
-    : "";
-  const accountFacts = [
-    ["Institution", isPrivateInstitution ? "Private" : "Public / CEI"],
-    ["Recruitment shape", verdict.shapeLabel],
-    ["Posts", effectivePostCount ? `${effectivePostCount} ${effectivePostCount === 1 ? "post" : "posts"}` : "Not post-wise disclosed"],
-    ["Source", structuredPos?.source_pdf ? "Structured PDF extraction" : sourceLabel(ad)],
-  ];
-  if (typeof structuredPos?.extraction_confidence === "number") {
-    accountFacts.push(["Extraction", `${Math.round(structuredPos.extraction_confidence * 100)}% confidence`]);
+  // Reservation operates at the cadre/institutional-roster level under the
+  // CEI(RTC) Act, 2019. For public institutions we distinguish:
+  //   - composite / rolling source ads: shared source URL, explicit multi-post
+  //     count, rolling/cadre wording, or multiple units under one call;
+  //   - explicitly single-post ads: only when the ad says one/1 post;
+  //   - unknown roster point: no post-wise category/roster mapping visible.
+  // Private universities are handled separately below because the CEI(RTC)
+  // roster-disclosure question does not apply to them.
+  const _adText = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.reservation_note || ""}`;
+  const shapeText = `${_adText} ${ad.original_url || ""} ${ad.ad_number || ""} ${ad._source_method || ""}`.toLowerCase();
+  const sourcePeerCount = ad.original_url
+    ? ADS.filter(x => x.original_url === ad.original_url).length
+    : 0;
+  const isCompositeAd = (() => {
+    if (structuredPos?.is_composite_call) return true;
+    if (typeof effectivePostCount === "number" && effectivePostCount >= 2) return true;
+    if (sourcePeerCount >= 2) return true;
+    if (/\b(rolling|rol?lling|all\s+areas?|multiple\s+(areas?|disciplines?)|composite|cadre|various\s+academic\s+units?|department[\s-]?wise|departments?,\s*centres?,\s*(and\s*)?schools?)\b/.test(shapeText)) return true;
+    return false;
+  })();
+  const isExplicitSinglePostAd = (() => {
+    if (effectivePostCount === 1) return true;
+    if (isCompositeAd) return false;
+    return /\b(?:one|1)\s+(?:post|position|vacancy)\b|\bsingle[\s-]+(?:post|position|vacancy)\b/i.test(_adText);
+  })();
+  // Reservation messaging — four states (plus private-uni handled below):
+  //   1. Per-post roster counts published → real coloured pills.
+  //   2. Special Recruitment Drive (SRD) for reserved categories →
+  //      affirmative-action call out, explain what an SRD is.
+  //   3. Composite cadre-level recruitment (multi-post call) without
+  //      per-post breakdown → flag the missing roster arithmetic.
+  //   4. Single-position / per-area ad → explain that reservation applies
+  //      at cadre-roster level, not at the individual-ad level.
+  // The statutory percentages (SC-15%, ST-7.5%, OBC-27%, EWS-10%, PwBD-4%)
+  // are the constitutional floor every CFTI is bound by; reproducing them
+  // on every card is boilerplate noise, not information.
+  const isSRD = Boolean(structuredPos?.is_special_recruitment_drive) || /\b(special\s+recruitment\s+drive|mission\s+mode\s+recruitment|SRD\b|recruitment\s+drive\s+for\s+(SC|ST|OBC|EWS|PwBD|PwD|reserved))/i.test(_adText);
+  // Private universities are outside the CEI(RTC) faculty-reservation
+  // regime. Do not classify their shared jobs pages as "composite
+  // recruitment" failures; that roster-disclosure question applies to
+  // public/CEI institutions.
+  const isPrivate = isPrivateInstitution;
+  // Each reservation-state row shows a label + an info icon. The
+  // explanation sits behind a click/keyboard disclosure so it works on
+  // touch devices too; browser-native title tooltips are too fragile for
+  // decision-critical context.
+  let reservPillsHTML = "";
+  const reservInfo = (tip) => `
+    <details class="reserv-info">
+      <summary aria-label="Explain reservation status"><span aria-hidden="true">?</span></summary>
+      <div class="reserv-info-pop">${escapeHTML(tip)}</div>
+    </details>`;
+  if (isPrivate && !catBits.length) {
+    reservPillsHTML = "";
+  } else if (catBits.length) {
+    reservPillsHTML = `<div class="row-reserv"><span class="reserv-label">Reserved seats</span>${
+      catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("")
+    }</div>`;
+  } else if (isSRD) {
+    const tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
+    reservPillsHTML = `<div class="row-reserv reserv-srd"><span class="reserv-label good">✓ Special Recruitment Drive</span>${reservInfo(tip)}</div>`;
+  } else if (isCompositeAd) {
+    const tip = "Composite or rolling faculty call. The ad may list many departments/areas under one recruitment PDF, but it does not disclose which roster category each selection point maps to.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing"><span class="reserv-label warn">⚠ Composite / rolling recruitment</span>${reservInfo(tip)}</div>`;
+  } else if (isExplicitSinglePostAd) {
+    const tip = "This public-institution ad appears to be for one post/position, but the roster category for that appointment is not disclosed in the advertisement.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Single post: roster point not disclosed</span>${reservInfo(tip)}</div>`;
+  } else {
+    const tip = "This public-institution ad does not disclose enough post-wise roster information to tell whether the recruitment is single-post or bulk, or which UR/SC/ST/OBC/EWS/PwBD roster point is being used.";
+    reservPillsHTML = `<div class="row-reserv reserv-missing reserv-singlepost"><span class="reserv-label warn">⚠ Roster point not disclosed</span>${reservInfo(tip)}</div>`;
   }
-  const accountabilityHTML = `
-    <aside class="accountability-panel verdict-${escapeAttr(verdict.tone)}" aria-label="Public-accountability reading">
-      <div class="acct-top">
-        <span class="acct-eyebrow">${escapeHTML(verdict.label)}</span>
-        <div class="acct-deadline">${deadlineHTML}</div>
-      </div>
-      <h4>${escapeHTML(verdict.title)}</h4>
-      <p>${escapeHTML(verdict.why)}</p>
-      ${categoryHTML}
-      <dl class="acct-facts">
-        ${accountFacts.map(([k, v]) => `<div><dt>${escapeHTML(k)}</dt><dd>${escapeHTML(v)}</dd></div>`).join("")}
-      </dl>
-      <button type="button" class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
-    </aside>`;
   // Hiring-language traps — surface known exclusion phrases that the ad
   // contains, so candidates can see the structural barriers up front.
   const traps = extractTraps(ad);
@@ -2197,26 +2209,31 @@ function renderAd(ad) {
     : "";
 
   return `
-    <article class="listing tier-${tier} scope-${institutionScope} verdict-${escapeAttr(verdict.tone)}" data-jobid="${escapeAttr(ad.id)}">
+    <article class="listing tier-${tier} scope-${institutionScope}" data-jobid="${escapeAttr(ad.id)}">
       <div class="tier-bar"></div>
-      <div class="listing-grid">
-        <div class="candidate-panel">
-          <div class="card-headline">
-            <h3 class="card-institution">${escapeHTML(instName)}${cityPart}</h3>
-            <p class="card-subhead">
-              <span class="card-discipline">${escapeHTML(discipline)}</span>
-              <span class="card-sep">·</span>
-              <span class="card-rank">${escapeHTML(rankLine)}</span>
-            </p>
-            ${flags.length ? `<div class="card-flags">${flags.join('')}</div>` : ""}
-          </div>
-          ${areasHTML}
-          ${trapsHTML}
-          ${applyLinksHTML}
-          ${detailsHTML2}
+      <div class="card-body">
+        <div class="card-headline">
+          <h3 class="card-institution">${escapeHTML(instName)}${cityPart}</h3>
+          <p class="card-subhead">
+            <span class="card-rank">${escapeHTML(rankLine)}, </span>
+            <span class="card-discipline">${escapeHTML(discipline)}</span>
+            ${contractStr ? `<span class="card-contract-inline"> · ${escapeHTML(contractStr)}</span>` : ""}
+          </p>
         </div>
-        ${accountabilityHTML}
+        <div class="card-deadline">${deadlineHTML}</div>
+        <div class="card-actions">
+          <button type="button" class="star ${saved?'on':''}" title="${saved?'Remove from saved':'Save to watchlist'}" aria-pressed="${saved}" aria-label="${saved?'Remove from saved':'Save to watchlist'}">${saved?'★':'☆'}</button>
+        </div>
       </div>
+      ${reservPillsHTML}
+      ${areasHTML}
+      ${trapsHTML}
+      ${detailsHTML2}
+      ${applyLinksHTML || flags.length ? `
+      <div class="card-footer">
+        ${applyLinksHTML}
+        ${flags.length ? `<div class="card-flags bottom-right">${flags.join('')}</div>` : ""}
+      </div>` : ""}
     </article>`;
 }
 
@@ -2566,7 +2583,7 @@ function chart5_disclosure_v2() {
 
   const lineEls = lines.map(L => {
     const path = d[L.key].map((v, i) => `${i === 0 ? 'M' : 'L'} ${xS(i)} ${yS(v)}`).join(" ");
-    const dots = d[L.key].map((v, i) => `<circle cx="${xS(i)}" cy="${yS(v)}" r="4" fill="${L.color}" stroke="white" stroke-width="1.5"/>`).join("");
+    const dots = d[L.key].map((v, i) => `<circle cx="${xS(i)}" cy="${yS(v)}" r="4" fill="${L.color}" stroke="var(--panel)" stroke-width="1.5"/>`).join("");
     const lastV = d[L.key][d[L.key].length - 1];
     const lastX = xS(d.years.length - 1);
     const lastY = yS(lastV);
@@ -2630,7 +2647,7 @@ function chartx_boilerplate() {
   ];
   const lineEls = lines.map(L => {
     const path = d[L.key].map((v, i) => `${i === 0 ? 'M' : 'L'} ${xS(i)} ${yS(v)}`).join(" ");
-    const dots = d[L.key].map((v, i) => `<circle cx="${xS(i)}" cy="${yS(v)}" r="3.5" fill="${L.color}" stroke="white" stroke-width="1.5"/>`).join("");
+    const dots = d[L.key].map((v, i) => `<circle cx="${xS(i)}" cy="${yS(v)}" r="3.5" fill="${L.color}" stroke="var(--panel)" stroke-width="1.5"/>`).join("");
     const lastV = d[L.key][d[L.key].length - 1];
     const lastX = xS(d.years.length - 1);
     const lastY = yS(lastV);
@@ -2669,7 +2686,7 @@ function charty_topics() {
     discrimination: "#a32626",
     establishment: "var(--jbm-promise)",
     policy: "var(--jbm-context)",
-    school: "#999",
+    school: "var(--muted)",
   };
 
   const W = 760, H = 60 + d.length * 36 + 30;
@@ -2754,7 +2771,7 @@ function chart1_vacancyTimeline(snaps) {
   const dots = data.map(d => {
     const x = xS(d.date), y = yS(d.vacant);
     const fill = d.hasCategory ? "var(--jbm-promise)" : "var(--jbm-emph)";
-    return `<circle cx="${x}" cy="${y}" r="5" fill="${fill}" stroke="white" stroke-width="2"/>
+    return `<circle cx="${x}" cy="${y}" r="5" fill="${fill}" stroke="var(--panel)" stroke-width="2"/>
             <text class="data-label" x="${x}" y="${y - 14}" text-anchor="middle" fill="${fill}">${d.vacant.toLocaleString('en-IN')}</text>`;
   }).join("");
 
@@ -2816,7 +2833,7 @@ function chart2_mandateVsReality(snaps) {
     const yMan = yS(cat.mandate), yAct = yS(sharePct);
     const stroke = cat.role === "emph" ? "var(--jbm-emph)" : (cat.name === "General" ? "#6b6b6b" : "var(--jbm-context)");
     const sw = cat.role === "emph" ? 3 : 2;
-    const labelColor = cat.role === "emph" ? "var(--jbm-emph)" : (cat.name === "General" ? "#444" : "var(--muted)");
+    const labelColor = cat.role === "emph" ? "var(--jbm-emph)" : (cat.name === "General" ? "var(--ink)" : "var(--muted)");
     return `
       <line x1="${xL}" y1="${yMan}" x2="${xR}" y2="${yAct}" stroke="${stroke}" stroke-width="${sw}" fill="none"/>
       <circle cx="${xL}" cy="${yMan}" r="5" fill="${stroke}"/>
@@ -2954,7 +2971,7 @@ function chart4_aiims(snaps) {
     const isHigh = d.vacancy_rate >= 40;
     const fill = isSevere ? "var(--jbm-emph)" : isHigh ? "#c97a4a" : "var(--jbm-context)";
     const y = baseY - level * (dotR * 2 + 2);
-    return `<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}" stroke="white" stroke-width="1.5"/>`;
+    return `<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}" stroke="var(--panel)" stroke-width="1.5"/>`;
   }).join("");
 
   // Label outliers: top 3 worst + best
@@ -3069,11 +3086,11 @@ function chart5_disclosure() {
 
   // Legend at bottom
   const legend = `
-    <circle cx="${ml + 4}" cy="${H - 22}" r="5" fill="var(--jbm-promise)" stroke="white" stroke-width="1.5"/>
+    <circle cx="${ml + 4}" cy="${H - 22}" r="5" fill="var(--jbm-promise)" stroke="var(--panel)" stroke-width="1.5"/>
     <text class="axis-label" x="${ml + 14}" y="${H - 18}">Disclosed</text>
-    <circle cx="${ml + 100}" cy="${H - 22}" r="5" fill="#c97a4a" stroke="white" stroke-width="1.5"/>
+    <circle cx="${ml + 100}" cy="${H - 22}" r="5" fill="var(--warn)" stroke="var(--panel)" stroke-width="1.5"/>
     <text class="axis-label" x="${ml + 110}" y="${H - 18}">Partial</text>
-    <circle cx="${ml + 180}" cy="${H - 22}" r="5" fill="var(--jbm-emph)" stroke="white" stroke-width="1.5"/>
+    <circle cx="${ml + 180}" cy="${H - 22}" r="5" fill="var(--jbm-emph)" stroke="var(--panel)" stroke-width="1.5"/>
     <text class="axis-label" x="${ml + 190}" y="${H - 18}">Withheld</text>
   `;
 
@@ -3119,7 +3136,7 @@ function chart6_whoIsAsking() {
     "Congress":              "var(--jbm-promise)",
     "Regional opposition":   "#6b8aab",
     "Ruling coalition":      "var(--jbm-context)",
-    "Other":                 "#999",
+    "Other":                 "var(--muted)",
   };
   const familyOrder = ["Dravidian / Left","Hindi-belt opposition","Congress","Regional opposition","Ruling coalition","Other"];
 
@@ -3222,7 +3239,7 @@ function chart7_rdGap() {
     return `
       <text class="data-label" x="${ml - 10}" y="${y + 4}" text-anchor="end" fill="${txt}" style="font-weight:${d.emph ? 700 : 500}">${escapeHTML(d.c)}</text>
       <line x1="${ml}" y1="${y}" x2="${x}" y2="${y}" stroke="${stickStroke}" stroke-width="${d.emph ? 2.5 : 1.5}" opacity="${d.emph ? 1 : 0.55}"/>
-      <circle cx="${x}" cy="${y}" r="${d.emph ? 7 : 5}" fill="${fill}" stroke="white" stroke-width="1.5"/>
+      <circle cx="${x}" cy="${y}" r="${d.emph ? 7 : 5}" fill="${fill}" stroke="var(--panel)" stroke-width="1.5"/>
       <text class="data-label" x="${x + (d.emph ? 12 : 10)}" y="${y + 4}" fill="${fill}" style="font-weight:${d.emph ? 800 : 600}">${d.pct.toFixed(2)}%</text>
     `;
   }).join("");
@@ -3273,7 +3290,7 @@ function chart8_counterfactual() {
     <rect x="${ml}" y="${barY}" width="${plotW}" height="${barH}" fill="var(--jbm-context)"/>
     <rect x="${ml}" y="${barY}" width="${hiredW}" height="${barH}" fill="var(--jbm-emph)"/>
     <line x1="${ml + hiredW}" y1="${barY - 6}" x2="${ml + hiredW}" y2="${barY + barH + 6}" stroke="var(--ink)" stroke-width="1.5"/>
-    <text class="anno-text emph" x="${ml + hiredW / 2}" y="${barY + barH/2 + 5}" text-anchor="middle" fill="white" style="font-weight:800; font-size:14px;">${hiresPerYear.toLocaleString('en-IN')} hired</text>
+    <text class="anno-text emph" x="${ml + hiredW / 2}" y="${barY + barH/2 + 5}" text-anchor="middle" fill="var(--panel)" style="font-weight:800; font-size:14px;">${hiresPerYear.toLocaleString('en-IN')} hired</text>
     <text class="anno-text" x="${ml + hiredW + (plotW - hiredW)/2}" y="${barY + barH/2 + 5}" text-anchor="middle" fill="var(--ink)" style="font-weight:700; font-size:14px;">${(phdsPerYear - hiresPerYear).toLocaleString('en-IN')} go elsewhere</text>
   `;
 
@@ -3343,7 +3360,7 @@ function realisationSlopeChart(snaps) {
       <circle class="point ${cat.color}" cx="${xL}" cy="${yMan}" r="5"/>
       <circle class="point ${cat.color}" cx="${xR}" cy="${yAct}" r="5"/>
       <text class="row-label ${cat.color}" x="${xL - 12}" y="${yMan + 4}" text-anchor="end">${cat.name} ${cat.mandate}%</text>
-      <text class="row-label ${cat.color}" x="${xR + 12}" y="${yAct + 4}" text-anchor="start">${sharePct.toFixed(1)}% <tspan fill="${cat.color === 'gain' ? '#666' : (cat.color.includes('outlier') ? 'var(--alarm)' : '#999')}" font-size="10">→ ${realisation.toFixed(0)}% of mandate</tspan></text>
+      <text class="row-label ${cat.color}" x="${xR + 12}" y="${yAct + 4}" text-anchor="start">${sharePct.toFixed(1)}% <tspan fill="${cat.color === 'gain' ? 'var(--muted)' : (cat.color.includes('outlier') ? 'var(--alarm)' : 'var(--muted-soft)')}" font-size="10">→ ${realisation.toFixed(0)}% of mandate</tspan></text>
     `;
   }).join("");
 
@@ -3397,7 +3414,7 @@ function realisationDonut(snaps) {
     const x2 = cx + rOuter * Math.cos(endAngle),   y2 = cy + rOuter * Math.sin(endAngle);
     const x3 = cx + rInner * Math.cos(endAngle),   y3 = cy + rInner * Math.sin(endAngle);
     const x4 = cx + rInner * Math.cos(startAngle), y4 = cy + rInner * Math.sin(startAngle);
-    return `<path d="M ${x1} ${y1} A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${rInner} ${rInner} 0 ${largeArc} 0 ${x4} ${y4} Z" fill="${cat.color}" stroke="white" stroke-width="2"/>`;
+    return `<path d="M ${x1} ${y1} A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${rInner} ${rInner} 0 ${largeArc} 0 ${x4} ${y4} Z" fill="${cat.color}" stroke="var(--panel)" stroke-width="2"/>`;
   }).join("");
   // Mandate dashes — small ticks outside donut
   const mandateMarks = cats.map(cat => {
@@ -4601,7 +4618,7 @@ function updateMapMarkers(filteredAds) {
       : `no ads match current filters &nbsp;·&nbsp; <a class="popup-link" href="${escapeAttr(coverageUrl)}" target="_blank" rel="noopener">career page →</a>`;
     marker.bindPopup(`
       <strong>${escapeHTML(inst.name)}</strong><br/>
-      <span style="color:#666">${escapeHTML(inst.type)} · ${escapeHTML([inst.city, inst.state].filter(Boolean).join(", "))}</span>
+      <span style="color:var(--muted)">${escapeHTML(inst.type)} · ${escapeHTML([inst.city, inst.state].filter(Boolean).join(", "))}</span>
       ${hssLine}
       <div style="margin-top:6px">${totalLine}</div>`);
   }
