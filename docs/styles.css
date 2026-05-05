@@ -581,8 +581,9 @@
      disambiguator without competing with the institution name. */
   .listing .card-institution {
     margin: 0;
-    font-family: var(--serif); font-size: 23px; font-weight: 750;
-    line-height: 1.18; color: var(--ink); letter-spacing: -0.012em;
+    font-family: var(--serif); font-size: 22px; font-weight: 700;
+    line-height: 1.2; color: var(--ink); letter-spacing: -0.014em;
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
   }
   .listing .card-institution .card-campus {
     font-family: var(--serif); font-weight: 500;
@@ -698,104 +699,76 @@
      (SC/ST/OBC/EWS/PwBD percentages) directly under the meta line, not
      buried in the details disclosure. Each category is colour-coded with
      the same palette as the per-position pills. */
-  .listing .row-reserv { display: flex; flex-wrap: wrap; gap: 5px 6px; align-items: center; margin: 8px 0 0; grid-column: 2 / span 3; }
-  .listing .row-reserv .reserv-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
-  .listing .row-reserv .reserv-status-icon {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 18px; height: 18px;
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    font-size: 12px; font-weight: 850;
-    line-height: 1;
-    flex: 0 0 auto;
-  }
-  .listing .row-reserv .reserv-status-icon.roster-missing { color: var(--muted); background: color-mix(in srgb, var(--muted) 8%, transparent); }
-  .listing .row-reserv .reserv-status-icon.roster-ok { color: var(--good); background: color-mix(in srgb, var(--good) 9%, transparent); }
-  .listing .row-reserv .reserv-label.roster-ok { color: var(--good); }
-  /* Roster-not-disclosed banner: previously rendered with a pink/red
-     tint that read as alarm. Recoloured into the warm-amber editorial
-     palette — the absence is a *finding* (warn), not an emergency. */
-  .listing .row-reserv.reserv-missing {
-    background: transparent;
-    border: 0;
-    border-top: 1px solid #e2c98f;
-    border-bottom: 1px solid #e2c98f;
-    border-radius: 0;
-    padding: 9px 0;
-  }
-  .listing .row-reserv.reserv-disclosed {
-    border-top: 1px solid color-mix(in srgb, var(--good) 34%, var(--border));
-    border-bottom: 1px solid color-mix(in srgb, var(--good) 34%, var(--border));
-    padding: 9px 0;
-  }
-  html[data-theme="dark"] .listing .row-reserv.reserv-missing {
-    background: transparent;
-    border-color: color-mix(in srgb, var(--warn) 44%, var(--border));
-  }
-  .listing .row-reserv .reserv-label.warn { color: var(--warn); }
-  .listing .row-reserv .reserv-missing-msg {
-    font-size: 13.5px; font-weight: 600; color: #5a3a18; line-height: 1.4;
-  }
-  html[data-theme="dark"] .listing .row-reserv .reserv-missing-msg {
-    color: color-mix(in srgb, var(--warn) 72%, var(--ink));
-  }
-  /* Info-icon affordance: a real click/keyboard disclosure. */
-  .listing .row-reserv .reserv-info {
-    position: relative;
-    display: inline-flex;
-    margin-left: 2px;
-    color: var(--muted);
-  }
-  .listing .row-reserv .reserv-info > summary {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 18px; height: 18px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
+  .listing .row-reserv { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 10px 0 0; grid-column: 2 / span 3; }
+  .listing .reserv-info { position: relative; }
+  .listing .art16-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
     font-size: 11px;
     font-weight: 700;
-    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     cursor: pointer;
+    border: 1px solid transparent;
     list-style: none;
-    background: var(--bg);
+    user-select: none;
+    transition: filter 0.2s;
   }
-  html[data-theme="dark"] .listing .row-reserv .reserv-info > summary {
-    background: var(--panel);
+  .listing .art16-btn:hover { filter: brightness(0.95); }
+  .listing .art16-btn::-webkit-details-marker { display: none; }
+  .listing .art16-btn.art16-red {
+    background: #ffebe9; color: #b91c1c; border-color: #fca5a5;
   }
-  .listing .row-reserv .reserv-info > summary::-webkit-details-marker { display: none; }
-  .listing .row-reserv .reserv-info[open] > summary {
-    color: var(--accent);
-    border-color: var(--accent);
+  html[data-theme="dark"] .listing .art16-btn.art16-red {
+    background: rgba(185, 28, 28, 0.2); color: #fca5a5; border-color: rgba(252, 165, 165, 0.3);
   }
-  .listing .row-reserv .reserv-info-pop {
+  .listing .art16-btn.art16-green {
+    background: #ecfdf5; color: #047857; border-color: #6ee7b7;
+  }
+  html[data-theme="dark"] .listing .art16-btn.art16-green {
+    background: rgba(4, 120, 87, 0.2); color: #6ee7b7; border-color: rgba(110, 231, 183, 0.3);
+  }
+  .listing .art16-btn.art16-grey {
+    background: #f3f4f6; color: #4b5563; border-color: #d1d5db;
+  }
+  html[data-theme="dark"] .listing .art16-btn.art16-grey {
+    background: rgba(75, 85, 99, 0.2); color: #9ca3af; border-color: rgba(156, 163, 175, 0.3);
+  }
+  .listing .art16-btn.art16-strike {
+    position: relative;
+    overflow: hidden;
+  }
+  .listing .art16-btn.art16-strike::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top right, transparent calc(50% - 1px), currentColor calc(50%), transparent calc(50% + 1px));
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .listing .art16-details { display: inline-flex; position: relative; margin-left: 4px; vertical-align: middle; }
+  .listing .reserv-info-pop {
     position: absolute;
     z-index: 20;
-    top: 24px;
-    left: -12px;
+    top: 28px;
+    left: 0;
     width: min(320px, calc(100vw - 48px));
-    padding: 8px 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
     background: var(--bg);
     color: var(--ink);
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     font-size: 12.5px;
     font-weight: 400;
     line-height: 1.45;
-    letter-spacing: 0;
-    text-transform: none;
   }
-  .listing .row-reserv.reserv-missing.reserv-silent { background: var(--chip-bg); border: 1px dashed var(--border); border-left: 3px solid var(--muted); }
-  .listing .row-reserv.reserv-missing.reserv-silent .reserv-label.warn { color: var(--muted); }
-  .listing .row-reserv.reserv-missing.reserv-silent .reserv-missing-msg { color: var(--ink); }
-  .listing .row-reserv.reserv-policy { background: var(--chip-bg); border-radius: 6px; padding: 6px 10px; }
-  .listing .reserv-pill.policy { opacity: 0.78; font-weight: 500; }
-  .listing .reserv-caveat { font-size: 11px; color: var(--muted); font-style: italic; margin-left: 6px; flex-basis: 100%; line-height: 1.4; padding-top: 2px; }
-  .listing .reserv-policy-text { font-size: 12px; color: var(--ink); font-family: var(--mono); }
-  /* SRD callout in cobalt — Special Recruitment Drives are an
-     anti-caste affirmative measure; the visual register honors that. */
-  .listing .row-reserv.reserv-srd { background: transparent; border: 0; border-top: 1px solid rgba(31,58,138,0.30); border-bottom: 1px solid rgba(31,58,138,0.30); border-radius: 0; padding: 9px 0; }
-  .listing .row-reserv.reserv-srd .reserv-label.good { color: var(--accent); font-weight: 700; }
-  .listing .row-reserv.reserv-srd .reserv-missing-msg { color: var(--accent-deep); }
+  .listing .reserv-info-pop strong { color: var(--accent); display: block; margin-bottom: 4px; }
+  .listing .reserv-breakdown { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+  .listing .reserv-label.warn { color: var(--warn); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .listing .reserv-label.good { color: #047857; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  html[data-theme="dark"] .listing .reserv-label.good { color: #6ee7b7; }
   /* Hiring-language traps */
   .listing .row-traps { grid-column: 2 / span 3; margin: 8px 0 0; background: #fff8e7; border: 1px solid #f0d98e; border-left: 3px solid #d49a2a; border-radius: 6px; padding: 0; }
   .listing .row-traps summary { padding: 8px 12px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: #5c4a1a; list-style: none; display: flex; align-items: center; gap: 8px; }
