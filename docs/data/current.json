@@ -4348,6 +4348,58 @@
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
+          "areas": [
+            "Airplane Design",
+            "Airplane Aerodynamics",
+            "Experimental structural mechanics",
+            "Structural Dynamics (experimental background preferred)",
+            "Advanced Manufacturing of Aerospace Structures",
+            "Avionics & sensors for aerospace applications (with hardware background)",
+            "Air Traffic Management"
+          ],
+          "methods_preference": "experimental",
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": "Capability in specialization area through publications in relevant reputed journals + aero background.",
+            "teaching_experience": null,
+            "other": "At least one degree (Bachelor's/Master's/Ph.D.) in Aerospace (Aero.) Engineering. OR At least 3 years teaching experience in Aerodynamics/Flight Mechanics/Aerospace Propulsion/Aerospace Structures at IIT/IIST Trivandrum/reputed university abroad. OR Ph.D. thesis relevant to Aero. Engineering and awarded by a university without an Aero. Engineering department."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10 starting ₹70,900; AP Grade-I Pay Level 12 starting ₹1,01,500",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Aerospace Engineering. Areas: (i) Airplane Design (ii) Airplane Aerodynamics (iii) Experimental structural mechanics (iv) Structural Dynamics (experimental preferred) (v) Advanced Manufacturing of Aerospace Structures (vi) Avionics & sensors for aerospace applications (with hardware background) (vii) Air Traffic Management. Eligibility: At least one degree in Aerospace Engineering OR 3+ years teaching at IIT/IIST/abroad in Aerodynamics/Flight Mechanics/Propulsion/Structures OR Ph.D. thesis relevant to Aerospace from a non-Aero department.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
+        {
+          "department": "Department of Aerospace Engineering",
+          "discipline": "Aerospace Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
           "areas": [],
           "methods_preference": null,
           "approach": null,
@@ -4393,19 +4445,27 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
-        "methods_preference": null,
+        "areas": [
+          "Airplane Design",
+          "Airplane Aerodynamics",
+          "Experimental structural mechanics",
+          "Structural Dynamics (experimental background preferred)",
+          "Advanced Manufacturing of Aerospace Structures",
+          "Avionics & sensors for aerospace applications (with hardware background)",
+          "Air Traffic Management"
+        ],
+        "methods_preference": "experimental",
         "approach": null,
         "qualifications": {
           "phd": "required",
           "first_class_preceding_degree": "required",
           "post_phd_experience_years": null,
-          "publications_required": null,
+          "publications_required": "Capability in specialization area through publications in relevant reputed journals + aero background.",
           "teaching_experience": null,
-          "other": "AP Grade-I requires 3+ yrs post-PhD experience; AP Grade-II for those with less than 3 yrs."
+          "other": "At least one degree (Bachelor's/Master's/Ph.D.) in Aerospace (Aero.) Engineering. OR At least 3 years teaching experience in Aerodynamics/Flight Mechanics/Aerospace Propulsion/Aerospace Structures at IIT/IIST Trivandrum/reputed university abroad. OR Ph.D. thesis relevant to Aero. Engineering and awarded by a university without an Aero. Engineering department."
         },
-        "general_eligibility": "Age <36 on 31 Dec 2026 (with OBC/SC/ST/PwD/women relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-        "specific_eligibility": "Department-specific areas in separate Annexure-1 PDF.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+        "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
           "SC": null,
@@ -4417,25 +4477,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "AP Grade-II Pay Level 10 starting ₹70,900 (total ₹1,71,300 with HRA); AP Grade-I Pay Level 12 starting ₹1,01,500 (total ₹2,29,400 with HRA)",
+        "pay_scale": "AP Grade-II Pay Level 10 starting ₹70,900; AP Grade-I Pay Level 12 starting ₹1,01,500",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Aerospace Engineering. Department-specific areas in Annexure-1 (separate PDF). Pay: AP-II Level 10, AP-I Level 12. Rolling deadline 15 Oct 2026.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Aerospace Engineering. Areas: (i) Airplane Design (ii) Airplane Aerodynamics (iii) Experimental structural mechanics (iv) Structural Dynamics (experimental preferred) (v) Advanced Manufacturing of Aerospace Structures (vi) Avionics & sensors for aerospace applications (with hardware background) (vii) Air Traffic Management. Eligibility: At least one degree in Aerospace Engineering OR 3+ years teaching at IIT/IIST/abroad in Aerodynamics/Flight Mechanics/Propulsion/Structures OR Ph.D. thesis relevant to Aerospace from a non-Aero department.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -4522,16 +4584,24 @@
           "structure_family": "iit-rolling"
         },
         {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
+          "department": "Department of Applied Mechanics and Biomedical Engineering",
+          "discipline": "Applied Mechanics and Biomedical Engineering",
           "school_or_centre": null,
           "ranks": [
             "Assistant Professor"
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
+          "areas": [
+            "Computational Solid Mechanics (multiscale/multiphysics modelling, phase field and nonlocal failure approaches, advanced discretization, physics-informed ML with mechanics-based modelling)",
+            "Topology Optimization integrating active material mechanics for multifunctional adaptive systems",
+            "Experimental thermal–fluid science (clean energy, advanced cooling, micro-gravity, micro & modular nuclear reactors)",
+            "AI-driven algorithm development for fluid mechanics",
+            "Medical Instrumentation and Biomedical Signal/Image Processing (electrophysiology, clinical imaging, surgical/interventional instruments, EEG/EMG/ECG processing, in vivo medical images)",
+            "Physiological Systems Modelling (cardiovascular, musculoskeletal, respiratory; mechanistic + control theory)",
+            "Data Science for Biomedical Engineering (AI/ML, IoT, VR/AR/MR for hospital workflows; clinical deployment beyond proof-of-concept)"
+          ],
+          "methods_preference": "interdisciplinary; computational + experimental",
           "approach": null,
           "qualifications": {
             "phd": "required",
@@ -4539,10 +4609,10 @@
             "post_phd_experience_years": null,
             "publications_required": null,
             "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
+            "other": "At least one pre-PhD engineering degree (Bachelor's or Master's). Post-doc research experience preferred."
           },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": "Department spans Solid Mechanics, Fluid Mechanics, and Biomedical Engineering. Strong engineering acumen and interdisciplinary focus.",
           "reservation_breakdown": {
             "UR": null,
             "SC": null,
@@ -4557,12 +4627,12 @@
           "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
           "application_deadline": "2026-10-15",
           "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
+          "raw_section_text": "Applied Mechanics and Biomedical Engineering. Interdisciplinary research spanning Solid Mechanics, Fluid Mechanics, Biomedical Engineering. Areas include: Computational Solid Mechanics (multiscale/multiphysics, phase field, physics-informed ML); Topology Optimization for multifunctional adaptive systems; Experimental thermal–fluid science (clean energy, micro-gravity, modular nuclear); AI-driven fluid mechanics algorithms; Medical Instrumentation & Biomedical Signal/Image Processing; Physiological Systems Modelling; Data Science for Biomedical Engineering (AI/ML/IoT/VR-AR-MR for clinical workflows). One pre-PhD engineering degree required; post-doc preferred.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.94,
           "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
           "structure_family": "iit-rolling"
         }
       ],
@@ -4618,7 +4688,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -4705,27 +4776,33 @@
           "structure_family": "iit-rolling"
         },
         {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
+          "department": "Department of Biotechnology",
+          "discipline": "Biotechnology",
           "school_or_centre": null,
           "ranks": [
             "Assistant Professor"
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
+          "areas": [
+            "Experimental cancer biology (molecular genetic mechanisms of cancer progression, tumour-immune cross-talk, cancer metabolism; animal models / human primary tissue; high-throughput technologies — gene editing, genomics, proteomics, metabolomics)",
+            "Biomaterials Engineering (immunotherapy/immunoengineering, computational design of biomaterials, materiomics for tissue engineering)",
+            "Synthetic biology for green manufacturing (synthetic biology/metabolic engineering; mammalian cell-line engineering for cell/gene therapy; downstream process development; bioprocess modelling, simulation, control; PAT/real-time monitoring; CFD for bioreactor scale-up; data-driven bioprocess optimization; autonomous biomanufacturing)",
+            "Systems Neuroscience (neuronal circuit function and behaviour using mice/rats/zebrafish)",
+            "Super-resolution and single-molecule imaging (developmental/disease biology, host-pathogen interactions, neuroscience, plant biology, condensate biology, genome biology, mechanobiology; quantitative biology pipelines; life-time based quantitative imaging desirable)"
+          ],
+          "methods_preference": "experimental",
           "approach": null,
           "qualifications": {
             "phd": "required",
             "first_class_preceding_degree": "required",
-            "post_phd_experience_years": null,
-            "publications_required": null,
+            "post_phd_experience_years": 3,
+            "publications_required": "Strong track record in specialised area as evidenced by peer-reviewed publications.",
             "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
+            "other": "Cancer biology: PhD in Biological Sciences + 3 yrs postdoc in cancer biology. Biomaterials: BE/BTech in Chemical/Biochemical/Biotechnology/Materials Sci & Engg + PhD + postdoc. Synthetic bio: BE/BTech in Chemical/Biochemical/Biotechnology + PhD + postdoc (academia or industry). Systems Neuroscience: PhD in Neuroscience preferably/biological sciences + 3 yrs postdoc. SR/SM imaging: BSc/MSc/BS/MS in Physics/Chemistry/Biological Sciences or BE/BTech/MTech + PhD + postdoc."
           },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
           "reservation_breakdown": {
             "UR": null,
             "SC": null,
@@ -4740,12 +4817,12 @@
           "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
           "application_deadline": "2026-10-15",
           "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
+          "raw_section_text": "Biotechnology. Areas: (i) Experimental cancer biology — molecular genetics of cancer progression, tumour-immune cross-talk, cancer metabolism, gene editing/genomics/proteomics/metabolomics. (ii) Biomaterials Engineering — immunoengineering, computational design, materiomics. (iii) Synthetic biology for green manufacturing — metabolic engineering, mammalian cell engineering, downstream processing, bioprocess modelling/control, autonomous biomanufacturing. (iv) Systems Neuroscience — neuronal circuit function in mice/rats/zebrafish. (v) Super-resolution and single-molecule imaging across life sciences. Each area has specific eligibility paths.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.94,
           "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
           "structure_family": "iit-rolling"
         }
       ],
@@ -4801,7 +4878,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -4852,6 +4930,61 @@
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
+          "areas": [
+            "Synthetic Carbohydrate Chemistry (synthesis and function)",
+            "Experimental Chemical Biology (molecular-level probing of cellular function)",
+            "Experimental Medicinal Chemistry (chemical synthesis and biological evaluation of small molecules)",
+            "Physical Organic Chemistry (chemical structure and reactivity, reaction mechanism, molecular interactions)",
+            "Ultra-fast optical spectroscopy (instrumentation for materials/biological systems/gas-phase chemistry)",
+            "Nuclear Magnetic Resonance spectroscopy (methodology development for biological/materials systems)",
+            "Electroanalytical chemistry (bio-electrochemistry, single-entity sensing, molecular rectifiers)",
+            "Multiscale modelling across time and length scales (method development)",
+            "Bioinorganic Chemistry (Heme systems and related materials)",
+            "Functional Molecular Materials of d-Block Elements"
+          ],
+          "methods_preference": "experimental + computational",
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": 3,
+            "publications_required": null,
+            "teaching_experience": "Should be able to teach UG and PG courses both at core and elective levels of the chosen section.",
+            "other": "Basic degrees in B.Sc. and M.Sc. (or M.S.) with Chemistry as major + Ph.D. in Chemistry. Min 3 years active postdoctoral research experience."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": "Sections: (i)-(iv) Organic; (v)-(viii) Physical & Theoretical; (ix)-(x) Inorganic.",
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Chemistry. 10 areas across Organic ((i)-(iv): carbohydrate chemistry, chemical biology, medicinal chemistry, physical organic), Physical & Theoretical ((v)-(viii): ultra-fast optical spectroscopy, NMR spectroscopy, electroanalytical chemistry, multiscale modelling), and Inorganic ((ix)-(x): bioinorganic — Heme systems, functional molecular materials of d-block elements). Requires B.Sc./M.Sc. with Chemistry major + PhD in Chemistry + 3 yrs active postdoc. Must teach UG/PG courses in chosen section.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
+        {
+          "department": "Department of Chemistry",
+          "discipline": "Chemistry",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
           "areas": [],
           "methods_preference": null,
           "approach": null,
@@ -4886,50 +5019,6 @@
           "source_pdf_url": "https://facapp.iitm.ac.in",
           "extraction_method": "claude-opus-4-7-direct-read",
           "structure_family": "iit-rolling"
-        },
-        {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
-          "school_or_centre": null,
-          "ranks": [
-            "Assistant Professor"
-          ],
-          "contract_status": "Permanent",
-          "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
-          "approach": null,
-          "qualifications": {
-            "phd": "required",
-            "first_class_preceding_degree": "required",
-            "post_phd_experience_years": null,
-            "publications_required": null,
-            "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
-          },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
-          "reservation_breakdown": {
-            "UR": null,
-            "SC": null,
-            "ST": null,
-            "OBC": null,
-            "EWS": null,
-            "PwBD": null
-          },
-          "is_special_recruitment_drive": false,
-          "is_composite_call": true,
-          "number_of_posts": null,
-          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
-          "application_deadline": "2026-10-15",
-          "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
-          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
-          "structure_family": "iit-rolling"
         }
       ],
       "structured_position": {
@@ -4941,19 +5030,30 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
-        "methods_preference": null,
+        "areas": [
+          "Synthetic Carbohydrate Chemistry (synthesis and function)",
+          "Experimental Chemical Biology (molecular-level probing of cellular function)",
+          "Experimental Medicinal Chemistry (chemical synthesis and biological evaluation of small molecules)",
+          "Physical Organic Chemistry (chemical structure and reactivity, reaction mechanism, molecular interactions)",
+          "Ultra-fast optical spectroscopy (instrumentation for materials/biological systems/gas-phase chemistry)",
+          "Nuclear Magnetic Resonance spectroscopy (methodology development for biological/materials systems)",
+          "Electroanalytical chemistry (bio-electrochemistry, single-entity sensing, molecular rectifiers)",
+          "Multiscale modelling across time and length scales (method development)",
+          "Bioinorganic Chemistry (Heme systems and related materials)",
+          "Functional Molecular Materials of d-Block Elements"
+        ],
+        "methods_preference": "experimental + computational",
         "approach": null,
         "qualifications": {
           "phd": "required",
           "first_class_preceding_degree": "required",
-          "post_phd_experience_years": null,
+          "post_phd_experience_years": 3,
           "publications_required": null,
-          "teaching_experience": null,
-          "other": null
+          "teaching_experience": "Should be able to teach UG and PG courses both at core and elective levels of the chosen section.",
+          "other": "Basic degrees in B.Sc. and M.Sc. (or M.S.) with Chemistry as major + Ph.D. in Chemistry. Min 3 years active postdoctoral research experience."
         },
-        "general_eligibility": "Same.",
-        "specific_eligibility": null,
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+        "specific_eligibility": "Sections: (i)-(iv) Organic; (v)-(viii) Physical & Theoretical; (ix)-(x) Inorganic.",
         "reservation_breakdown": {
           "UR": null,
           "SC": null,
@@ -4965,15 +5065,15 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Chemistry.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Chemistry. 10 areas across Organic ((i)-(iv): carbohydrate chemistry, chemical biology, medicinal chemistry, physical organic), Physical & Theoretical ((v)-(viii): ultra-fast optical spectroscopy, NMR spectroscopy, electroanalytical chemistry, multiscale modelling), and Inorganic ((ix)-(x): bioinorganic — Heme systems, functional molecular materials of d-block elements). Requires B.Sc./M.Sc. with Chemistry major + PhD in Chemistry + 3 yrs active postdoc. Must teach UG/PG courses in chosen section.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
@@ -4984,7 +5084,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -5035,6 +5136,59 @@
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
+          "areas": [
+            "Building technology, construction materials, and management — Building science and indoor comfort",
+            "Building technology — Long-term performance of concrete",
+            "Traffic engineering and transportation planning — Transportation Economics",
+            "Transportation — Emerging Mobility Technologies (mobility-on-demand, EVs, connected autonomous vehicles, public transport)",
+            "Transportation — Digital transportation infrastructure (AI/ML, IoT, Digital Twin, large-scale computing)",
+            "Transportation — Traffic Safety, Mobility and Health, Human Factors",
+            "Transportation — Modeling and Control of traffic and pedestrian systems",
+            "Pavement Engineering — pavement materials, design, construction, performance"
+          ],
+          "methods_preference": null,
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": null,
+            "teaching_experience": null,
+            "other": "Basic degree in Civil Engineering. PhD specialization in any of the specified areas. Candidates with basic degree in architecture also considered for Building Science and Indoor Comfort. For Transportation/Pavement areas: One degree in Civil Engineering, Master's or Ph.D. thesis in Pavement Engineering or Transportation Systems. Exceptional candidates with allied area degrees may be considered."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Civil Engineering. Two area clusters: (i) Building technology, construction materials, management — Building science/indoor comfort, Long-term performance of concrete; (ii) Traffic engineering and transportation planning — Transportation Economics, Emerging Mobility (MOD/EV/CAV/Public Transport), Digital infrastructure (AI/ML/IoT/Digital Twin), Traffic Safety/Mobility/Health/Human Factors, Modeling and Control of traffic and pedestrian systems; Pavement Engineering. Requires Civil Engineering degree + PhD in advertised area; architecture degree accepted for indoor-comfort area.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
+        {
+          "department": "Department of Civil Engineering",
+          "discipline": "Civil Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
           "areas": [],
           "methods_preference": null,
           "approach": null,
@@ -5069,50 +5223,6 @@
           "source_pdf_url": "https://facapp.iitm.ac.in",
           "extraction_method": "claude-opus-4-7-direct-read",
           "structure_family": "iit-rolling"
-        },
-        {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
-          "school_or_centre": null,
-          "ranks": [
-            "Assistant Professor"
-          ],
-          "contract_status": "Permanent",
-          "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
-          "approach": null,
-          "qualifications": {
-            "phd": "required",
-            "first_class_preceding_degree": "required",
-            "post_phd_experience_years": null,
-            "publications_required": null,
-            "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
-          },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
-          "reservation_breakdown": {
-            "UR": null,
-            "SC": null,
-            "ST": null,
-            "OBC": null,
-            "EWS": null,
-            "PwBD": null
-          },
-          "is_special_recruitment_drive": false,
-          "is_composite_call": true,
-          "number_of_posts": null,
-          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
-          "application_deadline": "2026-10-15",
-          "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
-          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
-          "structure_family": "iit-rolling"
         }
       ],
       "structured_position": {
@@ -5124,7 +5234,16 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
+        "areas": [
+          "Building technology, construction materials, and management — Building science and indoor comfort",
+          "Building technology — Long-term performance of concrete",
+          "Traffic engineering and transportation planning — Transportation Economics",
+          "Transportation — Emerging Mobility Technologies (mobility-on-demand, EVs, connected autonomous vehicles, public transport)",
+          "Transportation — Digital transportation infrastructure (AI/ML, IoT, Digital Twin, large-scale computing)",
+          "Transportation — Traffic Safety, Mobility and Health, Human Factors",
+          "Transportation — Modeling and Control of traffic and pedestrian systems",
+          "Pavement Engineering — pavement materials, design, construction, performance"
+        ],
         "methods_preference": null,
         "approach": null,
         "qualifications": {
@@ -5133,9 +5252,9 @@
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": null
+          "other": "Basic degree in Civil Engineering. PhD specialization in any of the specified areas. Candidates with basic degree in architecture also considered for Building Science and Indoor Comfort. For Transportation/Pavement areas: One degree in Civil Engineering, Master's or Ph.D. thesis in Pavement Engineering or Transportation Systems. Exceptional candidates with allied area degrees may be considered."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -5148,15 +5267,15 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Civil Engineering.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Civil Engineering. Two area clusters: (i) Building technology, construction materials, management — Building science/indoor comfort, Long-term performance of concrete; (ii) Traffic engineering and transportation planning — Transportation Economics, Emerging Mobility (MOD/EV/CAV/Public Transport), Digital infrastructure (AI/ML/IoT/Digital Twin), Traffic Safety/Mobility/Health/Human Factors, Modeling and Control of traffic and pedestrian systems; Pavement Engineering. Requires Civil Engineering degree + PhD in advertised area; architecture degree accepted for indoor-comfort area.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
@@ -5167,7 +5286,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -5209,6 +5329,52 @@
       "pdf_excerpt": "* The department specializes in interdisciplinary research that broadly spans the fields of Solid Mechanics, Fluid Mechanics, and Biomedical Engineering. Applications are invited from candidates with strong engineering acumen and an interdisciplinary focus in addressing contemporary critical challenges that fits into at least one of the following specializations: (i) Computational Solid Mechanics focussing on cutting-edge methodologies that bridge solid mechanics and scientific computing, addressing fundamental challenges in areas such as multiscale/multiphysics modelling, phase field and nonlocal approaches to failure, advanced discretization methods, and the integration of physics-informed machine learning with rigorous mechanics-based modelling. (ii) Topology Optimization integrating active material mechanics for multifunctional adaptive systems. (iii) Experimental thermal–fluid science with a preference for research relevant to clean energy systems, advanced cooling technologies, micro-gravity environments or micro & modular nuclear reactors. d) Bachelor’s degree in Engineering (iv) Computational and Product Design: Design / Electrical /Electronics/ 4.1) Demonstrated research experience during Mechanical / Production / Design / PhD or Post-Doctoral Fellowship (including Computer Science and Engineering / computational approaches) in Human Factors / Industrial Engineering Form Design / Aesthetics / Interaction Design 4.2) Demonstrated research experience during PhD or Post-Doctoral Fellowship in applied topology optimization / biomimetic design. 4.3) Demonstrated research experience during Ph.D or Post-Doctoral Fellowship in application of AI for Engineering Design/Manufacturing. • Implantable or non-invasive glucose e) For Area (v) : Mechanobiology and sensing…",
       "pdf_source_url": "https://facapp.iitm.ac.in/img/AP-Area_and_Qualification_RA2026_V2.pdf",
       "structured_positions": [
+        {
+          "department": "Department of Computer Science & Engineering",
+          "discipline": "Computer Science & Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
+          "areas": [
+            "All areas of Computer Science and Engineering"
+          ],
+          "methods_preference": null,
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": "Exceptionally good record of publications in CSE-related areas can compensate for qualification deviations.",
+            "teaching_experience": null,
+            "other": "Bachelor's: engineering degree in Computer Science / CSE / Computer Engineering. Master's: in same (waivable for direct PhD entrants). PhD: must be in CS / CSE / Computer Engineering. Deviations considered with exceptional publication record."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Computer Science & Engineering. All areas of CSE. Strict alignment required: Bachelor's, Master's, and PhD all in CS/CSE/Computer Engineering (Master's waivable for direct PhD). Deviations considered only with exceptional publication record.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
         {
           "department": "Department of Computer Science & Engineering",
           "discipline": "Computer Science & Engineering",
@@ -5263,18 +5429,20 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
+        "areas": [
+          "All areas of Computer Science and Engineering"
+        ],
         "methods_preference": null,
         "approach": null,
         "qualifications": {
           "phd": "required",
           "first_class_preceding_degree": "required",
           "post_phd_experience_years": null,
-          "publications_required": null,
+          "publications_required": "Exceptionally good record of publications in CSE-related areas can compensate for qualification deviations.",
           "teaching_experience": null,
-          "other": null
+          "other": "Bachelor's: engineering degree in Computer Science / CSE / Computer Engineering. Master's: in same (waivable for direct PhD entrants). PhD: must be in CS / CSE / Computer Engineering. Deviations considered with exceptional publication record."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -5287,25 +5455,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Computer Science & Engineering.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Computer Science & Engineering. All areas of CSE. Strict alignment required: Bachelor's, Master's, and PhD all in CS/CSE/Computer Engineering (Master's waivable for direct PhD). Deviations considered only with exceptional publication record.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -5356,6 +5526,56 @@
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
+          "areas": [
+            "Biological Engineering (protein/enzyme engineering; microfluidics/MEMS, single-cell systems; biopharmaceuticals; plant and agricultural bioengineering; sustainable biomanufacturing and bio-based materials)",
+            "Systems Biology (mechanistic/multiscale modeling of biological networks; data-integrated modeling and control; computational biochemical and pharmaceutical systems; microphysiological systems and organoids; systems immunoengineering)",
+            "Process Systems Engineering / Control (process design/control/safety grounded in classical chem engg; AI/ML-enabled decision-making; human-machine interfaces; digital twins with real-time sensor data)",
+            "Environmental Engineering (environmental sensing and monitoring; environmental toxicology; large-scale ecological systems modeling)",
+            "Catalysis / Reaction Engineering / Process Development for Clean Energy Transition and Circularity (novel catalytic materials, electrolytes, molecules; electrification of chemical processes; clean energy — hydrogen, ammonia, net-zero)"
+          ],
+          "methods_preference": "computational + experimental",
+          "approach": "clean energy transition and circularity emphasized",
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": null,
+            "teaching_experience": null,
+            "other": "At least one degree in Chemical Engineering. Strong research record with clear research vision in one or more areas."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Chemical Engineering. Five area clusters: (i) Biological Engineering — protein engineering, microfluidics/MEMS, biopharmaceuticals, plant bioengineering, sustainable biomanufacturing. (ii) Systems Biology — multiscale modelling, computational biochemical systems, organoids, immunoengineering. (iii) Process Systems Engineering/Control — AI/ML decision-making, digital twins. (iv) Environmental Engineering — sensing, toxicology, ecological modeling. (v) Catalysis/Clean Energy — novel catalytic materials, electrification, hydrogen/ammonia/net-zero. Requires Chemical Engineering degree + clear research vision.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
+        {
+          "department": "Department of Chemical Engineering",
+          "discipline": "Chemical Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
           "areas": [],
           "methods_preference": null,
           "approach": null,
@@ -5390,50 +5610,6 @@
           "source_pdf_url": "https://facapp.iitm.ac.in",
           "extraction_method": "claude-opus-4-7-direct-read",
           "structure_family": "iit-rolling"
-        },
-        {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
-          "school_or_centre": null,
-          "ranks": [
-            "Assistant Professor"
-          ],
-          "contract_status": "Permanent",
-          "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
-          "approach": null,
-          "qualifications": {
-            "phd": "required",
-            "first_class_preceding_degree": "required",
-            "post_phd_experience_years": null,
-            "publications_required": null,
-            "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
-          },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
-          "reservation_breakdown": {
-            "UR": null,
-            "SC": null,
-            "ST": null,
-            "OBC": null,
-            "EWS": null,
-            "PwBD": null
-          },
-          "is_special_recruitment_drive": false,
-          "is_composite_call": true,
-          "number_of_posts": null,
-          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
-          "application_deadline": "2026-10-15",
-          "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
-          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
-          "structure_family": "iit-rolling"
         }
       ],
       "structured_position": {
@@ -5445,18 +5621,24 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
-        "methods_preference": null,
-        "approach": null,
+        "areas": [
+          "Biological Engineering (protein/enzyme engineering; microfluidics/MEMS, single-cell systems; biopharmaceuticals; plant and agricultural bioengineering; sustainable biomanufacturing and bio-based materials)",
+          "Systems Biology (mechanistic/multiscale modeling of biological networks; data-integrated modeling and control; computational biochemical and pharmaceutical systems; microphysiological systems and organoids; systems immunoengineering)",
+          "Process Systems Engineering / Control (process design/control/safety grounded in classical chem engg; AI/ML-enabled decision-making; human-machine interfaces; digital twins with real-time sensor data)",
+          "Environmental Engineering (environmental sensing and monitoring; environmental toxicology; large-scale ecological systems modeling)",
+          "Catalysis / Reaction Engineering / Process Development for Clean Energy Transition and Circularity (novel catalytic materials, electrolytes, molecules; electrification of chemical processes; clean energy — hydrogen, ammonia, net-zero)"
+        ],
+        "methods_preference": "computational + experimental",
+        "approach": "clean energy transition and circularity emphasized",
         "qualifications": {
           "phd": "required",
           "first_class_preceding_degree": "required",
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": null
+          "other": "At least one degree in Chemical Engineering. Strong research record with clear research vision in one or more areas."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -5469,15 +5651,15 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Chemical Engineering.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Chemical Engineering. Five area clusters: (i) Biological Engineering — protein engineering, microfluidics/MEMS, biopharmaceuticals, plant bioengineering, sustainable biomanufacturing. (ii) Systems Biology — multiscale modelling, computational biochemical systems, organoids, immunoengineering. (iii) Process Systems Engineering/Control — AI/ML decision-making, digital twins. (iv) Environmental Engineering — sensing, toxicology, ecological modeling. (v) Catalysis/Clean Energy — novel catalytic materials, electrification, hydrogen/ammonia/net-zero. Requires Chemical Engineering degree + clear research vision.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
@@ -5488,7 +5670,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -5530,6 +5713,65 @@
       "pdf_excerpt": "* The department specializes in interdisciplinary research that broadly spans the fields of Solid Mechanics, Fluid Mechanics, and Biomedical Engineering. Applications are invited from candidates with strong engineering acumen and an interdisciplinary focus in addressing contemporary critical challenges that fits into at least one of the following specializations: (i) Computational Solid Mechanics focussing on cutting-edge methodologies that bridge solid mechanics and scientific computing, addressing fundamental challenges in areas such as multiscale/multiphysics modelling, phase field and nonlocal approaches to failure, advanced discretization methods, and the integration of physics-informed machine learning with rigorous mechanics-based modelling. (ii) Topology Optimization integrating active material mechanics for multifunctional adaptive systems. (iii) Experimental thermal–fluid science with a preference for research relevant to clean energy systems, advanced cooling technologies, micro-gravity environments or micro & modular nuclear reactors. d) Bachelor’s degree in Engineering (iv) Computational and Product Design: Design / Electrical /Electronics/ 4.1) Demonstrated research experience during Mechanical / Production / Design / PhD or Post-Doctoral Fellowship (including Computer Science and Engineering / computational approaches) in Human Factors / Industrial Engineering Form Design / Aesthetics / Interaction Design 4.2) Demonstrated research experience during PhD or Post-Doctoral Fellowship in applied topology optimization / biomimetic design. 4.3) Demonstrated research experience during Ph.D or Post-Doctoral Fellowship in application of AI for Engineering Design/Manufacturing. • Implantable or non-invasive glucose e) For Area (v) : Mechanobiology and sensing…",
       "pdf_source_url": "https://facapp.iitm.ac.in/img/AP-Area_and_Qualification_RA2026_V2.pdf",
       "structured_positions": [
+        {
+          "department": "Department of Data Science and Artificial Intelligence",
+          "discipline": "Data Science and Artificial Intelligence",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
+          "areas": [
+            "Computer Vision",
+            "Natural Language Processing",
+            "Speech Technologies",
+            "Agent-Based AI",
+            "Theoretical Machine Learning",
+            "Computer Systems for AI & ML",
+            "Autonomous systems",
+            "AI for Systems and Control",
+            "Quantum ML",
+            "Foundation Models and Generative AI",
+            "Causal Inference",
+            "AI for healthcare",
+            "Responsible AI",
+            "AI for Science"
+          ],
+          "methods_preference": null,
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": "Capability in specialization area through publications in relevant reputed venues.",
+            "teaching_experience": null,
+            "other": "PhD in Engineering / Sciences. Demonstrated capability in chosen specialization area."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Data Science and Artificial Intelligence. 14 areas: Computer Vision, NLP, Speech Technologies, Agent-Based AI, Theoretical ML, Computer Systems for AI&ML, Autonomous systems, AI for Systems and Control, Quantum ML, Foundation Models and Generative AI, Causal Inference, AI for healthcare, Responsible AI, AI for Science. PhD in Engineering/Sciences with publications in reputed venues.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
         {
           "department": "Department of Data Science and Artificial Intelligence",
           "discipline": "Data Science and Artificial Intelligence",
@@ -5584,18 +5826,33 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
+        "areas": [
+          "Computer Vision",
+          "Natural Language Processing",
+          "Speech Technologies",
+          "Agent-Based AI",
+          "Theoretical Machine Learning",
+          "Computer Systems for AI & ML",
+          "Autonomous systems",
+          "AI for Systems and Control",
+          "Quantum ML",
+          "Foundation Models and Generative AI",
+          "Causal Inference",
+          "AI for healthcare",
+          "Responsible AI",
+          "AI for Science"
+        ],
         "methods_preference": null,
         "approach": null,
         "qualifications": {
           "phd": "required",
           "first_class_preceding_degree": "required",
           "post_phd_experience_years": null,
-          "publications_required": null,
+          "publications_required": "Capability in specialization area through publications in relevant reputed venues.",
           "teaching_experience": null,
-          "other": null
+          "other": "PhD in Engineering / Sciences. Demonstrated capability in chosen specialization area."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -5608,25 +5865,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Data Science and Artificial Intelligence.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Data Science and Artificial Intelligence. 14 areas: Computer Vision, NLP, Speech Technologies, Agent-Based AI, Theoretical ML, Computer Systems for AI&ML, Autonomous systems, AI for Systems and Control, Quantum ML, Foundation Models and Generative AI, Causal Inference, AI for healthcare, Responsible AI, AI for Science. PhD in Engineering/Sciences with publications in reputed venues.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -5668,6 +5927,57 @@
       "pdf_excerpt": "a) Candidates must clearly demonstrate (i) Computer Vision 8 Data Science their capability in the specialization (ii) Natural Language Processing and Artificial area applied for through publications (iii) Speech Technologies Intelligence in relevant reputed venues (iv) Agent-Based AI and (v) Theoretical Machine Learning b) PhD in Engineering / Sciences (vi) Computer Systems for AI & ML (vii) Autonomous systems (viii) AI for Systems and Control (ix) Quantum ML (x) Foundation Models and Generative AI (xi) Causal Inference (xii) AI for healthcare (xiii) Responsible AI (xiv) AI for Science a) Candidates must have at least one (i) Speech signal processing and NLP, Radar signal 9 Electrical degree in Electrical Engineering.",
       "pdf_source_url": "https://facapp.iitm.ac.in/img/AP-Area_and_Qualification_RA2026_V2.pdf",
       "structured_positions": [
+        {
+          "department": "Department of Electrical Engineering",
+          "discipline": "Electrical Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
+          "areas": [
+            "Speech signal processing and NLP, Radar signal processing, Theory for deep learning, foundation models and adversarial models, Quantum information theory",
+            "MEMS technology; Wide bandgap semiconductor device technology; Emerging device technologies for computing and communication; AI/ML based modeling of semiconductor devices and processes",
+            "Electronic System Design — advanced hardware systems with strong industrial engagement and translational impact",
+            "Biomedical Instrumentation — medical device and applied instrumentation development with clinical validation",
+            "Experimental work in RF systems (GHz to sub-THz); radar systems, phased array antenna systems, reconfigurable metasurfaces; Optical communications & networks; Experimental quantum computing systems & quantum communication",
+            "Analog, Mixed-Signal and RF IC design with tapeout and testing experience; Digital systems design and architecture; Electronic Design Automation for IC Design"
+          ],
+          "methods_preference": "experimental + theoretical",
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": null,
+            "teaching_experience": null,
+            "other": "Candidates must have at least one degree in Electrical Engineering. OR degree in Computer Science and Engineering / Physics with strong research record in EE areas."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Electrical Engineering. Six area clusters: (i) Speech/NLP, Radar signal processing, deep-learning theory, quantum information theory; (ii) MEMS, wide bandgap semiconductor devices, emerging device tech, AI/ML for semiconductor modeling; (iii) Electronic System Design with industrial engagement; Biomedical Instrumentation with clinical validation; (iv) RF systems (GHz to sub-THz), radar, phased array, metasurfaces, optical communications & networks, experimental quantum computing/communication; (v) Analog/Mixed-Signal/RF IC design with tapeout, digital systems design, EDA. EE degree required (or CS/Physics with strong EE research record).",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
         {
           "department": "Department of Electrical Engineering",
           "discipline": "Electrical Engineering",
@@ -5722,8 +6032,15 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
-        "methods_preference": null,
+        "areas": [
+          "Speech signal processing and NLP, Radar signal processing, Theory for deep learning, foundation models and adversarial models, Quantum information theory",
+          "MEMS technology; Wide bandgap semiconductor device technology; Emerging device technologies for computing and communication; AI/ML based modeling of semiconductor devices and processes",
+          "Electronic System Design — advanced hardware systems with strong industrial engagement and translational impact",
+          "Biomedical Instrumentation — medical device and applied instrumentation development with clinical validation",
+          "Experimental work in RF systems (GHz to sub-THz); radar systems, phased array antenna systems, reconfigurable metasurfaces; Optical communications & networks; Experimental quantum computing systems & quantum communication",
+          "Analog, Mixed-Signal and RF IC design with tapeout and testing experience; Digital systems design and architecture; Electronic Design Automation for IC Design"
+        ],
+        "methods_preference": "experimental + theoretical",
         "approach": null,
         "qualifications": {
           "phd": "required",
@@ -5731,9 +6048,9 @@
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": null
+          "other": "Candidates must have at least one degree in Electrical Engineering. OR degree in Computer Science and Engineering / Physics with strong research record in EE areas."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -5746,25 +6063,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Electrical Engineering.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Electrical Engineering. Six area clusters: (i) Speech/NLP, Radar signal processing, deep-learning theory, quantum information theory; (ii) MEMS, wide bandgap semiconductor devices, emerging device tech, AI/ML for semiconductor modeling; (iii) Electronic System Design with industrial engagement; Biomedical Instrumentation with clinical validation; (iv) RF systems (GHz to sub-THz), radar, phased array, metasurfaces, optical communications & networks, experimental quantum computing/communication; (v) Analog/Mixed-Signal/RF IC design with tapeout, digital systems design, EDA. EE degree required (or CS/Physics with strong EE research record).",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -5851,27 +6170,43 @@
           "structure_family": "iit-rolling"
         },
         {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
+          "department": "Department of Engineering Design",
+          "discipline": "Engineering Design",
           "school_or_centre": null,
           "ranks": [
             "Assistant Professor"
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
-          "areas": [],
+          "areas": [
+            "Automotive Engineering: Sensor Technology for Autonomous Road Vehicle Design",
+            "Automotive: Two-Wheeled Road Vehicle Design",
+            "Automotive: Battery Technology for Electric Road Vehicle Design",
+            "Automotive: Electric Machine Design for EV (Electric Machine Control accepted)",
+            "Automotive: Software Defined Vehicles for Road Vehicle Design",
+            "Biomedical Device Design: Prosthetics and Implants",
+            "Biomedical Device Design: Medical Imaging Technology",
+            "Biomedical Device Design: Wearable Diagnostic Devices",
+            "Biomedical Device Design: Critical Care Devices",
+            "Robotics: Design and control for soft robots, continuum robots, legged locomotion",
+            "Robotics: Autonomous manipulation — ML for autonomous manipulation/grasping (RL with hardware validation)",
+            "Computational and Product Design: Human Factors / Form Design / Aesthetics / Interaction Design (computational approaches)",
+            "Computational and Product Design: Applied topology optimization / biomimetic design",
+            "Computational and Product Design: AI for Engineering Design/Manufacturing",
+            "Computational and Product Design: AR/VR/MR for Engineering Design/Manufacturing"
+          ],
           "methods_preference": null,
           "approach": null,
           "qualifications": {
             "phd": "required",
             "first_class_preceding_degree": "required",
             "post_phd_experience_years": null,
-            "publications_required": null,
+            "publications_required": "Research experience in advertised areas during PhD or Post-Doctoral Fellowship clearly demonstrated through First Author publications.",
             "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
+            "other": "Bachelor's in Engineering. Specific degrees required per area code: Automotive needs PhD/PostDoc demonstrated automotive expertise; Biomedical needs degree in Engineering Design/Electrical/Electronics/Instrumentation/Mechanical/Biomedical Engg/MBBS; Robotics needs engineering bachelor's + PhD/PostDoc in Robotics; Computational/Product needs Engineering Design/Electrical/Electronics/Mechanical/Production/Design/CSE/Industrial Engineering."
           },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs. Candidates should clearly indicate the area code (1.1-1.5, 2.1-2.4, 3.1-3.2, 4.1-4.4) they are applying for.",
+          "specific_eligibility": null,
           "reservation_breakdown": {
             "UR": null,
             "SC": null,
@@ -5886,12 +6221,12 @@
           "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
           "application_deadline": "2026-10-15",
           "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
+          "raw_section_text": "Engineering Design. Four area clusters with sub-codes: (1) Automotive Engineering [1.1-1.5: Sensor Tech for Autonomous Vehicles, Two-Wheeled Vehicle Design, Battery Tech for EVs, Electric Machine Design, Software Defined Vehicles]; (2) Biomedical Device Design [2.1-2.4: Prosthetics/Implants, Medical Imaging Technology, Wearable Diagnostic Devices, Critical Care Devices]; (3) Robotics [3.1-3.2: Soft/continuum/legged robots, Autonomous manipulation/RL with hardware]; (4) Computational and Product Design [4.1-4.4: Human Factors/Form Design/Aesthetics/Interaction Design, applied topology optimization/biomimetic, AI for Engineering Design/Manufacturing, AR/VR/MR for Engineering Design]. First-author research publications required.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.94,
           "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
           "structure_family": "iit-rolling"
         }
       ],
@@ -5947,7 +6282,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -5989,6 +6325,53 @@
       "pdf_excerpt": "* The department specializes in interdisciplinary research that broadly spans the fields of Solid Mechanics, Fluid Mechanics, and Biomedical Engineering. Applications are invited from candidates with strong engineering acumen and an interdisciplinary focus in addressing contemporary critical challenges that fits into at least one of the following specializations: (i) Computational Solid Mechanics focussing on cutting-edge methodologies that bridge solid mechanics and scientific computing, addressing fundamental challenges in areas such as multiscale/multiphysics modelling, phase field and nonlocal approaches to failure, advanced discretization methods, and the integration of physics-informed machine learning with rigorous mechanics-based modelling. (ii) Topology Optimization integrating active material mechanics for multifunctional adaptive systems. (iii) Experimental thermal–fluid science with a preference for research relevant to clean energy systems, advanced cooling technologies, micro-gravity environments or micro & modular nuclear reactors. d) Bachelor’s degree in Engineering (iv) Computational and Product Design: Design / Electrical /Electronics/ 4.1) Demonstrated research experience during Mechanical / Production / Design / PhD or Post-Doctoral Fellowship (including Computer Science and Engineering / computational approaches) in Human Factors / Industrial Engineering Form Design / Aesthetics / Interaction Design 4.2) Demonstrated research experience during PhD or Post-Doctoral Fellowship in applied topology optimization / biomimetic design. 4.3) Demonstrated research experience during Ph.D or Post-Doctoral Fellowship in application of AI for Engineering Design/Manufacturing. • Implantable or non-invasive glucose e) For Area (v) : Mechanobiology and sensing…",
       "pdf_source_url": "https://facapp.iitm.ac.in/img/AP-Area_and_Qualification_RA2026_V2.pdf",
       "structured_positions": [
+        {
+          "department": "Department of Humanities & Social Sciences",
+          "discipline": "Humanities & Social Sciences",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
+          "areas": [
+            "IKS (Indian Knowledge Systems): Yoga, Vedanta, Vyakarana, Tarka, Ayurveda, Sanskrit Language and Literature",
+            "Economics: Economic Theory (Macroeconomics; Game Theory; Behavioral and Experimental Economics; Financial Economics; Econometric Theory)"
+          ],
+          "methods_preference": null,
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": null,
+            "teaching_experience": null,
+            "other": "PhD in relevant areas of specialization."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Humanities & Social Sciences. Two areas only: (i) IKS (Indian Knowledge Systems) — Yoga, Vedanta, Vyakarana, Tarka, Ayurveda, Sanskrit Language and Literature. (ii) Economics — Economic Theory (Macroeconomics; Game Theory; Behavioral and Experimental Economics; Financial Economics; Econometric Theory). Note: HSS at IIT Madras is narrower than HSS at IIT Delhi/Bombay — no Sociology, Psychology, Literature, or Tech-in-Society explicitly advertised here.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
         {
           "department": "Department of Humanities & Social Sciences",
           "discipline": "Humanities & Social Sciences",
@@ -6043,7 +6426,10 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
+        "areas": [
+          "IKS (Indian Knowledge Systems): Yoga, Vedanta, Vyakarana, Tarka, Ayurveda, Sanskrit Language and Literature",
+          "Economics: Economic Theory (Macroeconomics; Game Theory; Behavioral and Experimental Economics; Financial Economics; Econometric Theory)"
+        ],
         "methods_preference": null,
         "approach": null,
         "qualifications": {
@@ -6052,9 +6438,9 @@
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": null
+          "other": "PhD in relevant areas of specialization."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -6067,25 +6453,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Humanities & Social Sciences.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Humanities & Social Sciences. Two areas only: (i) IKS (Indian Knowledge Systems) — Yoga, Vedanta, Vyakarana, Tarka, Ayurveda, Sanskrit Language and Literature. (ii) Economics — Economic Theory (Macroeconomics; Game Theory; Behavioral and Experimental Economics; Financial Economics; Econometric Theory). Note: HSS at IIT Madras is narrower than HSS at IIT Delhi/Bombay — no Sociology, Psychology, Literature, or Tech-in-Society explicitly advertised here.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -6127,6 +6515,59 @@
       "pdf_excerpt": "* The department specializes in interdisciplinary research that broadly spans the fields of Solid Mechanics, Fluid Mechanics, and Biomedical Engineering. Applications are invited from candidates with strong engineering acumen and an interdisciplinary focus in addressing contemporary critical challenges that fits into at least one of the following specializations: (i) Computational Solid Mechanics focussing on cutting-edge methodologies that bridge solid mechanics and scientific computing, addressing fundamental challenges in areas such as multiscale/multiphysics modelling, phase field and nonlocal approaches to failure, advanced discretization methods, and the integration of physics-informed machine learning with rigorous mechanics-based modelling. (ii) Topology Optimization integrating active material mechanics for multifunctional adaptive systems. (iii) Experimental thermal–fluid science with a preference for research relevant to clean energy systems, advanced cooling technologies, micro-gravity environments or micro & modular nuclear reactors. d) Bachelor’s degree in Engineering (iv) Computational and Product Design: Design / Electrical /Electronics/ 4.1) Demonstrated research experience during Mechanical / Production / Design / PhD or Post-Doctoral Fellowship (including Computer Science and Engineering / computational approaches) in Human Factors / Industrial Engineering Form Design / Aesthetics / Interaction Design 4.2) Demonstrated research experience during PhD or Post-Doctoral Fellowship in applied topology optimization / biomimetic design. 4.3) Demonstrated research experience during Ph.D or Post-Doctoral Fellowship in application of AI for Engineering Design/Manufacturing. • Implantable or non-invasive glucose e) For Area (v) : Mechanobiology and sensing…",
       "pdf_source_url": "https://facapp.iitm.ac.in/img/AP-Area_and_Qualification_RA2026_V2.pdf",
       "structured_positions": [
+        {
+          "department": "Department of Management Studies",
+          "discipline": "Management Studies",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
+          "areas": [
+            "Finance: Quantitative Finance",
+            "Operations: AI and ML driven supply chain modelling",
+            "Marketing: AI in Marketing",
+            "Marketing: Neuro and Sensory Marketing",
+            "Information systems",
+            "Strategy and Integrative Management: Global Corporate Strategy",
+            "Strategy and Integrative Management: Technology Foresight Studies",
+            "Strategy and Integrative Management: AI-Based Competitive Strategy"
+          ],
+          "methods_preference": null,
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": null,
+            "teaching_experience": null,
+            "other": "PhD/Doctoral research in relevant areas."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Management Studies. Areas: (i) Finance — Quantitative Finance; (ii) Operations — AI/ML supply chain modelling; (iii) Marketing — AI in Marketing, Neuro and Sensory Marketing; (iv) Information systems; (v) Strategy and Integrative Management — Global Corporate Strategy, Technology Foresight Studies, AI-Based Competitive Strategy. PhD/Doctoral research required.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
         {
           "department": "Department of Management Studies",
           "discipline": "Management Studies",
@@ -6181,7 +6622,16 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
+        "areas": [
+          "Finance: Quantitative Finance",
+          "Operations: AI and ML driven supply chain modelling",
+          "Marketing: AI in Marketing",
+          "Marketing: Neuro and Sensory Marketing",
+          "Information systems",
+          "Strategy and Integrative Management: Global Corporate Strategy",
+          "Strategy and Integrative Management: Technology Foresight Studies",
+          "Strategy and Integrative Management: AI-Based Competitive Strategy"
+        ],
         "methods_preference": null,
         "approach": null,
         "qualifications": {
@@ -6190,9 +6640,9 @@
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": null
+          "other": "PhD/Doctoral research in relevant areas."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -6205,25 +6655,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Management Studies.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Management Studies. Areas: (i) Finance — Quantitative Finance; (ii) Operations — AI/ML supply chain modelling; (iii) Marketing — AI in Marketing, Neuro and Sensory Marketing; (iv) Information systems; (v) Strategy and Integrative Management — Global Corporate Strategy, Technology Foresight Studies, AI-Based Competitive Strategy. PhD/Doctoral research required.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -6265,6 +6717,56 @@
       "pdf_excerpt": "(ii) Operations: AI and ML driven supply chain modelling (iii) Marketing: 3.1 AI in Marketing 3.2 Neuro and Sensory Marketing (iv) Information systems (v) Strategy and Integrative Management: 5.1 Global Corporate Strategy 5.2 Technology Foresight Studies 5.3 AI-Based Competitive Strategy Any one degree in Mechanical Engineering (i) Biomechanical Engineering 13 Mechanical (ii) Robotics/ Control & Automation in Engineering Manufacturing (iii) Fabrication and Material Processing for Electronics/ Semiconductors (iv) Non-Destructive Evaluation (NDE) (v) For women candidates with an excellent track record, any area of specialization can be considered For women candidates with an excellent track record, any area of specialization can be considered a) Applicants must have earned a (i) Mathematical Modelling of Physiological 14 Medical doctorate in Medicine/Engineering; Systems: Advanced computational and Sciences and b) A minimum of two years of research systems-level modelling of physiological Technology experience in a medical school or processes with demonstrated clinical relevance comparable clinical research and translational implications environment conducting relevant (ii) Medical Robotics: Design, development, and work is preferred.",
       "pdf_source_url": "https://facapp.iitm.ac.in/img/AP-Area_and_Qualification_RA2026_V2.pdf",
       "structured_positions": [
+        {
+          "department": "Department of Mechanical Engineering",
+          "discipline": "Mechanical Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
+          "areas": [
+            "Biomechanical Engineering",
+            "Robotics / Control & Automation in Manufacturing",
+            "Fabrication and Material Processing for Electronics / Semiconductors",
+            "Non-Destructive Evaluation (NDE)",
+            "Any area of specialization (for women candidates with excellent track record)"
+          ],
+          "methods_preference": null,
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": null,
+            "teaching_experience": null,
+            "other": "Any one degree in Mechanical Engineering."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": "For women candidates with an excellent track record, any area of specialization can be considered.",
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Mechanical Engineering. Areas: (i) Biomechanical Engineering; (ii) Robotics/Control & Automation in Manufacturing; (iii) Fabrication and Material Processing for Electronics/Semiconductors; (iv) Non-Destructive Evaluation (NDE); (v) For women candidates with an excellent track record — any area of specialization can be considered. Mechanical Engineering degree required.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
         {
           "department": "Department of Mechanical Engineering",
           "discipline": "Mechanical Engineering",
@@ -6319,7 +6821,13 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
+        "areas": [
+          "Biomechanical Engineering",
+          "Robotics / Control & Automation in Manufacturing",
+          "Fabrication and Material Processing for Electronics / Semiconductors",
+          "Non-Destructive Evaluation (NDE)",
+          "Any area of specialization (for women candidates with excellent track record)"
+        ],
         "methods_preference": null,
         "approach": null,
         "qualifications": {
@@ -6328,10 +6836,10 @@
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": null
+          "other": "Any one degree in Mechanical Engineering."
         },
-        "general_eligibility": "Same.",
-        "specific_eligibility": null,
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+        "specific_eligibility": "For women candidates with an excellent track record, any area of specialization can be considered.",
         "reservation_breakdown": {
           "UR": null,
           "SC": null,
@@ -6343,25 +6851,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Mechanical Engineering.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Mechanical Engineering. Areas: (i) Biomechanical Engineering; (ii) Robotics/Control & Automation in Manufacturing; (iii) Fabrication and Material Processing for Electronics/Semiconductors; (iv) Non-Destructive Evaluation (NDE); (v) For women candidates with an excellent track record — any area of specialization can be considered. Mechanical Engineering degree required.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -6448,27 +6958,33 @@
           "structure_family": "iit-rolling"
         },
         {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
+          "department": "Department of Medical Sciences and Technology",
+          "discipline": "Medical Sciences and Technology",
           "school_or_centre": null,
           "ranks": [
             "Assistant Professor"
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
-          "approach": null,
+          "areas": [
+            "Mathematical Modelling of Physiological Systems (computational and systems-level modelling with clinical relevance)",
+            "Medical Robotics (design, development, clinical deployment of medical robotic systems with engineered systems validated in clinical environments)",
+            "Biomedical Product Development (end-to-end with clinical collaboration; concept to validated prototype or deployed solution)",
+            "Diabetes-Focused Medical Devices and Therapeutic Technologies (insulin delivery, closed-loop diabetes management, implantable/non-invasive glucose sensing)",
+            "Mechanobiology and Advanced Electron Microscopy (force measurements, mechanotransduction; cryo-EM, cryogenic lift-out, cryo-electron tomography)"
+          ],
+          "methods_preference": "computational + experimental + clinical",
+          "approach": "translational",
           "qualifications": {
             "phd": "required",
             "first_class_preceding_degree": "required",
             "post_phd_experience_years": null,
-            "publications_required": null,
-            "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
+            "publications_required": "Excellent publication record. Potential to lead and establish a strong externally sponsored research program.",
+            "teaching_experience": "Committed to excellence in UG and graduate teaching.",
+            "other": "Doctorate in Medicine/Engineering. Min 2 years research experience in a medical school or comparable clinical research environment preferred. For Diabetes area: technology commercialization, IP generation, clinical collaboration, medical-device startup engagement expected. For Mechanobiology/EM area: hands-on cryo-EM/cryo-lift-out/cryo-electron tomography experience required."
           },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
           "reservation_breakdown": {
             "UR": null,
             "SC": null,
@@ -6483,12 +6999,12 @@
           "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
           "application_deadline": "2026-10-15",
           "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
+          "raw_section_text": "Medical Sciences and Technology. Five areas: (i) Mathematical Modelling of Physiological Systems with clinical relevance; (ii) Medical Robotics with clinical deployment; (iii) Biomedical Product Development end-to-end with clinical collaboration; (iv) Diabetes-Focused Medical Devices — insulin delivery, closed-loop diabetes management, glucose sensing; (v) Mechanobiology and Advanced Electron Microscopy — cryo-EM, cryo-lift-out, cryo-electron tomography. Doctorate in Medicine/Engineering + 2 yrs clinical research experience preferred.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.94,
           "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
           "structure_family": "iit-rolling"
         }
       ],
@@ -6544,7 +7060,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -6595,6 +7112,52 @@
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
+          "areas": [
+            "Solid-state quantum / Spintronic / memory devices (with demonstrated experience in device fabrication and integration)"
+          ],
+          "methods_preference": "experimental",
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": 2,
+            "publications_required": "Expertise demonstrated through high-quality research publications as first author or corresponding author.",
+            "teaching_experience": null,
+            "other": "Ph.D. with first class or equivalent at all preceding degrees. Min 2 years postdoctoral or industrial experience in advertised area. At least one degree (Bachelor's or Master's) in Metallurgical or Materials Engineering."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Metallurgical and Materials Engineering. Single advertised area: Solid-state quantum / Spintronic / memory devices, with demonstrated experience in device fabrication and integration. PhD with first class throughout. Min 2 years postdoctoral or industrial experience. Bachelor's or Master's in Met/Materials Engineering required. Publications as first/corresponding author in high-quality journals.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
+        {
+          "department": "Department of Metallurgical and Materials Engineering",
+          "discipline": "Metallurgical and Materials Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
           "areas": [],
           "methods_preference": null,
           "approach": null,
@@ -6629,50 +7192,6 @@
           "source_pdf_url": "https://facapp.iitm.ac.in",
           "extraction_method": "claude-opus-4-7-direct-read",
           "structure_family": "iit-rolling"
-        },
-        {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
-          "school_or_centre": null,
-          "ranks": [
-            "Assistant Professor"
-          ],
-          "contract_status": "Permanent",
-          "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
-          "approach": null,
-          "qualifications": {
-            "phd": "required",
-            "first_class_preceding_degree": "required",
-            "post_phd_experience_years": null,
-            "publications_required": null,
-            "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
-          },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
-          "reservation_breakdown": {
-            "UR": null,
-            "SC": null,
-            "ST": null,
-            "OBC": null,
-            "EWS": null,
-            "PwBD": null
-          },
-          "is_special_recruitment_drive": false,
-          "is_composite_call": true,
-          "number_of_posts": null,
-          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
-          "application_deadline": "2026-10-15",
-          "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
-          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
-          "structure_family": "iit-rolling"
         }
       ],
       "structured_position": {
@@ -6684,18 +7203,20 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
-        "methods_preference": null,
+        "areas": [
+          "Solid-state quantum / Spintronic / memory devices (with demonstrated experience in device fabrication and integration)"
+        ],
+        "methods_preference": "experimental",
         "approach": null,
         "qualifications": {
           "phd": "required",
           "first_class_preceding_degree": "required",
-          "post_phd_experience_years": null,
-          "publications_required": null,
+          "post_phd_experience_years": 2,
+          "publications_required": "Expertise demonstrated through high-quality research publications as first author or corresponding author.",
           "teaching_experience": null,
-          "other": null
+          "other": "Ph.D. with first class or equivalent at all preceding degrees. Min 2 years postdoctoral or industrial experience in advertised area. At least one degree (Bachelor's or Master's) in Metallurgical or Materials Engineering."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -6708,15 +7229,15 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Metallurgical and Materials Engineering.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Metallurgical and Materials Engineering. Single advertised area: Solid-state quantum / Spintronic / memory devices, with demonstrated experience in device fabrication and integration. PhD with first class throughout. Min 2 years postdoctoral or industrial experience. Bachelor's or Master's in Met/Materials Engineering required. Publications as first/corresponding author in high-quality journals.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
@@ -6727,7 +7248,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -6778,6 +7300,53 @@
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
+          "areas": [
+            "Naval Architecture: Ship structures; Ship structural design & shipbuilding; Recent techniques in ship design & construction; Ship machinery & systems; Autonomous and Green ships; Marine Engineering",
+            "Ocean Engineering: Offshore structure; Harbour & Coastal structures; Coastal Engineering; Offshore and Deepwater Engineering; Waterway and Port engineering"
+          ],
+          "methods_preference": null,
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": null,
+            "publications_required": null,
+            "teaching_experience": null,
+            "other": "Ph.D relevant to Ocean Engineering / Naval Architecture. First degree in Naval Architecture / Civil / Ocean Engineering. Naval Architecture area: NA degree + expertise. Ocean Engineering area: CE/OE degree + expertise."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Ocean Engineering. Two specialisations: (i) Naval Architecture — Ship structures, ship design and shipbuilding, machinery, autonomous/green ships, marine engineering; (ii) Ocean Engineering — Offshore structures, Harbour & Coastal structures, Coastal Engineering, Offshore and Deepwater, Waterway and Port engineering. PhD relevant to Ocean Engineering/Naval Architecture; first degree in NA/Civil/Ocean Engineering.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
+        {
+          "department": "Department of Ocean Engineering",
+          "discipline": "Ocean Engineering",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
           "areas": [],
           "methods_preference": null,
           "approach": null,
@@ -6812,50 +7381,6 @@
           "source_pdf_url": "https://facapp.iitm.ac.in",
           "extraction_method": "claude-opus-4-7-direct-read",
           "structure_family": "iit-rolling"
-        },
-        {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
-          "school_or_centre": null,
-          "ranks": [
-            "Assistant Professor"
-          ],
-          "contract_status": "Permanent",
-          "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
-          "approach": null,
-          "qualifications": {
-            "phd": "required",
-            "first_class_preceding_degree": "required",
-            "post_phd_experience_years": null,
-            "publications_required": null,
-            "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
-          },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
-          "reservation_breakdown": {
-            "UR": null,
-            "SC": null,
-            "ST": null,
-            "OBC": null,
-            "EWS": null,
-            "PwBD": null
-          },
-          "is_special_recruitment_drive": false,
-          "is_composite_call": true,
-          "number_of_posts": null,
-          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
-          "application_deadline": "2026-10-15",
-          "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
-          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
-          "structure_family": "iit-rolling"
         }
       ],
       "structured_position": {
@@ -6867,7 +7392,10 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
+        "areas": [
+          "Naval Architecture: Ship structures; Ship structural design & shipbuilding; Recent techniques in ship design & construction; Ship machinery & systems; Autonomous and Green ships; Marine Engineering",
+          "Ocean Engineering: Offshore structure; Harbour & Coastal structures; Coastal Engineering; Offshore and Deepwater Engineering; Waterway and Port engineering"
+        ],
         "methods_preference": null,
         "approach": null,
         "qualifications": {
@@ -6876,9 +7404,9 @@
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": null
+          "other": "Ph.D relevant to Ocean Engineering / Naval Architecture. First degree in Naval Architecture / Civil / Ocean Engineering. Naval Architecture area: NA degree + expertise. Ocean Engineering area: CE/OE degree + expertise."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -6891,15 +7419,15 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Ocean Engineering.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Ocean Engineering. Two specialisations: (i) Naval Architecture — Ship structures, ship design and shipbuilding, machinery, autonomous/green ships, marine engineering; (ii) Ocean Engineering — Offshore structures, Harbour & Coastal structures, Coastal Engineering, Offshore and Deepwater, Waterway and Port engineering. PhD relevant to Ocean Engineering/Naval Architecture; first degree in NA/Civil/Ocean Engineering.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
@@ -6910,7 +7438,8 @@
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -6952,6 +7481,54 @@
       "pdf_excerpt": "* The department specializes in interdisciplinary research that broadly spans the fields of Solid Mechanics, Fluid Mechanics, and Biomedical Engineering. Applications are invited from candidates with strong engineering acumen and an interdisciplinary focus in addressing contemporary critical challenges that fits into at least one of the following specializations: (i) Computational Solid Mechanics focussing on cutting-edge methodologies that bridge solid mechanics and scientific computing, addressing fundamental challenges in areas such as multiscale/multiphysics modelling, phase field and nonlocal approaches to failure, advanced discretization methods, and the integration of physics-informed machine learning with rigorous mechanics-based modelling. (ii) Topology Optimization integrating active material mechanics for multifunctional adaptive systems. (iii) Experimental thermal–fluid science with a preference for research relevant to clean energy systems, advanced cooling technologies, micro-gravity environments or micro & modular nuclear reactors.",
       "pdf_source_url": "https://facapp.iitm.ac.in/img/AP-Area_and_Qualification_RA2026_V2.pdf",
       "structured_positions": [
+        {
+          "department": "Department of Physics",
+          "discipline": "Physics",
+          "school_or_centre": null,
+          "ranks": [
+            "Assistant Professor"
+          ],
+          "contract_status": "Permanent",
+          "post_type": "Faculty",
+          "areas": [
+            "Experimental high-energy nuclear and particle physics (CMS and Belle II; flavour physics, Higgs physics, heavy-ion collisions, detector development; expertise sought to complement existing group: ElC, CBM, BESIII, generic R&D for particle-detector instrumentation)",
+            "Experimental Quantum Optics (UV-visible-IR; quantum imaging, ghost spectroscopy, photonics-based qubits and qudits)",
+            "Quantum Computing and Quantum Communications theory (quantum algorithms, quantum simulations, quantum networks, communications theory, quantum information theory)"
+          ],
+          "methods_preference": "experimental + theoretical",
+          "approach": null,
+          "qualifications": {
+            "phd": "required",
+            "first_class_preceding_degree": "required",
+            "post_phd_experience_years": 3,
+            "publications_required": "Strong track record in experimental collaborations or generic R&D.",
+            "teaching_experience": null,
+            "other": "PhD in Physics or in any closely related discipline. If Ph.D is in a closely related discipline, at least one degree (Bachelor's or Master's) should be in Physics. Min 3 years post-PhD industrial/research/teaching experience."
+          },
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
+          "reservation_breakdown": {
+            "UR": null,
+            "SC": null,
+            "ST": null,
+            "OBC": null,
+            "EWS": null,
+            "PwBD": null
+          },
+          "is_special_recruitment_drive": false,
+          "is_composite_call": true,
+          "number_of_posts": null,
+          "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
+          "application_deadline": "2026-10-15",
+          "open_date": "2026-02-27",
+          "raw_section_text": "Physics. Three areas: (i) Experimental high-energy nuclear and particle physics — CMS, Belle II experiments; sub-areas: flavour physics, Higgs physics, heavy-ion collisions, detector development; complementary expertise sought in ElC/CBM/BESIII/generic detector R&D. (ii) Experimental Quantum Optics — UV-visible-IR, quantum imaging, ghost spectroscopy, photonics-based qubits/qudits. (iii) Quantum Computing and Communications theory — quantum algorithms, simulations, networks, information theory. PhD in Physics or related (Physics degree at Bachelor/Master level if PhD in related). Min 3 years post-PhD experience.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
+          "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
+          "structure_family": "iit-rolling"
+        },
         {
           "department": "Department of Physics",
           "discipline": "Physics",
@@ -7006,18 +7583,22 @@
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
-        "methods_preference": null,
+        "areas": [
+          "Experimental high-energy nuclear and particle physics (CMS and Belle II; flavour physics, Higgs physics, heavy-ion collisions, detector development; expertise sought to complement existing group: ElC, CBM, BESIII, generic R&D for particle-detector instrumentation)",
+          "Experimental Quantum Optics (UV-visible-IR; quantum imaging, ghost spectroscopy, photonics-based qubits and qudits)",
+          "Quantum Computing and Quantum Communications theory (quantum algorithms, quantum simulations, quantum networks, communications theory, quantum information theory)"
+        ],
+        "methods_preference": "experimental + theoretical",
         "approach": null,
         "qualifications": {
           "phd": "required",
           "first_class_preceding_degree": "required",
-          "post_phd_experience_years": null,
-          "publications_required": null,
+          "post_phd_experience_years": 3,
+          "publications_required": "Strong track record in experimental collaborations or generic R&D.",
           "teaching_experience": null,
-          "other": null
+          "other": "PhD in Physics or in any closely related discipline. If Ph.D is in a closely related discipline, at least one degree (Bachelor's or Master's) should be in Physics. Min 3 years post-PhD industrial/research/teaching experience."
         },
-        "general_eligibility": "Same.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
         "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
@@ -7030,25 +7611,27 @@
         "is_special_recruitment_drive": false,
         "is_composite_call": true,
         "number_of_posts": null,
-        "pay_scale": "Same",
+        "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "IIT Madras AP — Physics.",
-        "apply_url": "https://facapp.iitm.ac.in",
+        "raw_section_text": "Physics. Three areas: (i) Experimental high-energy nuclear and particle physics — CMS, Belle II experiments; sub-areas: flavour physics, Higgs physics, heavy-ion collisions, detector development; complementary expertise sought in ElC/CBM/BESIII/generic detector R&D. (ii) Experimental Quantum Optics — UV-visible-IR, quantum imaging, ghost spectroscopy, photonics-based qubits/qudits. (iii) Quantum Computing and Communications theory — quantum algorithms, simulations, networks, information theory. PhD in Physics or related (Physics degree at Bachelor/Master level if PhD in related). Min 3 years post-PhD experience.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
         "extraction_confidence": 0.95,
-        "source_pdf": "Advertisement_RA-2026__6ece07c6eb5b.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
         "status": "matched",
-        "positions": 1,
+        "positions": 2,
         "source_pdfs": [
+          "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
           "Advertisement_RA-2026__6ece07c6eb5b.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read",
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
@@ -7091,16 +7674,18 @@
       "pdf_source_url": "https://facapp.iitm.ac.in/img/Advertisement_RA-2026.pdf",
       "structured_positions": [
         {
-          "department": "IIT Madras — All Departments (Annexure)",
-          "discipline": "Annexure-1 metadata",
-          "school_or_centre": null,
+          "department": "School of Interdisciplinary Studies (SIDiS)",
+          "discipline": "Interdisciplinary Studies",
+          "school_or_centre": "School of Interdisciplinary Studies",
           "ranks": [
             "Assistant Professor"
           ],
           "contract_status": "Permanent",
           "post_type": "Faculty",
-          "areas": [],
-          "methods_preference": null,
+          "areas": [
+            "Time-resolved THz spectroscopy for quantum materials"
+          ],
+          "methods_preference": "experimental",
           "approach": null,
           "qualifications": {
             "phd": "required",
@@ -7108,10 +7693,10 @@
             "post_phd_experience_years": null,
             "publications_required": null,
             "teaching_experience": null,
-            "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
+            "other": "Ph.D. in relevant fields."
           },
-          "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-          "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
+          "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+          "specific_eligibility": null,
           "reservation_breakdown": {
             "UR": null,
             "SC": null,
@@ -7126,26 +7711,28 @@
           "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
           "application_deadline": "2026-10-15",
           "open_date": "2026-02-27",
-          "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-          "apply_url": "https://facapp.iitm.ac.in",
-          "extraction_confidence": 0.85,
+          "raw_section_text": "School of Interdisciplinary Studies (SIDiS). Single advertised area: Time-resolved THz spectroscopy for quantum materials. PhD in relevant fields.",
+          "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_confidence": 0.95,
           "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-          "source_pdf_url": "https://facapp.iitm.ac.in",
-          "extraction_method": "claude-opus-4-7-direct-read",
+          "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+          "extraction_method": "claude-opus-4-7-direct-read-v2",
           "structure_family": "iit-rolling"
         }
       ],
       "structured_position": {
-        "department": "IIT Madras — All Departments (Annexure)",
-        "discipline": "Annexure-1 metadata",
-        "school_or_centre": null,
+        "department": "School of Interdisciplinary Studies (SIDiS)",
+        "discipline": "Interdisciplinary Studies",
+        "school_or_centre": "School of Interdisciplinary Studies",
         "ranks": [
           "Assistant Professor"
         ],
         "contract_status": "Permanent",
         "post_type": "Faculty",
-        "areas": [],
-        "methods_preference": null,
+        "areas": [
+          "Time-resolved THz spectroscopy for quantum materials"
+        ],
+        "methods_preference": "experimental",
         "approach": null,
         "qualifications": {
           "phd": "required",
@@ -7153,10 +7740,10 @@
           "post_phd_experience_years": null,
           "publications_required": null,
           "teaching_experience": null,
-          "other": "Per Advertisement_RA-2026 main advertisement: AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs."
+          "other": "Ph.D. in relevant fields."
         },
-        "general_eligibility": "Per main advt: Age <36 on 31 Dec 2026 (with relaxations). Reservation: SC-15%, ST-7.5%, OBC(NCL)-27%, EWS-10%.",
-        "specific_eligibility": "This file should be read alongside Advertisement_RA-2026 main advertisement.",
+        "general_eligibility": "AP Grade-I requires 3+ yrs post-PhD; AP Grade-II for those with less than 3 yrs.",
+        "specific_eligibility": null,
         "reservation_breakdown": {
           "UR": null,
           "SC": null,
@@ -7171,12 +7758,12 @@
         "pay_scale": "AP Grade-II Pay Level 10; AP Grade-I Pay Level 12",
         "application_deadline": "2026-10-15",
         "open_date": "2026-02-27",
-        "raw_section_text": "Annexure-1 v2 (16.04.2026) for IIT Madras Rolling Advertisement IITM/R/1/2026. Detailed per-department area-of-specialization and additional qualifications. To be read with the main advertisement Advertisement_RA-2026.",
-        "apply_url": "https://facapp.iitm.ac.in",
-        "extraction_confidence": 0.85,
+        "raw_section_text": "School of Interdisciplinary Studies (SIDiS). Single advertised area: Time-resolved THz spectroscopy for quantum materials. PhD in relevant fields.",
+        "apply_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_confidence": 0.95,
         "source_pdf": "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf",
-        "source_pdf_url": "https://facapp.iitm.ac.in",
-        "extraction_method": "claude-opus-4-7-direct-read",
+        "source_pdf_url": "https://facapp.iitm.ac.in/2026ra/",
+        "extraction_method": "claude-opus-4-7-direct-read-v2",
         "structure_family": "iit-rolling"
       },
       "pdf_extraction": {
@@ -7186,7 +7773,7 @@
           "AP-Area_and_Qualification_RA2026_V2__8b4cdc19fa39.pdf"
         ],
         "methods": [
-          "claude-opus-4-7-direct-read"
+          "claude-opus-4-7-direct-read-v2"
         ]
       },
       "_source_note": "Latest scrape returned no parsed ads; carrying forward previous listings for review."
