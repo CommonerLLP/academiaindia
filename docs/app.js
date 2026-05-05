@@ -953,14 +953,43 @@ function extractCardCues(text, ad = {}) {
 
 // "Rank · Contract" line. For Visiting the contract is implied so we
 // just say "Visiting Faculty"; otherwise the line is "<Rank> · <Contract>".
+// Collapse rank variants (e.g. Asst Prof / AP Grade I / AP Grade II) to a
+// single canonical rank, then return a deduped abbreviated list. Used by
+// cardRankLine to keep the headline compact even when the source PDF
+// enumerates many sub-grades.
+function condenseRanks(ranks) {
+  const norm = (r) => {
+    const lr = String(r || "").toLowerCase().trim();
+    if (lr.startsWith("assistant professor") || lr === "ap" || lr.startsWith("ap-grade") || lr.startsWith("ap grade")) return "Assistant Professor";
+    if (lr.startsWith("associate professor of practice")) return "Assoc Prof of Practice";
+    if (lr.startsWith("associate professor")) return "Associate Professor";
+    if (lr.startsWith("professor of practice")) return "Prof of Practice";
+    if (lr === "professor" || lr.startsWith("professor ") || lr === "full professor") return "Professor";
+    return String(r);
+  };
+  const seen = new Set();
+  const out = [];
+  for (const r of ranks) {
+    const n = norm(r);
+    if (!seen.has(n)) { seen.add(n); out.push(n); }
+  }
+  return out;
+}
+function abbreviateRank(r) {
+  return String(r || "")
+    .replace(/^Assistant Professor$/i, "Asst Prof")
+    .replace(/^Associate Professor$/i, "Assoc Prof")
+    .replace(/^Professor$/i, "Prof");
+}
+
 function cardRankLine(ad) {
   const sp = getStructuredPosition(ad);
   if (sp) {
     let rank = "";
-    const ranks = Array.isArray(sp.ranks) ? sp.ranks.filter(Boolean) : [];
-    if (ranks.length === 1) rank = ranks[0];
-    else if (ranks.length > 1 && ranks.length <= 3) rank = ranks.join(" / ");
-    else if (ranks.length > 3) rank = "Faculty (multiple ranks)";
+    const condensed = condenseRanks(Array.isArray(sp.ranks) ? sp.ranks.filter(Boolean) : []);
+    if (condensed.length === 1) rank = condensed[0];
+    else if (condensed.length >= 2 && condensed.length <= 4) rank = condensed.map(abbreviateRank).join(" / ");
+    else if (condensed.length > 4) rank = "Faculty (multiple ranks)";
     if (!rank && (sp.post_type === "Research" || sp.post_type === "Postdoc" || sp.post_type === "Scientific")) rank = "Postdoc / Research Fellow";
     if (!rank) rank = "Faculty";
     const cs = contractLabel(sp.contract_status);
@@ -1973,8 +2002,13 @@ function renderAd(ad) {
   if (ad.info_url && ad.info_url !== ad.original_url) {
     actionLinks.push(`<a href="${escapeAttr(ad.info_url)}" target="_blank" rel="noopener noreferrer">Listing page →</a>`);
   }
-  if (ad.apply_url) {
-    actionLinks.push(`<a href="${escapeAttr(ad.apply_url)}" target="_blank" rel="noopener noreferrer">Apply portal →</a>`);
+  // Fall back to the institution-level apply URL when the ad doesn't
+  // carry one. Some ad PDFs (IIT Indore, etc.) just point at the PDF and
+  // expect the candidate to find the institute's faculty-recruitment
+  // portal separately; the registry holds that portal URL.
+  const applyUrl = ad.apply_url || inst.apply_url;
+  if (applyUrl) {
+    actionLinks.push(`<a href="${escapeAttr(applyUrl)}" target="_blank" rel="noopener noreferrer">Apply portal →</a>`);
   }
 
   // Areas excerpt (quiet body; no accent border, no "AREAS / NOTES" label).
