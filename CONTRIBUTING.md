@@ -133,8 +133,10 @@ Run the suite:
 make test
 ```
 
-119 tests pass at the time of writing; new parsers should not break
-the count.
+153 tests pass + 9 deliberate skips at the time of writing; new
+parsers should not break the count. Frontend changes that touch
+anything under `docs/lib/` or `docs/app.js` should additionally
+keep `npm test` green (117 Vitest tests across 11 files).
 
 ## Hall of forbidden moves
 
@@ -214,3 +216,24 @@ frontend changes. The remaining 5 lib modules (`card-helpers`,
 `render-card`, `filters`, `map`, `render-tabs`) do not yet have
 backfilled test coverage — adding tests for them when you're working
 in those files is welcome.
+
+### 2026-05-06 — Test counts refreshed; lib coverage backfilled
+
+The numbers in the 2026-05-05 entry above are superseded:
+
+- **Python (`make test`)**: 153 tests pass + 9 deliberate skips (was 119).
+- **Frontend (`npm test`)**: 117 Vitest tests across 11 files (was 81
+  across 4).
+- The five lib modules called out as uncovered on 2026-05-05
+  (`card-helpers`, `render-card`, `filters`, `map`, `render-tabs`)
+  now all ship with at least smoke / contract tests, alongside
+  newer modules (`current-validator`, `search`).
+- Two `docs/lib/` modules remain without dedicated unit tests:
+  `charts.js` (chart data + Resources-tab payload) and `state.js`
+  (the shared mutable-state holder). Both are exercised indirectly
+  by the higher-level renderers and filters; direct contracts are
+  welcome the next time either is touched.
+
+The "Run the suite" block above is updated in place to reflect the
+current count; the 2026-05-05 entry is preserved verbatim as the
+record of what the floor looked like one day earlier.
