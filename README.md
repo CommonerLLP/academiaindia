@@ -211,6 +211,48 @@ This section is append-only. The body of the README above is preserved
 as the original description; each dated entry below records what
 changed in the project between then and the entry date.
 
+### 2026-05-06 — Parliamentary-corpus crawler extracted and externalised
+
+The three legacy scripts that built *The Gap*'s parliamentary corpus
+— `scripts/sansad_crawl.py` (291 lines), `scripts/sansad_rs_crawl.py`
+(215 lines), and `scripts/sansad_download_pdfs.py` (125 lines) — are
+**retired**. Their behaviour (LS DSpace API + RS rsdoc.nic.in API +
+PDF discovery + dedup-on-resume) now lives in a separately-released
+public-good package, **`sansad-semantic-crawler`**, hosted at
+[github.com/CommonSenseLLP/sansad-semantic-crawler](https://github.com/CommonSenseLLP/sansad-semantic-crawler)
+and pinned at `v0.1.0` in `requirements.txt`.
+
+The package is config-driven: it expects a topic-profile JSON that
+encodes search groups, ministry filters, and tag rules. The faculty-
+vacancy / reservation / Mission-Mode lens that drove the legacy
+scripts is now `notes/topics/cei-vacancies.json` — gitignored, since
+the analytical lens is project-specific and the public package ships
+only a `libraries.json` example for `freelibraries4all`.
+
+What the host project picks up in exchange:
+
+- **One canonical schema for both houses.** The legacy LS manifest
+  used `questiontype` / `questionno` / `members`; the legacy RS
+  manifest used `qtype` / `qno` / `asker`. The package emits
+  `qtype` / `qno` / `askers` directly for both houses.
+  `scripts/consolidate_corpus.py` is rewritten to consume that single
+  schema, which dropped roughly half its branching logic.
+- **Stable `key` field on every record** (`LS|U|178|2024-11-25` /
+  `RS|S|365|2025-07-23`), so dedup is no longer a per-script
+  computation. This was always how `consolidate_corpus.py`
+  internally normalised — it is now a guaranteed property of the
+  upstream manifest.
+- **Re-usable PDF naming** — the package writes LS PDFs to
+  `data/_sansad_crawl/pdfs/ls/` and RS PDFs to
+  `.../pdfs/rs/`. Filenames match the legacy convention
+  (`{qtype-letter}{qno}_{slug}.pdf`), so existing PDFs can be moved
+  into the new tree without re-download if the maintainer chooses
+  to skip the full re-crawl.
+
+Operational entry points: `make corpus-refresh` (full pipeline:
+crawl → parse → consolidate). See `make help` for the per-step
+targets.
+
 ### 2026-05-06 — Test counts + repo-layout refresh
 
 The 2026-05-05 entry below describes a frontend test floor of 81 Vitest
