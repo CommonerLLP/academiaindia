@@ -1192,6 +1192,19 @@
     background: #003380; border-color: #003380;
     color: #fff; opacity: 1; text-decoration: none;
   }
+  /* Third-party apply portal disclosure: shown next to the Apply
+     button when the apply URL's registered domain differs from the
+     institution's own domain (e.g. Ashoka → apply.interfolio.com).
+     Quiet, monospace, no surrounding box — reads as truth-in-
+     labelling rather than a warning. */
+  .listing .row-actions-inline .apply-host-via {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-left: -4px;
+    white-space: nowrap;
+    align-self: center;
+  }
   .listing .quiet-links {
     display: inline-flex; flex-wrap: wrap; gap: 16px;
     color: var(--muted); font-size: 12.5px;

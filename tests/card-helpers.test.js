@@ -74,7 +74,7 @@ describe("rank and source labels", () => {
   it("surfaces provenance labels for PDFs and carry-forward records", () => {
     expect(helpers.sourceLabel({ _pdf_parsed: true })).toBe("verified PDF");
     expect(helpers.sourceLabel({ _source_method: "stale carry-forward" })).toBe("carried forward");
-    expect(helpers.sourceLinkLabel({ original_url: "https://example.org/ad.pdf" })).toBe("Original PDF →");
+    expect(helpers.sourceLinkLabel({ original_url: "https://example.org/ad.pdf" })).toBe("Original PDF ↗");
   });
 });
 
