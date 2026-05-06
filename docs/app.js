@@ -564,9 +564,19 @@ function wireEvents() {
     if (scrollTarget) {
       // 250ms covers the renderVacancies async fetch path on first hit;
       // subsequent hits resolve from the cached VACANCY_DATA and complete
-      // sooner, but the timeout is harmless.
+      // sooner, but the timeout is harmless. If the target sits inside
+      // any closed <details> elements (e.g. the bibliography or the
+      // appendix), open them on the way up so the scroll lands at a
+      // visible target instead of the collapsed summary.
       setTimeout(() => {
-        document.getElementById(scrollTarget)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        const target = document.getElementById(scrollTarget);
+        if (!target) return;
+        let node = target;
+        while (node && node !== document.body) {
+          if (node.tagName === "DETAILS" && !node.open) node.open = true;
+          node = node.parentElement;
+        }
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 250);
     }
   });
