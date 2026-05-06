@@ -548,13 +548,27 @@ function wireEvents() {
   // banner ("See the breakdown by category →") and any other anchor with
   // a data-tab-link attribute. Triggers the same path as a tab click so
   // the panel renders correctly.
+  //
+  // Optional `data-scroll-target="<id>"` attribute scrolls to a named
+  // anchor inside the destination tab after activation completes. We
+  // wait one tick + a bit so async render functions (renderVacancies)
+  // have a chance to insert the target element before scrollIntoView.
   document.body.addEventListener("click", (e) => {
     const a = e.target.closest("a[data-tab-link]");
     if (!a) return;
     e.preventDefault();
     const tab = a.dataset.tabLink;
+    const scrollTarget = a.dataset.scrollTarget;
     const ok = activateTab(tab, { writeHash: true });
-    if (!ok) location.href = a.href;
+    if (!ok) { location.href = a.href; return; }
+    if (scrollTarget) {
+      // 250ms covers the renderVacancies async fetch path on first hit;
+      // subsequent hits resolve from the cached VACANCY_DATA and complete
+      // sooner, but the timeout is harmless.
+      setTimeout(() => {
+        document.getElementById(scrollTarget)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 250);
+    }
   });
 }
 

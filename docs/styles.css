@@ -514,34 +514,46 @@
      in the HTML; the denominator (#vgb-ads) is filled by app.js,
      filtered to non-private institutions so the ratio is honest. */
   .vacancy-gap-banner.vacancy-gap-banner-compact {
-    background: color-mix(in srgb, var(--alarm) 5%, var(--bg));
+    /* No background tint — color-mix(alarm × bg) drifts into beige in
+       light mode. The 3px alarm left rule + thin neutral top/bottom rules
+       carry the editorial register without warming the page background. */
+    background: transparent;
     border-left: 3px solid var(--alarm);
-    border-top: 1px solid color-mix(in srgb, var(--alarm) 18%, transparent);
-    border-bottom: 1px solid color-mix(in srgb, var(--alarm) 18%, transparent);
-    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 18px;
     margin: 4px 0 14px;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0;
   }
   .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-line {
     margin: 0;
-    font-size: 14.5px;
-    line-height: 1.5;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16.5px;
+    line-height: 1.55;
     color: var(--ink);
-    font-family: var(--sans);
     text-align: center;
+    letter-spacing: 0.005em;
   }
   .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-num {
+    /* Numbers stay editorial-bold but switch off italic so the digits read
+       cleanly. Tabular nums keep 10,637 and 249 from drifting on width. */
+    font-family: var(--sans);
+    font-style: normal;
     color: var(--alarm);
     font-weight: 800;
-    font-size: 16.5px;
+    font-size: 19px;
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
+    padding: 0 1px;
   }
   .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-link {
+    font-family: var(--sans);
+    font-style: normal;
     color: var(--accent);
     text-decoration: none;
     font-weight: 600;
-    margin-left: 8px;
+    margin-left: 10px;
     border-bottom: 1px solid var(--accent);
     white-space: nowrap;
   }
@@ -1126,10 +1138,10 @@
 
     /* Compact vacancy-gap line — slightly smaller body text on phones;
        border + colour stay so the line still reads as alarm copy. */
-    .vacancy-gap-banner.vacancy-gap-banner-compact { padding: 9px 12px; }
-    .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-line { font-size: 13px; line-height: 1.55; }
-    .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-num { font-size: 14.5px; }
-    .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-link { display: inline-block; margin-left: 4px; }
+    .vacancy-gap-banner.vacancy-gap-banner-compact { padding: 10px 14px; }
+    .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-line { font-size: 14.5px; line-height: 1.55; }
+    .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-num { font-size: 17px; }
+    .vacancy-gap-banner.vacancy-gap-banner-compact .vgb-link { display: inline-block; margin-left: 6px; }
 
     /* Listing card — collapse to 3 columns (tier-bar | content | deadline),
        drop the actions column entirely. The row-meta pills wrap naturally. */
@@ -1657,19 +1669,107 @@
   #vacancies-tab .anno-callout.cobalt { background: rgba(31,58,138,0.92); }
   #vacancies-tab .anno-callout.muted { background: rgba(95,93,87,0.92); }
 
-  /* Hero stat — NYT/FT-style opener */
-  #vacancies-tab .hero-stat { background: var(--bg); border: none; padding: 32px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
-  #vacancies-tab .hero-stat .hs-kicker { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--alarm); font-weight: 700; margin-bottom: 8px; }
-  #vacancies-tab .hero-stat .hs-num { font-family: var(--serif); font-weight: 800; font-size: 100px; line-height: 0.95; color: var(--alarm); letter-spacing: -0.04em; display: block; }
-  @media (max-width: 720px) { #vacancies-tab .hero-stat .hs-num { font-size: 72px; } }
-  #vacancies-tab .hero-stat .hs-headline { font-family: var(--serif); font-size: 22px; line-height: 1.35; color: var(--ink); font-weight: 600; max-width: 680px; margin: 14px 0 0; }
-  #vacancies-tab .hero-stat .hs-headline em { font-style: italic; color: var(--alarm); }
-  #vacancies-tab .hero-stat .hs-context { font-size: 13px; color: var(--muted); margin-top: 12px; max-width: 680px; line-height: 1.55; }
+  /* Hero stat — Ambedkarite grammar: an opening pretitle that sets the
+     denominator, a four-cell grid of per-category withholdings, and a
+     closing political claim. The hero block sits centered as a column;
+     the pretitle and grid are center-aligned, the closing context
+     paragraph is left-aligned (long prose) but its block centers via
+     auto margins.
 
-  /* Sub-hero stat strip — three big numbers */
-  #vacancies-tab .hero-stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 0 0 32px; }
+     Per-cell layout: small alarm-colored category label on top, a large
+     serif withholding count, a thin sans-serif qualifier under it. PwD
+     cell renders the count as an em-dash since the data is suppressed
+     by the Ministry — the absence is itself the data point. */
+  #vacancies-tab .hero-stat { background: var(--bg); border: none; padding: 32px 0 28px; border-bottom: 1px solid var(--border); margin: 0 auto 32px; max-width: 880px; text-align: center; }
+  #vacancies-tab .hero-stat .hs-kicker { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--alarm); font-weight: 700; margin-bottom: 18px; }
+  #vacancies-tab .hero-stat .hs-num { font-family: var(--serif); font-weight: 800; font-size: 96px; line-height: 0.95; color: var(--alarm); letter-spacing: -0.04em; display: block; font-variant-numeric: tabular-nums; }
+  @media (max-width: 720px) { #vacancies-tab .hero-stat .hs-num { font-size: 64px; } }
+  #vacancies-tab .hero-stat .hs-headline { font-family: var(--serif); font-size: 21px; line-height: 1.4; color: var(--ink); font-weight: 600; max-width: 720px; margin: 18px auto 0; }
+  #vacancies-tab .hero-stat .hs-headline em { font-style: italic; color: var(--alarm); }
+  #vacancies-tab .hero-stat .hs-pretitle { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--ink); max-width: 720px; margin: 0 auto 22px; font-weight: 500; }
+
+  /* Four-cell realisation grid: SC / OBC / ST / PwD (latter renders as
+     em-dash since data has not been disclosed since March 2023). */
+  #vacancies-tab .hero-stat .hs-realisation-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 0 0 24px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  #vacancies-tab .hero-stat .hsr-cell {
+    padding: 22px 14px;
+    border-right: 1px solid var(--border);
+  }
+  #vacancies-tab .hero-stat .hsr-cell:last-child { border-right: none; }
+  #vacancies-tab .hero-stat .hsr-cat { font-family: var(--sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--alarm); font-weight: 700; margin-bottom: 10px; }
+  #vacancies-tab .hero-stat .hsr-num { font-family: var(--serif); font-weight: 800; font-size: 56px; color: var(--alarm); line-height: 1; letter-spacing: -0.03em; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  #vacancies-tab .hero-stat .hsr-num .hsr-pct { font-size: 30px; font-weight: 700; vertical-align: top; line-height: 1; margin-left: 1px; }
+  #vacancies-tab .hero-stat .hsr-pwd .hsr-num { color: var(--muted); }
+  #vacancies-tab .hero-stat .hsr-sub { font-family: var(--sans); font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+
+  @media (max-width: 720px) {
+    #vacancies-tab .hero-stat .hs-realisation-grid { grid-template-columns: repeat(2, 1fr); }
+    #vacancies-tab .hero-stat .hsr-cell {
+      padding: 16px 10px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    #vacancies-tab .hero-stat .hsr-cell:nth-child(2n) { border-right: none; }
+    #vacancies-tab .hero-stat .hsr-cell:nth-last-child(-n+2) { border-bottom: none; }
+    #vacancies-tab .hero-stat .hsr-num { font-size: 40px; }
+    #vacancies-tab .hero-stat .hsr-num .hsr-pct { font-size: 22px; }
+  }
+
+  #vacancies-tab .hero-stat .hs-context { font-size: 14px; color: var(--ink); margin: 16px auto 0; max-width: 760px; line-height: 1.6; text-align: left; font-family: var(--serif); }
+  #vacancies-tab .hero-stat .hs-context strong { color: var(--alarm); font-weight: 700; }
+
+  /* In-page anchor link inside .act-deck (e.g. "Scope, sources, and
+     methodology"). Cobalt with bottom-rule on hover only — the default
+     <a> text-decoration is suppressed so we don't double-underline. */
+  #vacancies-tab .gap-anchor-link {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+  }
+  #vacancies-tab .gap-anchor-link:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  /* Sub-hero stat strip — three big numbers, rendered flush with the
+     hero-stat content above (no card frame). First cell's content
+     starts at x=0 of main, matching the kicker / 31% / headline edge.
+     Vertical rules separate cells; thin horizontal rules contain the
+     row. NYT/FT-style ruled strip, not a Bootstrap card grid. */
+  #vacancies-tab .hero-stat-strip {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    gap: 0;
+    margin: 0 0 32px;
+  }
   @media (max-width: 720px) { #vacancies-tab .hero-stat-strip { grid-template-columns: 1fr; } }
-  #vacancies-tab .hero-stat-strip .hss-cell { background: var(--panel); padding: 18px 20px; }
+  #vacancies-tab .hero-stat-strip .hss-cell {
+    background: transparent;
+    padding: 22px 18px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  #vacancies-tab .hero-stat-strip .hss-cell:last-child { border-right: none; }
+  @media (max-width: 720px) {
+    #vacancies-tab .hero-stat-strip .hss-cell {
+      padding: 16px 0;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    #vacancies-tab .hero-stat-strip .hss-cell:last-child { border-bottom: none; }
+  }
   #vacancies-tab .hero-stat-strip .hss-num { font-family: var(--serif); font-weight: 800; font-size: 38px; line-height: 1; color: var(--alarm); display: block; letter-spacing: -0.02em; }
   #vacancies-tab .hero-stat-strip .hss-cell:nth-child(2) .hss-num { color: var(--accent); }
   #vacancies-tab .hero-stat-strip .hss-cell:nth-child(3) .hss-num { color: var(--alarm); }
@@ -1737,10 +1837,25 @@
   }
 
   /* Section headers tightened */
+  /* Shared narrative-column width — used by every block-level child of
+     the Gap tab so the page reads as a single editorial column. Earlier
+     we had act-deck at 780, jbm-card at full container width (~1032 at
+     1280 viewport), and the bibliography section's border-top running
+     wall-to-wall. Capping all of them to 880 produces a coherent column
+     rhythm: deck, chart, deck, chart, verdict, appendix, bibliography,
+     all the same edge. */
+  #vacancies-tab .act-header,
+  #vacancies-tab .act-deck,
+  #vacancies-tab .jbm-card,
+  #vacancies-tab .hero-stat-strip,
+  #vacancies-tab .gap-bibliography,
+  #vacancies-tab .vacancies-appendix {
+    max-width: 880px;
+  }
   #vacancies-tab .act-header { margin: 56px 0 8px; padding-bottom: 12px; border-bottom: 2px solid var(--alarm); display: flex; align-items: baseline; gap: 12px; }
   #vacancies-tab .act-header .act-num { font-family: var(--mono); font-size: 11px; color: var(--alarm); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
   #vacancies-tab .act-header .act-title { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
-  #vacancies-tab .act-deck { font-family: var(--serif); font-size: 17px; line-height: 1.45; color: var(--ink); font-weight: 500; max-width: 780px; margin: 0 0 18px; }
+  #vacancies-tab .act-deck { font-family: var(--serif); font-size: 17px; line-height: 1.45; color: var(--ink); font-weight: 500; margin: 0 0 18px; }
   #vacancies-tab .act-deck strong { color: var(--alarm); font-weight: 700; }
 
   /* Counterfactual ticker */

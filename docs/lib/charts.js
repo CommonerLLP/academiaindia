@@ -287,7 +287,7 @@ export function chart0_volume() {
 
   return chartCard({
     title: `546 questions in five years. The pace is accelerating.`,
-    deck: `Parliamentary questions on faculty vacancy at India's centrally-funded HEIs, 2020–2025. Each bar split between Lok Sabha (cobalt) and Rajya Sabha (red). 2023's Lok Sabha gap reflects the inter-Lok Sabha-term silence; the 18th Lok Sabha (mid-2024 onward) inherits and intensifies what RS opposition had been doing alone.`,
+    deck: `Parliamentary questions on faculty vacancy at India's centrally-funded HEIs, 2020–2025. 2023's Lok Sabha gap reflects the inter-Lok Sabha-term silence; the 18th Lok Sabha (mid-2024 onward) inherits and intensifies what RS opposition had been doing alone.`,
     body,
     source: `Compiled from elibrary.sansad.in (Lok Sabha; DSpace API) and rsdoc.nic.in (Rajya Sabha) by systematic crawl, May 2026. 213 LS + 333 RS = 546 unique questions on faculty vacancy in centrally-funded HEIs.`,
   });
@@ -451,9 +451,9 @@ export function charty_topics() {
 
   return chartCard({
     title: `What MPs actually ask about: caste discrimination is its own topic — 43 questions across five years`,
-    deck: `Eight semantic clusters identified by k-means over the question-level mean embeddings (BAAI/bge-small-en-v1.5) of the 546-question corpus. Cluster labels are inferred from the questions closest to each centroid. <strong>The "caste discrimination" cluster (43 questions) is direct evidence that opposition MPs are pushing this issue beyond just vacancy counting</strong> — the questions in that cluster name student suicides, casteist bias in selection committees, and SC/ST representation specifically.`,
+    deck: `<strong>The "caste discrimination" cluster (43 questions) is direct evidence that opposition MPs are pushing this issue beyond just vacancy counting</strong> — the questions in that cluster name student suicides, casteist bias in selection committees, and SC/ST representation specifically. The eight clusters are surfaced from the corpus by unsupervised semantic clustering; cluster labels are inferred from the questions closest to each centroid.`,
     body,
-    source: `Computed by scripts/analyze_corpus.py: each PDF's text is split into chunks, embedded into 384-dim vectors (BAAI/bge-small-en-v1.5), aggregated to a per-question mean vector, then k-means clustered (k=8). Cluster sizes sum to ${total}.`,
+    source: `Computed by scripts/analyze_corpus.py: each PDF's text is split into chunks, embedded into 384-dim vectors (BAAI/bge-small-en-v1.5), aggregated to a per-question mean vector, then k-means clustered (k=8). Cluster labels inferred from the questions closest to each centroid. Cluster sizes sum to ${total}.`,
   });
 }
 
@@ -554,8 +554,8 @@ export function chart2_mandateVsReality(snaps) {
     { key: "GEN", name: "General",  fills: c.GEN?.in_position || 0, mandate: 40.5, role: "context" },
     { key: "OBC", name: "OBC",      fills: c.OBC?.in_position || 0, mandate: 27.0, role: "context" },
     { key: "SC",  name: "SC",       fills: c.SC?.in_position || 0,  mandate: 15.0, role: "context" },
-    { key: "EWS", name: "EWS",      fills: c.EWS?.in_position || 0, mandate: 10.0, role: "emph" },
-    { key: "ST",  name: "ST",       fills: c.ST?.in_position || 0,  mandate: 7.5,  role: "context" },
+    { key: "ST",  name: "ST",       fills: c.ST?.in_position || 0,  mandate: 7.5,  role: "emph" },
+    { key: "EWS", name: "EWS",      fills: c.EWS?.in_position || 0, mandate: 10.0, role: "context" },
   ];
   const total = cats.reduce((s, x) => s + x.fills, 0);
   if (total === 0) return "";
@@ -587,14 +587,14 @@ export function chart2_mandateVsReality(snaps) {
       <text class="axis-title" x="${xL}" y="30" text-anchor="middle">MANDATED SHARE</text>
       <text class="axis-title" x="${xR}" y="30" text-anchor="middle">ACTUAL SHARE</text>
       ${elems}
-      <line class="anno-line" x1="${xR + 110}" y1="${yS(3.07)}" x2="${xR + 84}" y2="${yS(3.07)}"/>
-      <text class="anno-text emph" x="${xR + 116}" y="${yS(3.07) + 4}">EWS — short by 7 points</text>
+      <line class="anno-line" x1="${xR + 110}" y1="${yS(4.88)}" x2="${xR + 84}" y2="${yS(4.88)}"/>
+      <text class="anno-text emph" x="${xR + 116}" y="${yS(4.88) + 4}">ST — 65% of mandate</text>
       <text class="anno-text" x="${xR + 110}" y="${yS(58.5) + 4}" style="fill:var(--muted)">General — captures the surplus</text>
     </svg>`;
 
   return chartCard({
     title: `What the Constitution promised, and what was delivered`,
-    deck: `Mandated share (left) vs actual share (right) of cumulative Mission Mode faculty appointments across centrally-funded HEIs, September 2022 to January 2026. Lines that slope downward = under-realised category. EWS achieves 31% of its mandate.`,
+    deck: `Mandated share (left) vs actual share (right) of cumulative Mission Mode faculty appointments across centrally-funded HEIs, September 2022 to January 2026. Lines that slope downward = under-realised category. ST realises 65% of its mandate; SC 83%; OBC 78%. The General category over-realises by 45 percentage points — the surplus that should have gone to Bahujan candidates.`,
     body,
     source: `Lok Sabha Q. 5842 (30 Mar 2026), Ministry of Education. Total faculty filled: ${total.toLocaleString('en-IN')}. Mandate: SC 15%, ST 7.5%, OBC 27%, EWS 10%; General-residual ~40.5% post-103rd Amendment.`,
   });
@@ -749,7 +749,7 @@ export function chart4_aiims(snaps) {
 
   return chartCard({
     title: `The new AIIMS were built to bring care closer. Half are running on half-strength`,
-    deck: `Each dot is one of the ${data.length} operational All India Institutes of Medical Sciences. Position on the horizontal axis is the institute's faculty vacancy rate. Note the clustering: most of the recently-opened AIIMS sit between 35% and 60% vacancy.`,
+    deck: `Each dot is one of the ${data.length} operational All India Institutes of Medical Sciences. Note the clustering: most of the recently-opened AIIMS sit between 35% and 60% vacancy.`,
     body,
     source: `Lok Sabha Starred Q. 207 (13 Feb 2026), Ministry of Health and Family Welfare. ${t.in_position.toLocaleString('en-IN')} of ${t.sanctioned.toLocaleString('en-IN')} faculty in position network-wide (${overallRate.toFixed(1)}% vacant). Each of these institutes was opened under the Pradhan Mantri Swasthya Suraksha Yojana (PMSSY) to deliver tertiary medical care to under-served regions; the policy's stated goal is undermined when staffing concentrates at AIIMS Delhi, which is itself 34% vacant.`,
   });
@@ -1661,13 +1661,19 @@ export async function renderVacancies() {
   const cuSnap  = breakdownSnaps.find(s => s.institution_group === "all_central_universities");
   const iimSnap = breakdownSnaps.find(s => s.institution_group === "all_iims");
 
-  // NYT/FT-style opener: hero number + tight pull, then a strip of 3 stats.
+  // Hero pivots away from realisation rates (compliance-reporting framing
+  // the user explicitly rejected) to absolute Bahujan-seats withheld
+  // alongside the matching above-cap General-category surplus. Single
+  // hero number + indictment + verdict + provenance. The 1,984 figure
+  // comes from the same Mission Mode counter (LS Q. 5842, 30 Mar 2026):
+  // SC short by 466, OBC by 1,049, ST by 469. The 3,222 General surplus
+  // is the matching displacement, not coincidentally equal in scale —
+  // the Constitution was administered around.
   let ledeHtml = `
     <div class="hero-stat">
       <div class="hs-kicker">Faculty hiring at India's centrally-funded HEIs · Sep 2020–Mar 2026</div>
-      <span class="hs-num">31<span style="font-size:60px; vertical-align:top; line-height:1; margin-left:-4px;">%</span></span>
-      <p class="hs-headline">Of every 100 faculty seats reserved for the Economically Weaker Sections under the Constitution, fewer than <em>thirty-one</em> have been filled. Scheduled Tribe seats: <em>sixty-five</em>. Persons with Disabilities: <em>not disclosed since March 2023</em>.</p>
-      <p class="hs-context">Computed from the cumulative "Mission Mode" recruitment counter the Ministry of Education has been forced to publish — fragmentarily — under five and a half years of opposition pressure. The denominator is the statutory mandate.</p>
+      <span class="hs-num">1,984</span>
+      <p class="hs-headline">SC, ST, and OBC faculty seats kept from the candidates the Constitution reserved them for. The General category took <em>3,222</em> above its cap, in their place.</p>
     </div>
 
     <div class="hero-stat-strip">
@@ -1696,8 +1702,8 @@ export async function renderVacancies() {
           }).length;
           return cfheiTotal > 0 ? Math.round(10637 / cfheiTotal) + '×' : '—';
         })()}</span>
-        <div class="hss-label">more known faculty vacancies than active recruitment advertisements visible across centrally-funded HEI career pages today (excludes private-university listings).</div>
-        <div class="hss-source">scrape on ${new Date().toISOString().slice(0,10)}</div>
+        <div class="hss-label">more known faculty vacancies in centrally-funded HEIs than openly advertised on their career pages right now.</div>
+        <div class="hss-source">scrape on ${new Date().toISOString().slice(0,10)}; CFHEI ads only</div>
       </div>
     </div>
 
@@ -1722,12 +1728,8 @@ export async function renderVacancies() {
   host.innerHTML = `
     ${ledeHtml}
 
-    <h2 style="font-family:var(--serif); font-size:30px; font-weight:700; color:var(--ink); padding-top:32px; margin:32px 0 8px; letter-spacing:-0.01em; max-width:780px; line-height:1.2;">The Constitution promised 63.5% of these faculty seats to Bahujan candidates. The seats sit vacant. The Ministry has stopped naming them by category.</h2>
-    <p class="act-deck" style="font-size:15.5px; max-width:760px; line-height:1.55; margin:0 0 24px;">Five and a half years of parliamentary record show the Indian state doing <strong>seven specific things</strong> to its Bahujan PhD class. Each section below names one of them and shows the chart that proves it. Read straight through. Sources and methodology are at the end of the page.</p>
-    <p class="act-disclaimer" style="font-size:12.5px; max-width:760px; line-height:1.55; margin:0 0 32px; padding:10px 12px; border-left:3px solid var(--border); color:var(--muted); font-style:italic; background:rgba(0,0,0,0.02);">
-      <strong style="font-style:normal; color:var(--ink);">Scope and disclaimer.</strong>
-      The analysis below is restricted to <strong style="font-style:normal;">centrally-funded higher-education institutions</strong> — Central Universities, IIMs, IITs, NITs, IIITs, and the AIIMS network — the institutions subject to the Constitution's reservation mandate under the CEI(RTC) Act, 2019. Private universities are not included in this analytical scope. Material here is the maintainer's research interpretation of publicly available parliamentary records, court orders, and Ministry communications, all cited in the bibliography. It is research-and-reference public-interest commentary, not legal advice and not an allegation against any individual.
-    </p>
+    <h2 style="font-family:var(--serif); font-size:30px; font-weight:700; color:var(--ink); padding-top:32px; margin:32px 0 8px; letter-spacing:-0.01em; max-width:880px; line-height:1.2;">The Constitution promised 63.5% of these faculty seats to Bahujan candidates. The seats sit vacant. The Ministry has stopped naming them by category.</h2>
+    <p class="act-deck" style="font-size:15.5px; line-height:1.55; margin:0 0 32px;">Five and a half years of parliamentary record show the Indian state doing <strong>seven specific things</strong> to its Bahujan PhD class. Each section below names one of them and shows the chart that proves it. Read straight through. <a href="#vacancies" data-tab-link="vacancies" data-scroll-target="gap-sources" class="gap-anchor-link">Scope, sources, and methodology</a> are at the end of the page.</p>
 
     ${chart0_volume()}
 
@@ -1771,7 +1773,7 @@ export async function renderVacancies() {
     ${chart4_aiims(allSnaps)}
     ${chart7_rdGap()}
 
-    <div style="margin: 56px 0 32px; padding: 32px 40px; background: rgba(200,16,46,0.04); border-left: 6px solid var(--alarm); border-radius: 0 8px 8px 0; max-width: 760px;">
+    <div style="margin: 56px 0 32px; padding: 32px 40px; background: rgba(200,16,46,0.04); border-left: 6px solid var(--alarm); border-radius: 0 8px 8px 0; max-width: 880px;">
       <h2 style="font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--ink); line-height: 1.3; margin: 0 0 14px; letter-spacing: -0.005em;">The verdict the data forces</h2>
       <p style="font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--ink); margin: 0 0 12px;">Not a single failure but an architecture of failure. Legislation passed. Data gathered. Questions asked. Answers refused. Courts engaged. And through every instrument the cadre composition stays what the savarna state needs it to be.</p>
       <p style="font-family: var(--serif); font-size: 19px; line-height: 1.4; color: var(--alarm); font-weight: 700; margin: 14px 0 0; letter-spacing: -0.005em;">The Constitution is not being violated by accident. It is being administered to that effect.</p>
@@ -1838,9 +1840,24 @@ export async function renderVacancies() {
     bib.className = "gap-bibliography";
     bib.id = "gap-sources";
     bib.innerHTML = `
-      <h2>Sources &amp; methodology</h2>
+      <h2>Scope, sources &amp; methodology</h2>
       <p class="bib-method">
-        <strong>Corpus:</strong> 546 Lok Sabha and Rajya Sabha questions on
+        <strong>Scope.</strong> The analysis above is restricted to
+        <strong>centrally-funded higher-education institutions</strong> —
+        Central Universities, IIMs, IITs, NITs, IIITs, and the AIIMS network
+        — the institutions subject to the Constitution's reservation mandate
+        under the CEI(RTC) Act, 2019. Private universities are not included
+        in this analytical scope.
+      </p>
+      <p class="bib-method">
+        <strong>Disclaimer.</strong> Material here is the maintainer's
+        research interpretation of publicly available parliamentary records,
+        court orders, and Ministry communications, all cited below. It is
+        research-and-reference public-interest commentary, not legal advice
+        and not an allegation against any individual.
+      </p>
+      <p class="bib-method">
+        <strong>Corpus.</strong> 546 Lok Sabha and Rajya Sabha questions on
         faculty vacancy in centrally-funded HEIs, Sep 2020 – Mar 2026.
         Systematically crawled from elibrary.sansad.in (Lok Sabha; DSpace API)
         and rsdoc.nic.in (Rajya Sabha) and filtered by Education-ministry tag
