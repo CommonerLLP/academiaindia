@@ -497,9 +497,13 @@ export function renderAd(ad) {
   // areas", "in any of the relevant areas", "in relevant area" — they
   // appear when the source advt has no real specialisation discipline
   // and we end up echoing nothing useful.
+  // Filler-phrase remover. Earlier version used "$1 " as the
+  // replacement template referencing a non-capturing group — JS
+  // substituted the literal text "$1" instead. Replace with a plain
+  // space; the trailing collapse-whitespace pass handles spacing.
   const stripFiller = (s) => String(s || "")
-    .replace(/(?:^|;|\s)\s*Experience\s+in\s+(?:one\s+of\s+)?(?:any\s+of\s+)?the\s+relevant\s+area[s]?\.?\s*/gi, "$1 ")
-    .replace(/(?:^|;|\s)\s*Strong\s+academic\s+and\s+research\s+background\.?\s*/gi, "$1 ")
+    .replace(/(?:^|;|\s)\s*Experience\s+in\s+(?:one\s+of\s+)?(?:any\s+of\s+)?the\s+relevant\s+area[s]?\.?\s*/gi, " ")
+    .replace(/(?:^|;|\s)\s*Strong\s+academic\s+and\s+research\s+background\.?\s*/gi, " ")
     .replace(/\s*;\s*\.?\s*$/g, "")
     .replace(/^\s*;\s*/g, "")
     .replace(/\s{2,}/g, " ")
@@ -535,9 +539,32 @@ export function renderAd(ad) {
       }
     }
     const descN = _norm(descBody);
+    // Token-overlap circular-description detector. Strip the
+    // "Institution + rank-abbrev + dash" prefix, then compare the
+    // remaining tokens to the headline's token set. Catches
+    // "IIT Bombay AP — Ashank Desai Centre for Policy Studies.
+    // Public Policy." where every meaningful word already appears
+    // in the institution name + cardDiscipline.
+    const rankPrefixRe = /^(.+?)\s+(?:AP|Asst\.?\s*Prof\.?|Assoc\.?\s*Prof\.?|Full\s+Prof\.?|Professor|Faculty)\s*[–—\-]\s*/i;
+    const rankStripped = descBody.replace(rankPrefixRe, "").trim();
+    const _stop = new Set(["the","of","for","and","an","a","in","to","at","on","or"]);
+    const _tokens = (s) => (String(s).toLowerCase().match(/[a-z]+/g) || [])
+      .filter(t => t.length > 2 && !_stop.has(t));
+    const shellTokenSet = new Set(_tokens(`${instName} ${discipline}`));
+    const descTokens = _tokens(rankStripped);
+    const tokenOverlap = descTokens.length
+      ? descTokens.filter(t => shellTokenSet.has(t)).length / descTokens.length
+      : 0;
     const isCircular = descBody.length < 220
       && shellN.length > 8
-      && (descN === shellN || descN.replace(/^(?:ap|aps|professor|associateprofessor|assistantprofessor)/, "") === shellN || shellN.length > 0 && descN.length - shellN.length < 30 && descN.includes(shellN));
+      && (
+        descN === shellN
+        || descN.replace(/^(?:ap|aps|professor|associateprofessor|assistantprofessor)/, "") === shellN
+        || (shellN.length > 0 && descN.length - shellN.length < 30 && descN.includes(shellN))
+        // Short description whose meaningful tokens are mostly already
+        // in the headline + cardDiscipline — adds no information.
+        || (descBody.length < 150 && descTokens.length >= 3 && tokenOverlap >= 0.7)
+      );
     if (descBody && !isCircular) {
       detailsBlocks.push(`<div class="detail-block"><span class="k">Description</span><div class="v">${escapeHTML(descBody)}</div></div>`);
     }
@@ -564,11 +591,17 @@ export function renderAd(ad) {
   // are surfaced separately via the existing Eligibility / Description
   // blocks built above. Each row only renders when populated, so ads
   // with a sparse structured_position don't grow empty rows.
+  // Filler phrases sometimes leak into structured fields too — most
+  // commonly "Experience in one of the relevant areas." landing in
+  // qualifications.other when the LLM extraction had no real content
+  // to put there. Run the same stripFiller pass we use on the
+  // free-text Eligibility / Evaluation rows. If the field collapses
+  // to empty, drop the row entirely.
   const pushBlock = (label, value) => {
     if (value == null) return;
-    const text = String(value).trim();
-    if (!text || text.toLowerCase() === "none" || text === "—") return;
-    detailsBlocks.push(`<div class="detail-block"><span class="k">${escapeHTML(label)}</span><div class="v">${escapeHTML(text)}</div></div>`);
+    const cleaned = stripFiller(String(value)).trim();
+    if (!cleaned || cleaned.toLowerCase() === "none" || cleaned === "—" || cleaned === ".") return;
+    detailsBlocks.push(`<div class="detail-block"><span class="k">${escapeHTML(label)}</span><div class="v">${escapeHTML(cleaned)}</div></div>`);
   };
   const sq = structuredPos?.qualifications || {};
   // Flat-field fallback: ads without structured_position still expose
