@@ -171,10 +171,29 @@ disclaimers that aren't sourced — will be declined.
 
 ## Licence
 
-- **Code**: MIT.
-- **Data and corpus**: Creative Commons Attribution-ShareAlike 4.0
-  International (CC BY-SA 4.0). Cite as: *Whose University?,
+This project is **non-commercial source-available**. Both restrictions
+matter equally:
+
+- **Code**: [PolyForm Noncommercial
+  1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/).
+  Source-available and modifiable for research, education, journalism,
+  public-interest work, and personal use. Commercial use is not
+  permitted under any circumstance.
+- **Data and corpus**: [Creative Commons
+  Attribution-NonCommercial-ShareAlike 4.0
+  International](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  (CC BY-NC-SA 4.0). Free for non-commercial reuse with attribution
+  and share-alike. Cite as: *Whose University?,
   whoseuniversity.org, accessed YYYY-MM-DD.*
+
+These are public records of the Indian state, processed and
+published as a public-interest research artefact. The licences
+ensure they stay that way — no commercial product can be built on
+top of this work, by anyone.
+
+A `CITATION.cff` at the repository root carries machine-readable
+citation metadata; GitHub renders it as a "Cite this repository"
+button.
 
 
 ## Document history
@@ -182,6 +201,26 @@ disclaimers that aren't sourced — will be declined.
 This section is append-only. The body of the README above is preserved
 as the original description; each dated entry below records what
 changed in the project between then and the entry date.
+
+### 2026-05-06 — Project relicensed to non-commercial terms
+
+The Licence section above is rewritten as of this date. Prior to
+2026-05-06 the project shipped under MIT (code) and CC BY-SA 4.0
+(data); both permitted commercial use. From 2026-05-06 forward,
+the project is non-commercial source-available: PolyForm
+Noncommercial 1.0.0 for code, CC BY-NC-SA 4.0 for data and corpus.
+
+The change is not retroactive against existing users — both MIT and
+CC BY-SA 4.0 are perpetual for any recipient who exercised rights
+under them. New copies of the code and data going forward are
+governed by the new terms.
+
+The intent: this work is funded indirectly by the Indian public,
+exists to surface a public-interest argument, and should never
+become a commercial product — anyone's, including the maintainer's.
+The site footer and the colophon disclaimer on every page are
+updated to match. A `LICENSE` file with the canonical PolyForm
+text and a `CITATION.cff` are added at the repository root.
 
 ### 2026-05-05 — Phase 2 frontend refactor
 
