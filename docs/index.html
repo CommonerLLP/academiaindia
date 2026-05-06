@@ -54,11 +54,8 @@
 </head>
 <body>
 <a class="skip-link" href="#feed">Skip to listings</a>
-<header class="masthead">
-  <div class="text-wrap">
-    <h1>Whose University?</h1>
-    <p class="subtitle">A public-interest tracker of academic work in India.</p>
-  </div>
+<header class="masthead masthead-compact">
+  <h1><span class="masthead-title">Whose University?</span><span class="masthead-strapline">A public-interest tracker of academic work in India.</span></h1>
 </header>
 
 <!-- ============================================================
@@ -179,19 +176,18 @@
            sum here: 4,889 CU teaching (Jul 2025) + 5,748 AIIMS faculty
            (Feb 2026) ≈ 10,637 visible standing vacancies, plus IIT/IIM/NIT/
            IIIT residuals that the Ministry refuses to disclose. -->
-      <div class="vacancy-gap-banner" id="vacancy-gap-banner">
-        <div class="vgb-inner">
-          <p class="vgb-eyebrow">The vacancy gap</p>
-          <h2 class="vgb-headline">
-            <span class="vgb-num" id="vgb-vacant">10,637</span> known vacancies.
-            <span class="vgb-num" id="vgb-ads">—</span> advertised.
-            <span id="vgb-ratio">—</span>
-          </h2>
-          <p class="vgb-sub">
-            Institutions keep the rest open instead of filling them. <a href="#vacancies" data-tab-link="vacancies">See the breakdown →</a>
-          </p>
-        </div>
-      </div>
+      <!-- Compact vacancy-gap line. Numerator: 10,637 — partial CFHEI
+           disclosure (4,889 CU teaching Jul 2025 + 5,748 AIIMS Feb
+           2026). Denominator: live CFHEI ads only — private-university
+           postings are excluded so the ratio doesn't understate the
+           regression. -->
+      <aside class="vacancy-gap-banner vacancy-gap-banner-compact" id="vacancy-gap-banner" role="note">
+        <p class="vgb-line">
+          <strong class="vgb-num" id="vgb-vacant">10,637</strong> vacancies at India's public HEIs ·
+          only <strong class="vgb-num" id="vgb-ads">—</strong> being recruited for currently
+          <a class="vgb-link" href="#gap" data-tab-link="gap">→ The Gap</a>
+        </p>
+      </aside>
 
       <div class="chipbar" id="active-filters"></div>
 
