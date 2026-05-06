@@ -281,6 +281,19 @@
     color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border);
   }
   footer.colophon .colophon-meta-line a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    vertical-align: -0.12em;
+  }
+  .github-link .github-icon {
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+    fill: currentColor;
+  }
   @media (max-width: 720px) {
     footer.colophon { padding: 28px 16px 32px; }
     /* Mobile: drop the nowrap so the line wraps naturally rather than
@@ -325,6 +338,11 @@
   #about-tab.about-page a {
     color: var(--accent); text-decoration: none;
     border-bottom: 1px solid var(--accent);
+  }
+  #about-tab.about-page a.github-link {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
   }
   #about-tab.about-page a:hover { background: var(--accent); color: var(--bg); }
   #about-tab.about-page p.about-verdict {
@@ -431,7 +449,7 @@
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     padding: 8px 32px; display: flex; flex-wrap: wrap; gap: 8px;
-    align-items: center; justify-content: center; position: sticky; top: 0; z-index: 30;
+    align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000;
   }
   .filter-strip .strip-label { font-size: 12px; color: var(--muted); margin-right: 4px; font-weight: 500; }
   .filter-search {
@@ -480,7 +498,13 @@
     background: var(--panel); border: 1px solid var(--border);
     border-radius: 4px; box-shadow: 0 12px 32px rgba(15,23,42,0.14);
     padding: 12px; min-width: 240px; max-width: 320px;
-    z-index: 40; display: none;
+    z-index: 1100; display: none;
+  }
+  /* Right-edge filters (Location, Institution type): open the popover
+     leftward so it doesn't extend off-screen on the right. */
+  .filter-dd:last-child > .popover,
+  .filter-dd:nth-last-child(2) > .popover {
+    left: auto; right: 0;
   }
   .filter-dd.open > .popover { display: block; }
   .filter-dd > .popover .filter-group { display: flex; flex-direction: column; gap: 2px; }
@@ -1187,6 +1211,15 @@
     .filter-dd > .filter-trigger { padding: 6px 10px; font-size: 12.5px; }
     .filter-strip .quick-chip { padding: 6px 10px; font-size: 12px; }
     .filter-dd > .popover { left: -4px; right: auto; min-width: calc(100vw - 28px); max-width: calc(100vw - 28px); }
+    /* Override right-aligned positioning for edge filters on mobile —
+       everything goes full-width on small screens. */
+    .filter-dd:last-child > .popover,
+    .filter-dd:nth-last-child(2) > .popover { left: auto; right: -4px; }
+
+    /* Map: shorter on mobile, summary stacks vertically. */
+    #map-container { height: calc(100vh - 220px); min-height: 320px; max-height: 560px; }
+    .map-summary { font-size: 12px; gap: 4px 8px; padding: 8px 0; }
+    .map-legend { padding: 8px 10px; gap: 4px; font-size: 11px; }
 
     /* Compact vacancy-gap line — slightly smaller body text on phones;
        border + colour stay so the line still reads as alarm copy. */
@@ -1329,14 +1362,64 @@
   .listing .deadline-future-date { color: var(--ink); font-weight: 500; }
 
   /* Map */
-  #map-container { height: 620px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-  .map-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; font-size: 12px; }
-  .map-legend-item { display: flex; align-items: center; gap: 5px; }
+  /* Trap Leaflet's internal z-indexes (tile pane 200, controls 800+)
+     inside its own stacking context so the filter-strip popovers
+     (z-index: 1100) always paint above the map surface. */
+  #map-container {
+    height: calc(100vh - 200px); min-height: 480px; max-height: 800px;
+    border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
+    position: relative; z-index: 0;
+  }
+  /* Map summary bar — sits between filter strip and the map, mirrors
+     the listings summary row so the user gets count feedback. */
+  .map-summary {
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 16px;
+    padding: 10px 0; font-size: 13px; color: var(--muted);
+  }
+  .map-summary .map-counts {
+    display: flex; gap: 16px; align-items: center;
+  }
+  .map-summary .map-counts .emph {
+    font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums;
+  }
+  .map-summary .map-active-chips {
+    display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+  }
+  /* Legend — upgraded from a flat flex row to a styled strip with
+     clickable items that double as institution-type toggles. */
+  .map-legend {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
+    font-size: 12px; padding: 10px 14px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .map-legend-item {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 4px;
+    cursor: default; transition: background 0.15s ease;
+    font-weight: 500;
+  }
+  .map-legend-item:hover { background: var(--chip-bg); }
   .map-legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  /* Map tile boundary disclaimer — legally important for Indian maps.
+     Styled quiet so it doesn't overpower the map itself. */
+  .map-disclaimer {
+    font-size: 11.5px; color: var(--muted); line-height: 1.5;
+    margin: 10px 0 0; padding: 0; font-style: italic;
+  }
+  .map-disclaimer a { color: var(--accent); text-decoration: none; }
+  .map-disclaimer a:hover { text-decoration: underline; }
   .leaflet-popup-content { font-size: 13px; line-height: 1.5; min-width: 180px; }
   .leaflet-popup-content strong { color: var(--accent); }
   .popup-hss { color: var(--warn); font-weight: 600; margin-top: 4px; }
   .popup-link { color: var(--accent); text-decoration: none; font-size: 12px; }
+  /* Dark-mode overrides for Leaflet popups + map legend. */
+  html[data-theme="dark"] .leaflet-popup-content-wrapper { background: var(--panel); color: var(--ink); }
+  html[data-theme="dark"] .leaflet-popup-tip { background: var(--panel); }
+  html[data-theme="dark"] .leaflet-popup-close-button { color: var(--muted); }
+  html[data-theme="dark"] .map-legend { background: var(--panel); border-color: var(--border); }
+  html[data-theme="dark"] .map-legend-item:hover { background: rgba(255,255,255,0.06); }
 
   /* Coverage */
   #coverage-summary .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
