@@ -30,6 +30,8 @@
     --muted-soft: #888883;     /* neutral non-urgent signal */
     --accent: #123f73;         /* Ambedkar cobalt/navy for actions */
     --accent-deep: #0b2d55;    /* hover / pressed */
+    --ambedkar-blue: #0047AB;        /* Ambedkar blue — masthead title + Apply CTA */
+    --ambedkar-blue-deep: #003380;   /* Ambedkar blue hover/pressed */
     --warn: #8a5a18;           /* amber for disclosure absence */
     --alarm: #7a1620;          /* oxblood — Dalit Panther saturated red */
     --good: #1b5e20;
@@ -47,6 +49,8 @@
     --muted-soft: #6f716f;
     --accent: #7ea7df;         /* luminous cobalt */
     --accent-deep: #a4c3ee;
+    --ambedkar-blue: #5b8ad6;        /* Ambedkar blue, lifted for dark-mode contrast */
+    --ambedkar-blue-deep: #82a6e0;   /* Ambedkar blue hover/pressed in dark mode */
     --warn: #d0a05e;           /* amber */
     --alarm: #e05b63;          /* oxblood in dark mode */
     --good: #63ad78;
@@ -100,7 +104,6 @@
      nameplate. The 6px Dalit Panther red strip stays. */
   header.masthead {
     background: var(--bg);
-    border-top: 6px solid var(--alarm);
     border-bottom: 1px solid var(--border);
     padding: 28px 32px 32px;
     text-align: center;
@@ -139,35 +142,49 @@
      fold for the actual feed. The strapline still uses the serif italic
      register; just smaller and beside the title rather than below it. */
   header.masthead.masthead-compact {
-    padding: 18px 32px 20px;
+    padding: 22px 32px 24px;
     text-align: center;
   }
   header.masthead.masthead-compact h1 {
-    font-size: 34px;
+    font-size: 40px;
     font-weight: 700;
-    color: var(--accent);
-    letter-spacing: -0.022em;
+    /* Ambedkar blue token — same colour the Apply CTA fills with, in
+       both modes. Light: #0047AB. Dark: #5b8ad6 (lifted for text
+       contrast against charcoal — Apply button shifts up too so they
+       still match exactly). */
+    color: var(--ambedkar-blue);
+    letter-spacing: -0.024em;
     line-height: 1.2;
-    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 18px;
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 22px;
     max-width: 1180px; margin: 0 auto;
   }
   header.masthead.masthead-compact .masthead-title {
     font-family: var(--serif);
+    /* Inherits color: var(--ambedkar-blue) from the parent h1 — same
+       blue the Apply CTA fills with, so the masthead title sits in the
+       same family as the site's primary action. Strapline below stays
+       vermillion. */
   }
   header.masthead.masthead-compact .masthead-strapline {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 400;
-    color: var(--ink);
+    color: var(--alarm);                /* Dalit Panther vermillion */
     line-height: 1.4;
   }
-  @media (max-width: 720px) {
+  /* No column-mode breakpoint here — the h1 keeps `flex-wrap: wrap` on,
+     so as long as title + strapline can fit on one line they will. When
+     they can't (very narrow viewports), flex naturally wraps the
+     strapline onto a second row, both still centered via the parent's
+     justify-content: center. The earlier @media (max-width: 720px)
+     forced flex-direction: column even at widths where the items would
+     have fit inline — that was the artificial constraint. */
+  @media (max-width: 540px) {
     header.masthead.masthead-compact h1 {
-      font-size: 26px; gap: 6px; flex-direction: column;
-      align-items: center;            /* column flex needs cross-axis center */
+      font-size: 30px; gap: 6px;
     }
-    header.masthead.masthead-compact .masthead-strapline { font-size: 13.5px; }
+    header.masthead.masthead-compact .masthead-strapline { font-size: 15px; }
   }
 
   /* (Vacancies-tab strip removed; compact vacancy-gap line is now
@@ -190,7 +207,7 @@
      designed to receive them. */
   footer.colophon {
     background: var(--bg);
-    border-top: 4px solid var(--alarm);
+    border-top: 1px solid var(--border);
     margin-top: 64px;
     padding: 36px 32px 40px;
     color: var(--ink);
@@ -211,7 +228,10 @@
   }
   footer.colophon .colophon-caveat {
     font-family: var(--sans); font-size: 13px; color: var(--muted);
-    max-width: 72ch; margin: 0 auto 18px; line-height: 1.55;
+    margin: 0 auto 18px; line-height: 1.55;
+    /* No max-width: lets the line span the full footer width and stay
+       on one line at desktop widths. On narrower viewports it wraps
+       naturally. */
   }
   footer.colophon .colophon-caveat .colophon-about-link {
     color: var(--accent); text-decoration: none; font-weight: 600;
@@ -222,7 +242,9 @@
   }
   footer.colophon .colophon-meta-line {
     font-family: var(--sans); font-size: 11.5px; color: var(--muted);
-    margin: 0 auto; letter-spacing: 0.02em; max-width: 80ch; line-height: 1.7;
+    margin: 0 auto; letter-spacing: 0.02em; line-height: 1.7;
+    /* No max-width: lets the meta line span the full footer width and
+       stay on one line at desktop widths. */
   }
   footer.colophon .colophon-meta-line a {
     color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border);
@@ -564,7 +586,7 @@
   html[data-theme="dark"] .vacancy-gap-banner.vacancy-gap-banner-compact {
     background: color-mix(in srgb, var(--alarm) 12%, var(--bg));
   }
-  .feed-list { display: flex; flex-direction: column; gap: 10px; }
+  .feed-list { display: flex; flex-direction: column; gap: 18px; }
   /* Load-more button — large, satisfying tap target. Cobalt to align with
      the political register; the chevron suggests progressive expansion. */
   .load-more { display: block; width: 100%; margin: 14px 0 0; padding: 18px 24px; background: var(--panel); border: 2px solid var(--accent); border-radius: 10px; color: var(--accent); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s, color .15s; text-align: center; letter-spacing: 0.01em; }
@@ -597,29 +619,22 @@
   html[data-theme="dark"] .listing:hover {
     background: color-mix(in srgb, var(--panel) 92%, var(--accent) 8%);
   }
+  /* All listing cards (public + private) share the same neutral
+     surface and the same cobalt hover. The earlier scope-private
+     amber/brown hover override was the "ugly brown" tinge — dropped
+     so private-uni cards don't read as visually downranked. The
+     "Private university" tag in the card meta is sufficient as
+     scope signal; we don't need a colour difference too. */
   .listing.scope-public,
   .listing.scope-private {
     background: var(--panel);
     border-color: var(--border);
   }
   .listing:hover { border-color: var(--accent); background: color-mix(in srgb, var(--panel) 96%, var(--accent) 4%); }
-  .listing.scope-private:hover { border-color: #b85a1c; background: color-mix(in srgb, var(--panel) 97%, #b85a1c 3%); }
-  html[data-theme="dark"] .listing.scope-private:hover {
-    border-color: var(--warn);
-    background: color-mix(in srgb, var(--panel) 94%, var(--warn) 6%);
-  }
-  /* Tier bar: 4-px coloured strip on the left. Saturated colour reads as
-     a deliberate UI element with political weight, not a soft accent. */
-  .listing .tier-bar {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    width: 4px; border-radius: 0; background: var(--border);
-  }
-  .listing.tier-critical .tier-bar { background: var(--alarm); }
-  .listing.tier-soon     .tier-bar { background: var(--warn); }
-  /* tier-ok (31+ days) is "not urgent" — a neutral signal, not a positive
-     one. Use muted-soft instead of green; the candidate's eye is drawn
-     to the urgent cards (alarm/warn), not away from far-out ones. */
-  .listing.tier-ok       .tier-bar { background: var(--muted-soft); }
+  /* Tier bar removed entirely — the 4px strip on the left of every
+     listing read as a vestigial decorative accent. Urgency is now
+     conveyed by the deadline column's red intensity alone. */
+  .listing .tier-bar { display: none; }
 
   /* Headline grid: discipline + rank + inst on the left, deadline column
      on the right, star button in its own column. */
@@ -1061,8 +1076,14 @@
   /* Critical-tier deadlines (≤7 days) get heavier weight and a stronger
      red — the protest register applied to the moment that actually
      matters: "this closes soon, act on it." */
+  /* Urgency hierarchy on the deadline number. One colour family — the
+     project's protest red — at different intensities, plus muted for
+     "not soon": critical (≤7 days) is the boldest, largest, and most
+     saturated; soon (8-30 days) reads in the same red but at the
+     default size + weight; ok (31+ days) drops to muted. The earlier
+     amber #8a5403 read as ugly brown — replaced. */
   .listing.tier-critical .deadline-num { color: var(--alarm); font-weight: 850; font-size: 29px; }
-  .listing.tier-soon     .deadline-num { color: #8a5403; }
+  .listing.tier-soon     .deadline-num { color: var(--alarm); font-weight: 700; }
   .listing.tier-ok       .deadline-num { color: var(--muted); }
   .listing .deadline-num.small { font-size: 12px; font-weight: 500; color: var(--muted); }
   /* Rolling-deadline pill — same visual slot as the big number, but
@@ -1212,7 +1233,7 @@
   }
   .empty-state-reserved .empty-state-cta a:hover { opacity: 0.8; }
 
-  /* Apply CTA — filled button in Krishna cobalt (#0047AB). Hardcoded
+  /* Apply CTA — filled button in Ambedkar blue (#0047AB). Hardcoded
      here rather than driven by --accent so the broader palette stays
      untouched until the full Ambedkar/Left aesthetic redesign lands.
      The earlier classified-row treatment (text-only, var(--accent))
@@ -1220,15 +1241,17 @@
      2026-05-05 maintainer call. */
   .listing .row-actions-inline a.btn-apply {
     display: inline-flex; align-items: center; gap: 4px;
-    background: #0047AB; color: #fff;
+    /* Ambedkar blue — same token the masthead title uses, so the
+       primary CTA and the editorial nameplate sit in the same blue. */
+    background: var(--ambedkar-blue); color: #fff;
     padding: 6px 14px; border-radius: 6px;
     font-size: 13px; font-weight: 600; text-decoration: none;
-    border: 1px solid #0047AB;
+    border: 1px solid var(--ambedkar-blue);
     transition: background 0.15s ease, opacity 0.15s ease;
     flex-shrink: 0;
   }
   .listing .row-actions-inline a.btn-apply:hover {
-    background: #003380; border-color: #003380;
+    background: var(--ambedkar-blue-deep); border-color: var(--ambedkar-blue-deep);
     color: #fff; opacity: 1; text-decoration: none;
   }
   /* Third-party apply portal disclosure: shown next to the Apply
@@ -1301,9 +1324,13 @@
      the 1080px main. The 880px column matches what the inner blocks
      (act-header, act-deck, jbm-card, hero-stat-strip, gap-bibliography,
      vacancies-appendix) cap themselves at, so everything aligns to the
-     same edges. Other tabs keep main's full 1080px so card grids stay
-     wide. */
+     same edges. */
   #vacancies-tab { max-width: 880px; margin-left: auto; margin-right: auto; }
+  /* Listings tab uses the same narrative column — narrower job cards
+     centered within main, matching The Gap tab's column. The filter
+     strip, vacancy-gap line, summary row, heuristic banner, and the
+     listing cards all sit inside this 880px frame. */
+  #listings-tab { max-width: 880px; margin-left: auto; margin-right: auto; }
   /* H3 section headers on Vacancies tab carry a red left bar — these
      are arguments, not just navigation, and the visual register says so. */
   #vacancies-tab h3 { font-family: var(--serif); font-weight: 700; font-size: 19px; margin: 24px 0 10px; padding: 4px 0 4px 14px; border-left: 4px solid var(--alarm); }
@@ -1745,6 +1772,30 @@
     color: var(--bg);
   }
 
+  /* Section-heading anchor — a small "#" link that appears on hover next
+     to each H2/H3/appendix-summary. Click to copy a deep-link URL to the
+     section, the same way GitHub's README headings do it.
+     The corresponding hashchange-router enhancement in app.js routes
+     /#point-3 etc. into the right tab + scrolls. */
+  #vacancies-tab .heading-anchor {
+    color: var(--accent);
+    text-decoration: none;
+    margin-left: 10px;
+    font-weight: 500;
+    font-size: 0.7em;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  #vacancies-tab h2:hover > .heading-anchor,
+  #vacancies-tab .act-title:hover > .heading-anchor,
+  #vacancies-tab .vacancies-appendix > summary:hover .heading-anchor,
+  #vacancies-tab .heading-anchor:focus {
+    opacity: 0.55;
+  }
+  #vacancies-tab .heading-anchor:hover {
+    opacity: 1;
+  }
+
   /* Sub-hero stat strip — three big numbers, rendered flush with the
      hero-stat content above (no card frame). First cell's content
      starts at x=0 of main, matching the kicker / 31% / headline edge.
@@ -1791,13 +1842,53 @@
   #vacancies-tab .jbm-source,
   #vacancies-tab .hero-stat-strip .hss-source { display: none; }
 
-  /* Bibliography block appended by JS at the end of #vacancies-tab. */
-  #vacancies-tab .gap-bibliography { margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--border); }
-  #vacancies-tab .gap-bibliography h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--ink); margin: 0 0 12px; letter-spacing: -0.01em; }
-  #vacancies-tab .gap-bibliography .bib-method { font-size: 14px; color: var(--ink); max-width: 760px; line-height: 1.6; margin: 0 0 20px; font-family: var(--serif); }
-  #vacancies-tab .gap-bibliography ol { font-size: 13px; color: var(--muted); max-width: 760px; line-height: 1.6; padding-left: 22px; margin: 0; font-family: var(--sans, "Inter"); }
-  #vacancies-tab .gap-bibliography ol li { margin-bottom: 10px; }
-  #vacancies-tab .gap-bibliography ol li strong { color: var(--ink); font-weight: 700; }
+  /* Bibliography appended by JS at the end of #vacancies-tab. Now a
+     collapsible <details> — same disclosure pattern as the appendix
+     so the Gap tab ends with two click-to-expand sections rather
+     than a long, always-visible reference list. Anchor links to
+     #gap-sources auto-open the <details> via the click handler in
+     app.js. */
+  #vacancies-tab details.gap-bibliography {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  #vacancies-tab details.gap-bibliography > summary {
+    cursor: pointer;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    padding: 12px 0;
+    list-style: none;
+    letter-spacing: -0.005em;
+  }
+  #vacancies-tab details.gap-bibliography > summary::-webkit-details-marker { display: none; }
+  #vacancies-tab details.gap-bibliography > summary::before {
+    content: "▸ ";
+    color: var(--accent);
+    display: inline-block;
+    margin-right: 4px;
+    transition: transform 0.15s;
+  }
+  #vacancies-tab details.gap-bibliography[open] > summary::before {
+    content: "▾ ";
+  }
+  #vacancies-tab details.gap-bibliography .bib-summary-hint {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  #vacancies-tab details.gap-bibliography[open] .bib-summary-hint {
+    display: none;
+  }
+  #vacancies-tab details.gap-bibliography .bib-body {
+    padding-top: 18px;
+  }
+  #vacancies-tab details.gap-bibliography .bib-method { font-size: 14px; color: var(--ink); max-width: 760px; line-height: 1.6; margin: 0 0 20px; font-family: var(--serif); }
+  #vacancies-tab details.gap-bibliography ol { font-size: 13px; color: var(--muted); max-width: 760px; line-height: 1.6; padding-left: 22px; margin: 0; font-family: var(--sans, "Inter"); }
+  #vacancies-tab details.gap-bibliography ol li { margin-bottom: 10px; }
+  #vacancies-tab details.gap-bibliography ol li strong { color: var(--ink); font-weight: 700; }
 
   /* Mobile chart polish: SVG charts and card paddings shrink to make the
      actual data area larger on small viewports. */
@@ -1883,6 +1974,6 @@
   #vacancies-tab .mp-aff { font-size: 11px; color: var(--muted); margin-top: 2px; display: block; }
   #vacancies-tab .mp-state { font-size: 11px; color: var(--accent); font-weight: 600; }
 
-  /* Footer red top border bookends the masthead's red top strip — the
-     full page sits inside a Bahujan-radical-tradition frame. */
-  footer { max-width: 1480px; margin: 40px auto 0; padding: 24px 32px; border-top: 4px solid var(--alarm); font-size: 12px; color: var(--muted); line-height: 1.6; }
+  /* Footer — soft top rule (no longer the heavy alarm-red stripe that
+     bookended the masthead's red strip). */
+  footer { max-width: 1480px; margin: 40px auto 0; padding: 24px 32px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); line-height: 1.6; }

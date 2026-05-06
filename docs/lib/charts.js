@@ -589,12 +589,12 @@ export function chart2_mandateVsReality(snaps) {
       ${elems}
       <line class="anno-line" x1="${xR + 110}" y1="${yS(4.88)}" x2="${xR + 84}" y2="${yS(4.88)}"/>
       <text class="anno-text emph" x="${xR + 116}" y="${yS(4.88) + 4}">ST — 65% of mandate</text>
-      <text class="anno-text" x="${xR + 110}" y="${yS(58.5) + 4}" style="fill:var(--muted)">General — captures the surplus</text>
+      <text class="anno-text" x="${xR + 110}" y="${yS(58.5) + 4}" style="fill:var(--muted)">"General" — captures the surplus</text>
     </svg>`;
 
   return chartCard({
     title: `What the Constitution promised, and what was delivered`,
-    deck: `Mandated share (left) vs actual share (right) of cumulative Mission Mode faculty appointments across centrally-funded HEIs, September 2022 to January 2026. Lines that slope downward = under-realised category. ST realises 65% of its mandate; SC 83%; OBC 78%. The General category over-realises by 45 percentage points — the surplus that should have gone to Bahujan candidates.`,
+    deck: `Mandated share (left) vs actual share (right) of cumulative Mission Mode faculty appointments across centrally-funded HEIs, September 2022 to January 2026. Lines that slope downward = under-realised category. ST realises 65% of its mandate; SC 83%; OBC 78%. The "General" category over-realises by 45 percentage points — the surplus that should have gone to Bahujan candidates.`,
     body,
     source: `Lok Sabha Q. 5842 (30 Mar 2026), Ministry of Education. Total faculty filled: ${total.toLocaleString('en-IN')}. Mandate: SC 15%, ST 7.5%, OBC 27%, EWS 10%; General-residual ~40.5% post-103rd Amendment.`,
   });
@@ -709,7 +709,11 @@ export function chart4_aiims(snaps) {
     const isHigh = d.vacancy_rate >= 40;
     const fill = isSevere ? "var(--jbm-emph)" : isHigh ? "#c97a4a" : "var(--jbm-context)";
     const y = baseY - level * (dotR * 2 + 2);
-    return `<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}" stroke="var(--panel)" stroke-width="1.5"/>`;
+    // <title> inside <circle> renders as the browser's native tooltip on
+    // hover. Outliers (top-3 + best) carry a visible <text> label as well;
+    // the rest stay silent until the cursor lands on them.
+    const tooltip = `AIIMS ${d.name} — ${d.vacancy_rate.toFixed(0)}% vacant`;
+    return `<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}" stroke="var(--panel)" stroke-width="1.5" style="cursor:pointer;"><title>${escapeHTML(tooltip)}</title></circle>`;
   }).join("");
 
   // Label outliers: top 3 worst + best
@@ -1103,7 +1107,7 @@ export function realisationSlopeChart(snaps) {
   }).join("");
 
   return `<div class="viz-card slope-card">
-    <div class="viz-hdr" style="font-size:18px; line-height:1.3;">EWS realises at one-third of its mandate. The General category over-realises by 44%.</div>
+    <div class="viz-hdr" style="font-size:18px; line-height:1.3;">EWS realises at one-third of its mandate. The "General" category over-realises by 44%.</div>
     <div class="viz-sub" style="margin-bottom:16px;">Mandated share of all CFHEI faculty hires (left) compared to actual share (right), Sep 2022 → Jan 2026.</div>
     <svg class="slope-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Slope chart of mandate vs actual share">
       <defs>
@@ -1118,7 +1122,7 @@ export function realisationSlopeChart(snaps) {
       <line class="annotation-arrow" x1="${xR + 110}" y1="${yScale(3.07)}" x2="${xR + 50}" y2="${yScale(3.07)}"/>
       <text class="annotation" x="${xR + 115}" y="${yScale(3.07) + 4}">EWS — short by 7 percentage points</text>
       <line class="annotation-arrow" x1="${xR + 110}" y1="${yScale(58.5)}" x2="${xR + 50}" y2="${yScale(58.5)}"/>
-      <text class="annotation" x="${xR + 115}" y="${yScale(58.5) + 4}" style="fill:var(--muted);">General — captures the surplus</text>
+      <text class="annotation" x="${xR + 115}" y="${yScale(58.5) + 4}" style="fill:var(--muted);">"General" — captures the surplus</text>
     </svg>
     <div class="chart-source"><strong>Source:</strong> Lok Sabha Q. 5842, 30 Mar 2026 (first cumulative-by-category disclosure, surfaced after the Supreme Court's Article 142 order). Total faculty filled across all CFHEIs: ${total.toLocaleString('en-IN')}. Mandate: SC 15%, ST 7.5%, OBC 27%, EWS 10%; GEN-residual 40.5% post-103rd Amendment.</div>
   </div>`;
@@ -1175,7 +1179,7 @@ export function realisationDonut(snaps) {
     </div>`;
   }).join("");
   return `<div class="viz-card">
-    <div class="viz-hdr">59 of every 100 hires went to the General category. The mandate is 40.5%.</div>
+    <div class="viz-hdr">59 of every 100 hires went to the "General" category. The mandate is 40.5%.</div>
     <div class="viz-sub">Dashes mark where each category's statutory mandate should reach.</div>
     <div class="donut-wrap">
       <svg class="donut-svg" viewBox="0 0 280 280" role="img" aria-label="Mission Mode fills donut">
@@ -1673,7 +1677,7 @@ export async function renderVacancies() {
     <div class="hero-stat">
       <div class="hs-kicker">Faculty hiring at India's centrally-funded HEIs · Sep 2020–Mar 2026</div>
       <span class="hs-num">1,984</span>
-      <p class="hs-headline">SC, ST, and OBC faculty seats kept from the candidates the Constitution reserved them for. The General category took <em>3,222</em> above its cap, in their place.</p>
+      <p class="hs-headline">SC, ST, and OBC faculty seats kept from the candidates the Constitution reserved them for. The "General" category took <em>3,222</em> above its cap, in their place.</p>
     </div>
 
     <div class="hero-stat-strip">
@@ -1728,59 +1732,64 @@ export async function renderVacancies() {
   host.innerHTML = `
     ${ledeHtml}
 
-    <h2 style="font-family:var(--serif); font-size:30px; font-weight:700; color:var(--ink); padding-top:32px; margin:32px 0 8px; letter-spacing:-0.01em; max-width:880px; line-height:1.2;">The Constitution promised 63.5% of these faculty seats to Bahujan candidates. The seats sit vacant. The Ministry has stopped naming them by category.</h2>
+    <h2 id="bahujan-promise" class="gap-h2" style="font-family:var(--serif); font-size:30px; font-weight:700; color:var(--ink); padding-top:32px; margin:32px 0 8px; letter-spacing:-0.01em; max-width:880px; line-height:1.2;">The Constitution promised 63.5% of these faculty seats to Bahujan candidates. The seats sit vacant. The Ministry has stopped naming them by category.<a href="#bahujan-promise" class="heading-anchor" aria-label="Link to this section">#</a></h2>
     <p class="act-deck" style="font-size:15.5px; line-height:1.55; margin:0 0 32px;">Five and a half years of parliamentary record show the Indian state doing <strong>seven specific things</strong> to its Bahujan PhD class. Each section below names one of them and shows the chart that proves it. Read straight through. <a href="#vacancies" data-tab-link="vacancies" data-scroll-target="gap-sources" class="gap-anchor-link">Scope, sources, and methodology</a> are at the end of the page.</p>
 
     ${chart0_volume()}
 
     ${charty_topics()}
 
-    <div class="act-header"><span class="act-num">Point 1</span><h3 class="act-title">The state is making them, then refusing them.</h3></div>
+    <div class="act-header"><span class="act-num">Point 1</span><h3 id="point-1" class="act-title">The state is making them, then refusing them.<a href="#point-1" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
     <p class="act-deck"><strong>The doctorate is a credential the state issues; the seat is a credential the state withholds.</strong> India produces ~25,550 PhDs a year — third-highest absolute output of any country. Mission Mode hires ~5,100 across all centrally-funded HEIs combined. Four of every five PhDs the system credentials get no faculty position in the system that credentialed them.</p>
     ${chart8_counterfactual()}
 
-    <div class="act-header"><span class="act-num">Point 2</span><h3 class="act-title">It is keeping their seats officially "vacant" while adjuncts fill the gap.</h3></div>
+    <div class="act-header"><span class="act-num">Point 2</span><h3 id="point-2" class="act-title">It is keeping their seats officially "vacant" while adjuncts fill the gap.<a href="#point-2" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
     <p class="act-deck"><strong>Same syllabus. The seat that would have gone to a Bahujan candidate stays empty; the labour is supplied by someone whose hiring required no roster compliance.</strong> ~10,600 standing vacancies at central HEIs and AIIMS, mostly reserved by statute. Ad-hoc, guest, and contract appointments fill the teaching gap — and fall outside the reservation regime entirely. The vacancy line has stayed flat for fifteen months.</p>
     ${chart1_vacancyTimeline(allSnaps)}
 
-    <div class="act-header"><span class="act-num">Point 3</span><h3 class="act-title">It is concealing the data that would make this legible.</h3></div>
+    <div class="act-header"><span class="act-num">Point 3</span><h3 id="point-3" class="act-title">It is concealing the data that would make this legible.<a href="#point-3" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
     <p class="act-deck"><strong>The Ministry has the numbers. It chooses when to publish.</strong> Of 546 parliamentary questions across five years, fewer than 4% of answers — at peak — gave a category-wise breakdown. By 2025 it was below 1%. <strong>PwBD vacancy data has not been disclosed since March 2023.</strong> The 200-point roster under the CEI(RTC) Act, 2019 contains the data — its release is administrative discretion, not statutory compulsion.</p>
     ${chart5_disclosure_v2()}
     ${chartx_boilerplate()}
 
-    <div class="act-header"><span class="act-num">Point 4</span><h3 class="act-title">It is calibrating disclosure to political leverage.</h3></div>
+    <div class="act-header"><span class="act-num">Point 4</span><h3 id="point-4" class="act-title">It is calibrating disclosure to political leverage.<a href="#point-4" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
     <p class="act-deck"><strong>Disclosure is dispensed as political concession, not constitutional right.</strong> The work of asking falls almost entirely to opposition MPs from states with Dravidian, anti-caste, and left political traditions. The ruling coalition has tabled essentially zero of these questions over five years. Bahujan candidates without an MP at Kharge's level have no instrument to extract the data the Ministry holds.</p>
     ${chart6_whoIsAsking()}
 
-    <div class="act-header"><span class="act-num">Point 5</span><h3 class="act-title">It is breaking the rank-promotion bridge.</h3></div>
+    <div class="act-header"><span class="act-num">Point 5</span><h3 id="point-5" class="act-title">It is breaking the rank-promotion bridge.<a href="#point-5" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
     <p class="act-deck"><strong>The seats above them have been kept open instead of filled.</strong> The single document in this corpus that publishes faculty vacancy by rank <em>and</em> by category was given to one MP — Mallikarjun Kharge, Leader of Opposition, Rajya Sabha — on 23 July 2025. Refused to every other parliamentarian who asked. Read it. The largest unfilled bucket sits at the Associate Professor rank — the bridge between entry-level and seniority — meaning Bahujan candidates who do enter as Assistant Professors are not progressing through the cadre.</p>
     ${chart3_kharge(allSnaps)}
 
-    <div class="act-header"><span class="act-num">Point 6</span><h3 class="act-title">It is letting reserved posts lapse, then converting them to "Unreserved."</h3></div>
-    <p class="act-deck"><strong>Each lapsed post is a Bahujan candidate's seat permanently exited from the reserved roster.</strong> The discretionary brake is a four-word phrase: "no suitable candidate available." Reserved posts re-advertised in two cycles without filling become candidates for <em>de-reservation</em> — converted to Unreserved and captured by the General pool. The CEI(RTC) Act, 2019 nominally tightened this; institutional practice survives the statute.</p>
+    <div class="act-header"><span class="act-num">Point 6</span><h3 id="point-6" class="act-title">It is letting reserved posts lapse, then converting them to "Unreserved."<a href="#point-6" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
+    <p class="act-deck"><strong>Each lapsed post is a Bahujan candidate's seat permanently exited from the reserved roster.</strong> The discretionary brake is a four-word phrase: "no suitable candidate available." Reserved posts re-advertised in two cycles without filling become candidates for <em>de-reservation</em> — converted to Unreserved and captured by the "General" pool. The CEI(RTC) Act, 2019 nominally tightened this; institutional practice survives the statute.</p>
     <div class="jbm-card" style="border-left: 4px solid var(--alarm); background: rgba(200,16,46,0.04);">
       <h4 class="jbm-title" style="color: var(--alarm);">⚑ The chart that should be here, isn't</h4>
       <p class="jbm-deck">The institutional records that would let us count de-reserved posts year by year — selection-committee minutes, de-reservation requests forwarded to UGC, the post-by-post lapsing trail — <strong>are not published.</strong> The data exists, held inside the institutions. RS AU354 (3 Dec 2025) explicitly asked the Ministry for this disclosure and was answered with non-substantive narrative. <strong>The absence of a chart on this page is itself the political condition the page documents.</strong> An institution-by-institution RTI campaign would generate the missing data; the <a href="#resources" data-tab-link="resources" style="color:var(--accent); font-weight:600;">Resources tab</a> contains a template targeting this gap.</p>
       <div class="jbm-source"><strong>Sources:</strong> RS AU354 (3 Dec 2025); RS AU2425 (22 Mar 2023).</div>
     </div>
 
-    <div class="act-header"><span class="act-num">Point 7</span><h3 class="act-title">It is laundering the lapsed seats through a "Mission Mode" counter.</h3></div>
-    <p class="act-deck"><strong>The counter rises while the cadre composition stays what the savarna state needs it to be.</strong> When MPs ask how many vacancies remain, the Ministry answers with how many cumulative recruitments have been made since September 2022 — different number, different question, designed to look like an answer. The chart below is the only caste-disaggregated disclosure of Mission Mode fills in the entire 546-question parliamentary corpus. The Ministry was forced to publish it in March 2026, after the Supreme Court invoked Article 142. <strong>The General category over-realises by 44 percentage points. The seats that should have gone to Bahujan candidates didn't fail to be filled — they were redistributed.</strong></p>
+    <div class="act-header"><span class="act-num">Point 7</span><h3 id="point-7" class="act-title">It is laundering the lapsed seats through a "Mission Mode" counter.<a href="#point-7" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
+    <p class="act-deck"><strong>The counter rises while the cadre composition stays what the savarna state needs it to be.</strong> When MPs ask how many vacancies remain, the Ministry answers with how many cumulative recruitments have been made since September 2022 — different number, different question, designed to look like an answer. The chart below is the only caste-disaggregated disclosure of Mission Mode fills in the entire 546-question parliamentary corpus. The Ministry was forced to publish it in March 2026, after the Supreme Court invoked Article 142. <strong>The "General" category over-realises by 44 percentage points. The seats that should have gone to Bahujan candidates didn't fail to be filled — they were redistributed.</strong></p>
     ${chart2_mandateVsReality(allSnaps)}
 
-    <div class="act-header" style="margin-top:60px; border-bottom-color:var(--accent);"><span class="act-num" style="color:var(--accent);">The cost</span><h3 class="act-title">What this is doing to Indian higher education, and to India.</h3></div>
+    <div class="act-header" style="margin-top:60px; border-bottom-color:var(--accent);"><span class="act-num" style="color:var(--accent);">The cost</span><h3 id="the-cost" class="act-title">What this is doing to Indian higher education, and to India.<a href="#the-cost" class="heading-anchor" aria-label="Link to this section">#</a></h3></div>
     <p class="act-deck">A faculty cadre held two-thirds full does not produce the research, the teaching, or the institutional capacity the Republic was promised. The cost is structural and visible at every scale: in the new AIIMS network running at half-strength, and in an R&amp;D-as-percentage-of-GDP figure that has been stuck at the world floor for two decades.</p>
     ${chart4_aiims(allSnaps)}
     ${chart7_rdGap()}
 
-    <div style="margin: 56px 0 32px; padding: 32px 40px; background: rgba(200,16,46,0.04); border-left: 6px solid var(--alarm); border-radius: 0 8px 8px 0; max-width: 880px;">
-      <h2 style="font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--ink); line-height: 1.3; margin: 0 0 14px; letter-spacing: -0.005em;">The verdict the data forces</h2>
-      <p style="font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--ink); margin: 0 0 12px;">Not a single failure but an architecture of failure. Legislation passed. Data gathered. Questions asked. Answers refused. Courts engaged. And through every instrument the cadre composition stays what the savarna state needs it to be.</p>
-      <p style="font-family: var(--serif); font-size: 19px; line-height: 1.4; color: var(--alarm); font-weight: 700; margin: 14px 0 0; letter-spacing: -0.005em;">The Constitution is not being violated by accident. It is being administered to that effect.</p>
+    <!-- Free-expand verdict box: viewport-width breakout so the closing
+         editorial signature spans the whole window irrespective of the
+         880px narrative column the rest of the tab uses. The trick
+         (width:100vw + margin-left calc) keeps the element centered in
+         its parent while breaking out of the parent's max-width. -->
+    <div class="gap-verdict" id="architecture-of-failure" style="margin: 56px calc(-50vw + 50%) 32px; padding: 40px max(28px, calc(50vw - 540px)); background: rgba(200,16,46,0.04); border-top: 1px solid color-mix(in srgb, var(--alarm) 35%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--alarm) 35%, transparent); width: 100vw; box-sizing: border-box;">
+      <h2 id="architecture-heading" style="font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--ink); line-height: 1.25; margin: 0 0 16px; letter-spacing: -0.01em;">Not a single failure but an architecture of failure.<a href="#architecture-of-failure" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+      <p style="font-family: var(--serif); font-size: 18px; line-height: 1.6; color: var(--ink); margin: 0 0 14px;">Legislation passed. Data gathered. Questions asked. Answers refused. Courts engaged. And through every instrument the cadre composition stays what the savarna state needs it to be.</p>
+      <p style="font-family: var(--serif); font-size: 21px; line-height: 1.4; color: var(--alarm); font-weight: 700; margin: 14px 0 0; letter-spacing: -0.005em;">The Constitution is not being violated by accident. It is being administered to that effect.</p>
     </div>
 
-    <details class="vacancies-appendix" style="margin-top:48px; padding-top:24px; border-top:2px solid var(--alarm);">
-      <summary style="cursor:pointer; font-family:var(--serif); font-size:18px; font-weight:700; color:var(--ink); padding:12px 0; list-style:none;">Appendix: the rhetorical apparatus and the historical timeline <span style="color:var(--accent); font-size:13px; font-weight:500;">(click to expand)</span></summary>
+    <details class="vacancies-appendix" id="appendix" style="margin-top:48px; padding-top:24px; border-top:2px solid var(--alarm);">
+      <summary style="cursor:pointer; font-family:var(--serif); font-size:18px; font-weight:700; color:var(--ink); padding:12px 0; list-style:none;">Appendix: the rhetorical apparatus and the historical timeline <a href="#appendix" class="heading-anchor" aria-label="Link to this section" onclick="event.stopPropagation();">#</a> <span style="color:var(--accent); font-size:13px; font-weight:500;">(click to expand)</span></summary>
       <div style="padding-top:18px;">
 
       <p class="act-deck" style="font-size:13.5px;">For the reader who wants every receipt: the historical timeline that situates the seven points above, and a prose breakdown of the three rhetorical instruments the Ministry uses to refuse disclosure.</p>
@@ -1836,35 +1845,41 @@ export async function renderVacancies() {
     items.push(`<li>${html}</li>`);
   }
   if (items.length) {
-    const bib = document.createElement("section");
+    // Collapsible bibliography — same disclosure pattern as the appendix.
+    // Anchor links to #gap-sources auto-open the <details> via the click
+    // handler in app.js (which finds any closed <details> ancestor and
+    // sets .open=true before scrolling).
+    const bib = document.createElement("details");
     bib.className = "gap-bibliography";
     bib.id = "gap-sources";
     bib.innerHTML = `
-      <h2>Scope, sources &amp; methodology</h2>
-      <p class="bib-method">
-        <strong>Scope.</strong> The analysis above is restricted to
-        <strong>centrally-funded higher-education institutions</strong> —
-        Central Universities, IIMs, IITs, NITs, IIITs, and the AIIMS network
-        — the institutions subject to the Constitution's reservation mandate
-        under the CEI(RTC) Act, 2019. Private universities are not included
-        in this analytical scope.
-      </p>
-      <p class="bib-method">
-        <strong>Disclaimer.</strong> Material here is the maintainer's
-        research interpretation of publicly available parliamentary records,
-        court orders, and Ministry communications, all cited below. It is
-        research-and-reference public-interest commentary, not legal advice
-        and not an allegation against any individual.
-      </p>
-      <p class="bib-method">
-        <strong>Corpus.</strong> 546 Lok Sabha and Rajya Sabha questions on
-        faculty vacancy in centrally-funded HEIs, Sep 2020 – Mar 2026.
-        Systematically crawled from elibrary.sansad.in (Lok Sabha; DSpace API)
-        and rsdoc.nic.in (Rajya Sabha) and filtered by Education-ministry tag
-        and topical keyword. 213 LS + 333 RS = 546 unique answers in the
-        analytical window.
-      </p>
-      <ol>${items.join("")}</ol>
+      <summary>Scope, sources &amp; methodology <a href="#gap-sources" class="heading-anchor" aria-label="Link to this section" onclick="event.stopPropagation();">#</a> <span class="bib-summary-hint">(click to expand)</span></summary>
+      <div class="bib-body">
+        <p class="bib-method">
+          <strong>Scope.</strong> The analysis above is restricted to
+          <strong>centrally-funded higher-education institutions</strong> —
+          Central Universities, IIMs, IITs, NITs, IIITs, and the AIIMS network
+          — the institutions subject to the Constitution's reservation mandate
+          under the CEI(RTC) Act, 2019. Private universities are not included
+          in this analytical scope.
+        </p>
+        <p class="bib-method">
+          <strong>Disclaimer.</strong> Material here is the maintainer's
+          research interpretation of publicly available parliamentary records,
+          court orders, and Ministry communications, all cited below. It is
+          research-and-reference public-interest commentary, not legal advice
+          and not an allegation against any individual.
+        </p>
+        <p class="bib-method">
+          <strong>Corpus.</strong> 546 Lok Sabha and Rajya Sabha questions on
+          faculty vacancy in centrally-funded HEIs, Sep 2020 – Mar 2026.
+          Systematically crawled from elibrary.sansad.in (Lok Sabha; DSpace API)
+          and rsdoc.nic.in (Rajya Sabha) and filtered by Education-ministry tag
+          and topical keyword. 213 LS + 333 RS = 546 unique answers in the
+          analytical window.
+        </p>
+        <ol>${items.join("")}</ol>
+      </div>
     `;
     host.appendChild(bib);
   }
