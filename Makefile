@@ -17,7 +17,55 @@ $(PYTHON):
 	python3 -m venv $(VENV)
 	$(PIP) install -q -r requirements.txt
 
-.PHONY: serve sweep scrape scrape-fresh refresh-pdfs report test deps prune-archive clean help
+.PHONY: serve sweep scrape scrape-fresh refresh-pdfs report test deps prune-archive clean help \
+        corpus-crawl corpus-parse corpus-export corpus-consolidate corpus-refresh
+
+# ---- parliamentary corpus refresh -----------------------------------------
+#
+# As of 2026-05-06 the LS + RS crawler is the public package
+# `sansad-semantic-crawler` (PolyForm-NC), pinned in requirements.txt at
+# v0.1.0. The host project supplies the topic profile (`notes/topics/
+# cei-vacancies.json`, gitignored — encodes the faculty-vacancy +
+# reservation + Mission Mode regex lens) and the output directory
+# (`data/_sansad_crawl/`, also gitignored).
+#
+# Three legacy scripts (`scripts/sansad_crawl.py`,
+# `scripts/sansad_rs_crawl.py`, `scripts/sansad_download_pdfs.py`) were
+# retired in the same commit; their LS-side schema (`questiontype` /
+# `questionno` / `members`) was the only schema variation that the
+# consolidation step had to remap, and consolidate_corpus.py now reads
+# the package's canonical schema directly.
+
+TOPIC_PROFILE := notes/topics/cei-vacancies.json
+CORPUS_OUT    := data/_sansad_crawl
+
+corpus-crawl: $(PYTHON)
+	@test -f $(TOPIC_PROFILE) || { echo "missing $(TOPIC_PROFILE) — see CONTRIBUTING.md for the topic-profile contract"; exit 1; }
+	$(PYTHON) -m sansad_semantic_crawler crawl \
+	  --topic $(TOPIC_PROFILE) \
+	  --out   $(CORPUS_OUT) \
+	  $(ARGS)
+
+corpus-parse: $(PYTHON)
+	$(PYTHON) -m sansad_semantic_crawler parse \
+	  --topic $(TOPIC_PROFILE) \
+	  --out   $(CORPUS_OUT)
+
+corpus-export: $(PYTHON)
+	$(PYTHON) -m sansad_semantic_crawler export \
+	  --topic $(TOPIC_PROFILE) \
+	  --out   $(CORPUS_OUT) \
+	  --format json
+
+corpus-consolidate: $(PYTHON)
+	$(PYTHON) scripts/consolidate_corpus.py
+
+# Full pipeline: crawl, parse, then consolidate. Skips export (the host
+# project consumes the canonical merged manifest, not the package's
+# summary JSON). Pass `ARGS='--max-buckets 1 --max-records 5 --no-download'`
+# for a smoke run before committing to a full crawl.
+corpus-refresh: corpus-crawl corpus-parse corpus-consolidate
+
 
 # ---- core operations -------------------------------------------------------
 
@@ -68,11 +116,16 @@ clean:
 	rm -rf .cache/
 
 help:
-	@echo "Core:"
+	@echo "Core (vacancy scraper):"
 	@echo "  make serve         — serve dashboard at http://localhost:$(PORT)/dashboard/"
 	@echo "  make sweep         — run scraper (alias: make scrape)"
 	@echo "  make scrape-fresh  — busts PDF cache before scraping"
 	@echo "  make refresh-pdfs  — drop .cache/pdfs/ to force re-download next sweep"
+	@echo "Parliamentary corpus (sansad-semantic-crawler):"
+	@echo "  make corpus-refresh    — crawl + parse + consolidate (full pipeline)"
+	@echo "  make corpus-crawl      — crawl LS + RS into data/_sansad_crawl/ (use ARGS='--max-records 5 --no-download' to smoke-test)"
+	@echo "  make corpus-parse      — extract text from downloaded PDFs"
+	@echo "  make corpus-consolidate — merge into corpus/parliamentary_corpus.jsonl"
 	@echo "Ops:"
 	@echo "  make report        — print HSS + coverage summary"
 	@echo "  make test          — run unit tests under scraper/tests/"

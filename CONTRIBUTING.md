@@ -196,6 +196,41 @@ of a cosmetic bug.
 This section is append-only. The body above is preserved as the
 original contract; dated entries below record what changed afterwards.
 
+### 2026-05-06 — Parliamentary-corpus crawler externalised
+
+Until 2026-05-06 the parliamentary-corpus refresh that drives *The
+Gap* lived in three repo-local scripts:
+
+```
+scripts/sansad_crawl.py           # LS DSpace API (291 lines)
+scripts/sansad_rs_crawl.py        # RS rsdoc.nic.in API (215 lines)
+scripts/sansad_download_pdfs.py   # PDF download pass (125 lines)
+```
+
+These are retired. The same functionality now lives in a separately-
+released public package, **`sansad-semantic-crawler`** at
+[github.com/CommonSenseLLP/sansad-semantic-crawler](https://github.com/CommonSenseLLP/sansad-semantic-crawler)
+(PolyForm Noncommercial 1.0.0), pinned at `v0.1.0` in
+`requirements.txt`. The host project supplies the topic profile —
+`notes/topics/cei-vacancies.json`, gitignored — that encodes the
+faculty-vacancy / reservation / Mission-Mode regex lens.
+
+If you're touching the corpus refresh path:
+
+- Run `make corpus-refresh` (or the per-step targets `corpus-crawl` /
+  `corpus-parse` / `corpus-consolidate`). `make help` lists them.
+- The package emits a single canonical schema for both houses
+  (`qtype` / `qno` / `askers` / stable `key`); the bidirectional
+  legacy mapping in `scripts/consolidate_corpus.py` is gone.
+- The topic profile is the right place to add a new search query, a
+  new tag rule, or a new ministry — it is private because the
+  analytical lens is project-specific. Generic crawler bugs belong
+  upstream at the package repo.
+
+The retirement is full deletion (not deprecation): legacy manifests
+on disk before this commit are not consumable by the new
+`consolidate_corpus.py` and need a re-crawl.
+
 ### 2026-05-05 — Frontend test floor stood up
 
 The "Run the suite" block above mentions only `make test` (the Python

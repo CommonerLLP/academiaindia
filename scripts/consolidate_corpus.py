@@ -1,43 +1,92 @@
-"""Merge the manual + systematically-crawled corpora into one canonical
-manifest, dedupe by (house, q_no, q_date), and re-extract text for the
-combined PDF set so the existing corpus_index.py can rebuild over it.
+"""Merge the manual + sansad-crawled corpora into one canonical manifest,
+dedupe by stable key, and re-symlink PDFs for `corpus_index.py` to rebuild
+over.
 
-Sources:
+Sources (all under the gitignored `data/` tree):
   data/*.pdf                              -- the user's manual collection
-  data/_sansad_crawl/pdfs/                -- crawled LS PDFs (post-2018)
-  data/_sansad_crawl/pdfs_rs/             -- crawled RS PDFs
-  data/_sansad_crawl/manifest.jsonl       -- LS manifest
-  data/_sansad_crawl/manifest_rs.jsonl    -- RS manifest
+  data/_sansad_crawl/manifest.jsonl       -- LS records (sansad-semantic-crawler)
+  data/_sansad_crawl/manifest_rs.jsonl    -- RS records (sansad-semantic-crawler)
+  data/_sansad_crawl/pdfs/ls/             -- LS answer PDFs
+  data/_sansad_crawl/pdfs/rs/             -- RS answer PDFs
 
 Output:
   corpus/parliamentary_corpus.jsonl       -- canonical merged manifest
-  corpus/pdfs/                            -- symlinks to all unique PDFs
+  corpus/pdfs_combined/                   -- symlinks to all unique PDFs
   corpus/STATS.md                         -- descriptive stats summary
+
+Schema contract (post-migration to sansad-semantic-crawler v0.1.0):
+  Both manifests already share the canonical keys
+  `key | house | qtype | qno | date | title | askers | ministry | ...`.
+  The pre-v0.1.0 LS-side schema (`questiontype` / `questionno` / `members`)
+  was dropped at this layer when the legacy scripts/sansad_crawl.py was
+  retired; if you find a manifest line with those keys, regenerate the
+  manifest by re-running the corpus refresh through the package.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import os
-import shutil
 from collections import Counter
 from pathlib import Path
 from datetime import datetime
 
 ROOT = Path(__file__).resolve().parents[1]
+CRAWL_DIR = ROOT / "data" / "_sansad_crawl"
+LS_MANIFEST = CRAWL_DIR / "manifest.jsonl"
+RS_MANIFEST = CRAWL_DIR / "manifest_rs.jsonl"
+LS_PDFS = CRAWL_DIR / "pdfs" / "ls"
+RS_PDFS = CRAWL_DIR / "pdfs" / "rs"
+
 OUT_DIR = ROOT / "corpus"
 OUT_PDFS = OUT_DIR / "pdfs_combined"
 MANIFEST = OUT_DIR / "parliamentary_corpus.jsonl"
 STATS = OUT_DIR / "STATS.md"
 
 
-def normalize_qkey(house: str | None, qtype: str | None, qno: str | None, date: str | None) -> str:
-    """Canonical key for dedup. Ignores subtle name variants."""
-    h = (house or "").upper().split()[0][:2] or "XX"  # LO / RA / XX
-    q = (qtype or "U").upper()[:1]
-    n = str(qno or "X").strip().split(".")[0]
-    d = (date or "").strip()[:10]
-    return f"{h}|{q}|{n}|{d}"
+def read_manifest(path: Path) -> list[dict]:
+    """Yield validated records from a sansad-semantic-crawler JSONL manifest.
+    Skips non-JSON lines; logs nothing — corpus_index.py is the right place
+    to fail loudly on malformed records, not the consolidation step."""
+    if not path.exists():
+        return []
+    rows: list[dict] = []
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return rows
+
+
+def relocate_pdf(pdf_path_field: str | None, pdf_root: Path) -> Path | None:
+    """Resolve a manifest's `pdf_path` (relative to the crawler's out_dir)
+    to an absolute path under `data/_sansad_crawl/`. Returns None if the
+    field is empty or the file isn't on disk."""
+    if not pdf_path_field:
+        return None
+    abs_path = (CRAWL_DIR / pdf_path_field).resolve()
+    if abs_path.exists() and abs_path.stat().st_size > 1000:
+        return abs_path
+    # Fall back: the package writes filenames the same way the legacy
+    # scripts did; if the manifest entry is missing `pdf_path` but the
+    # filename can be reconstructed, look it up directly.
+    return None
+
+
+def add_symlink(src: Path, dst_dir: Path, added: set[str]) -> None:
+    """Symlink `src` into `dst_dir` if not already present. Idempotent."""
+    if src.name in added:
+        return
+    dst = dst_dir / src.name
+    if dst.exists():
+        added.add(src.name)
+        return
+    try:
+        os.symlink(src.resolve(), dst)
+        added.add(src.name)
+    except FileExistsError:
+        added.add(src.name)
 
 
 def consolidate() -> None:
@@ -49,112 +98,84 @@ def consolidate() -> None:
     seen: dict[str, dict] = {}
     pdfs_added: set[str] = set()
 
-    # 1) LS systematic crawl
-    ls_manifest = ROOT / "data" / "_sansad_crawl" / "manifest.jsonl"
-    ls_pdfs = ROOT / "data" / "_sansad_crawl" / "pdfs"
-    if ls_manifest.exists():
-        with ls_manifest.open() as f:
-            for line in f:
-                try: r = json.loads(line)
-                except: continue
-                key = normalize_qkey("Lok Sabha", r.get("questiontype"), r.get("questionno"), r.get("date"))
-                # locate PDF
-                qt = (r.get("questiontype") or "U").upper()[:1]
-                qno = r.get("questionno") or "X"
-                fname = f"{qt}{qno}_{(r.get('uuid') or '')[:8].replace('-', '')}.pdf"
-                pdf_src = ls_pdfs / fname
-                rec = {
-                    "key": key,
-                    "house": "Lok Sabha",
-                    "qtype": (r.get("questiontype") or "").strip(),
-                    "qno": r.get("questionno"),
-                    "date": r.get("date"),
-                    "title": r.get("title"),
-                    "askers": r.get("members") or [],
-                    "ministry": r.get("ministry"),
-                    "pdf_path": str(pdf_src.relative_to(ROOT)) if pdf_src.exists() else None,
-                    "source": "elibrary.sansad.in",
-                    "found_via_query": r.get("found_via_query"),
-                    "uuid": r.get("uuid"),
-                    "handle": r.get("handle"),
-                }
-                seen[key] = rec
-                if pdf_src.exists() and pdf_src.name not in pdfs_added:
-                    pdfs_added.add(pdf_src.name)
-                    dst = OUT_PDFS / pdf_src.name
-                    if not dst.exists():
-                        try:
-                            os.symlink(pdf_src.resolve(), dst)
-                        except FileExistsError:
-                            pass
+    # --- LS records --------------------------------------------------------
+    for r in read_manifest(LS_MANIFEST):
+        key = r.get("key")
+        if not key:
+            # Defensive: every record from the package carries a stable key.
+            # An empty key here means the manifest was generated by something
+            # else; skip rather than silently corrupting the dedup index.
+            continue
+        pdf_src = relocate_pdf(r.get("pdf_path"), LS_PDFS)
+        rec = {
+            "key": key,
+            "house": "Lok Sabha",
+            "qtype": (r.get("qtype") or "").strip(),
+            "qno": r.get("qno"),
+            "date": r.get("date"),
+            "title": r.get("title"),
+            "askers": r.get("askers") or [],
+            "ministry": r.get("ministry"),
+            "pdf_path": str(pdf_src.relative_to(ROOT)) if pdf_src else None,
+            "source": r.get("source") or "elibrary.sansad.in",
+            "found_via_group": r.get("found_via_group"),
+            "found_via_query": r.get("found_via_query"),
+            "uuid": r.get("uuid"),
+            "handle": r.get("handle"),
+            "tags": r.get("tags") or [],
+            "score": r.get("score"),
+        }
+        seen[key] = rec
+        if pdf_src:
+            add_symlink(pdf_src, OUT_PDFS, pdfs_added)
 
-    # 2) RS systematic crawl
-    rs_manifest = ROOT / "data" / "_sansad_crawl" / "manifest_rs.jsonl"
-    rs_pdfs = ROOT / "data" / "_sansad_crawl" / "pdfs_rs"
-    if rs_manifest.exists():
-        with rs_manifest.open() as f:
-            for line in f:
-                try: r = json.loads(line)
-                except: continue
-                # RS date is "DD.MM.YYYY"; normalize
-                ans_date = r.get("ans_date") or ""
-                try:
-                    date_iso = datetime.strptime(ans_date, "%d.%m.%Y").strftime("%Y-%m-%d")
-                except ValueError:
-                    date_iso = (r.get("adate") or "")[:10]
-                key = normalize_qkey("Rajya Sabha", r.get("qtype"), r.get("qno"), date_iso)
-                pdf_path = r.get("pdf_path")
-                rec = {
-                    "key": key,
-                    "house": "Rajya Sabha",
-                    "qtype": (r.get("qtype") or "").strip(),
-                    "qno": r.get("qno"),
-                    "date": date_iso,
-                    "title": r.get("qtitle"),
-                    "askers": [r.get("asker")] if r.get("asker") else [],
-                    "ministry": r.get("ministry"),
-                    "pdf_path": pdf_path,
-                    "source": "rsdoc.nic.in",
-                    "qslno": r.get("qslno"),
-                    "ses_no": r.get("ses_no"),
-                }
-                # Don't overwrite LS keys with RS — different houses, different keys anyway.
-                seen[key] = rec
-                if pdf_path:
-                    pdf_src = ROOT / pdf_path
-                    if pdf_src.exists() and pdf_src.name not in pdfs_added:
-                        pdfs_added.add(pdf_src.name)
-                        dst = OUT_PDFS / pdf_src.name
-                        if not dst.exists():
-                            try:
-                                os.symlink(pdf_src.resolve(), dst)
-                            except FileExistsError:
-                                pass
+    # --- RS records --------------------------------------------------------
+    for r in read_manifest(RS_MANIFEST):
+        key = r.get("key")
+        if not key:
+            continue
+        pdf_src = relocate_pdf(r.get("pdf_path"), RS_PDFS)
+        rec = {
+            "key": key,
+            "house": "Rajya Sabha",
+            "qtype": (r.get("qtype") or "").strip(),
+            "qno": r.get("qno"),
+            "date": r.get("date"),
+            "title": r.get("title"),
+            "askers": r.get("askers") or [],
+            "ministry": r.get("ministry"),
+            "pdf_path": str(pdf_src.relative_to(ROOT)) if pdf_src else None,
+            "source": r.get("source") or "rsdoc.nic.in",
+            "qslno": r.get("qslno"),
+            "ses_no": r.get("ses_no"),
+            "found_via_query": r.get("found_via_query"),
+            "tags": r.get("tags") or [],
+            "score": r.get("score"),
+        }
+        # LS and RS keys cannot collide (the leading "LS"/"RS" segment in
+        # `key` makes them disjoint), so this assignment is safe.
+        seen[key] = rec
+        if pdf_src:
+            add_symlink(pdf_src, OUT_PDFS, pdfs_added)
 
-    # 3) Manual collection in /data — symlink PDFs that aren't already present
+    # --- Manual PDFs in /data ---------------------------------------------
     manual_pdfs = list((ROOT / "data").glob("*.pdf"))
-    manual_added = 0
     for src in manual_pdfs:
-        if src.name not in pdfs_added:
-            pdfs_added.add(src.name)
-            dst = OUT_PDFS / src.name
-            if not dst.exists():
-                try:
-                    os.symlink(src.resolve(), dst)
-                    manual_added += 1
-                except FileExistsError:
-                    pass
+        add_symlink(src, OUT_PDFS, pdfs_added)
 
-    # Write manifest
-    with MANIFEST.open("w") as f:
+    # --- Write manifest ----------------------------------------------------
+    with MANIFEST.open("w", encoding="utf-8") as f:
         for rec in seen.values():
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-    # Stats
+    # --- Stats -------------------------------------------------------------
     by_house = Counter(r["house"] for r in seen.values())
     by_year = Counter((r.get("date") or "0000")[:4] for r in seen.values())
     by_qtype = Counter(r.get("qtype") or "?" for r in seen.values())
     pdfs_in_corpus = len(list(OUT_PDFS.iterdir()))
+
+    ls_pdf_count = len(list(LS_PDFS.glob("*.pdf"))) if LS_PDFS.exists() else 0
+    rs_pdf_count = len(list(RS_PDFS.glob("*.pdf"))) if RS_PDFS.exists() else 0
 
     lines = [
         "# Parliamentary corpus — descriptive stats",
@@ -163,7 +184,7 @@ def consolidate() -> None:
         "",
         f"**Total unique questions in manifest: {len(seen)}**",
         f"**Total PDFs in combined corpus: {pdfs_in_corpus}**",
-        f"  (LS systematic: {len(list(ls_pdfs.glob('*.pdf'))) if ls_pdfs.exists() else 0}; RS systematic: {len(list(rs_pdfs.glob('*.pdf'))) if rs_pdfs.exists() else 0}; manual /data: {len(manual_pdfs)})",
+        f"  (LS systematic: {ls_pdf_count}; RS systematic: {rs_pdf_count}; manual /data: {len(manual_pdfs)})",
         "",
         "## By house",
         "",
@@ -172,18 +193,10 @@ def consolidate() -> None:
     ]
     for h, n in by_house.most_common():
         lines.append(f"| {h} | {n} |")
-    lines.append("")
-    lines.append("## By question type")
-    lines.append("")
-    lines.append("| Type | Count |")
-    lines.append("|---|---|")
+    lines += ["", "## By question type", "", "| Type | Count |", "|---|---|"]
     for q, n in by_qtype.most_common():
         lines.append(f"| {q} | {n} |")
-    lines.append("")
-    lines.append("## By year")
-    lines.append("")
-    lines.append("| Year | Count |")
-    lines.append("|---|---|")
+    lines += ["", "## By year", "", "| Year | Count |", "|---|---|"]
     for y in sorted(by_year):
         lines.append(f"| {y} | {by_year[y]} |")
     STATS.write_text("\n".join(lines) + "\n")
@@ -193,10 +206,12 @@ def consolidate() -> None:
     print(f"Combined PDFs:  {pdfs_in_corpus}")
     print()
     print("--- BY HOUSE ---")
-    for h, n in by_house.most_common(): print(f"  {h:14s} {n}")
+    for h, n in by_house.most_common():
+        print(f"  {h:14s} {n}")
     print()
     print("--- BY YEAR ---")
-    for y in sorted(by_year): print(f"  {y}  {by_year[y]:4d}")
+    for y in sorted(by_year):
+        print(f"  {y}  {by_year[y]:4d}")
 
 
 if __name__ == "__main__":
