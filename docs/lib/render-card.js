@@ -337,7 +337,7 @@ export function renderAd(ad) {
   if (contractStr === "Permanent") contractStr = "";
   // A small flag-row for non-blocking but worth-knowing signals.
   const flags = [];
-  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private university" : "Public institution"}</span>`);
+  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private" : "Public"}</span>`);
   if (effectivePostCount) {
     flags.push(`<span class="card-flag">${effectivePostCount} ${effectivePostCount === 1 ? "post" : "posts"}</span>`);
   }
