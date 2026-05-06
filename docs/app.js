@@ -716,7 +716,7 @@ function renderAdList(filtered) {
             Most institutions cite the statutory reservation policy without operationalising it — no per-post category counts, no rosters published with the advertisement. This isn't a filter bug; it's the project's central finding about disclosure.
           </div>
           <div class="empty-state-cta">
-            <a href="#gap" data-tab-link="gap">See The Gap →</a>
+            <a href="#vacancies" data-tab-link="vacancies">See The Gap →</a>
           </div>
         </div>`;
     } else {
