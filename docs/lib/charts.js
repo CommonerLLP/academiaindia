@@ -126,6 +126,7 @@ export const LS_QUESTIONERS = [
 ];
 
 import { escapeHTML, escapeAttr } from "./sanitize.js";
+import { state } from "./state.js";
 
 // Module-local cache of vacancy_snapshots.json. Populated on first
 // renderVacancies() call. Was a let in app.js until charts moved here.
@@ -1681,8 +1682,21 @@ export async function renderVacancies() {
         <div class="hss-source">RS AU365, 23 Jul 2025</div>
       </div>
       <div class="hss-cell">
-        <span class="hss-num">36×</span>
-        <div class="hss-label">more known faculty vacancies than active recruitment advertisements visible across all institutional career pages today.</div>
+        <span class="hss-num">${(() => {
+          // Honest math: numerator is CFHEI-only (10,637 from CU + AIIMS
+          // disclosures). Denominator must also be CFHEI-only to avoid
+          // understating the disclosure regression. Private universities
+          // (Ashoka, FLAME, APU, Krea, etc.) sit outside the CEI(RTC) Act
+          // scope and aren't part of the parliamentary-record numerator;
+          // counting them in the advertised denominator would dilute the
+          // ratio. Filter by inst.type !== 'PrivateUniversity'.
+          const cfheiTotal = (state.ADS || []).filter(a => {
+            const inst = state.INSTITUTIONS[a.institution_id];
+            return inst && inst.type !== 'PrivateUniversity';
+          }).length;
+          return cfheiTotal > 0 ? Math.round(10637 / cfheiTotal) + '×' : '—';
+        })()}</span>
+        <div class="hss-label">more known faculty vacancies than active recruitment advertisements visible across centrally-funded HEI career pages today (excludes private-university listings).</div>
         <div class="hss-source">scrape on ${new Date().toISOString().slice(0,10)}</div>
       </div>
     </div>

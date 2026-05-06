@@ -656,19 +656,19 @@ function renderSummary(filtered, st) {
   el.innerHTML =
     `<span class="emph">${filtered.length}</span> advertisements shown <span style="color:var(--muted-soft)">of ${total} total</span>` +
     (active > 0 ? `<span class="active-mark">· ${active} filter${active!==1?"s":""} active</span>` : "");
-  // Sum of the most recent disclosed standing vacancies we have:
-  //   - Central Universities teaching (AU1206, Jul 2025): 4,889
-  //   - AIIMS network faculty (AS207, Feb 2026): 5,748
-  // = 10,637 minimum. IIT/IIM/NIT/IIIT/IISER vacancies remain undisclosed
-  // post-2023 (last comprehensive all-CHEI figure was 14,606, Feb 2023);
-  // the true current standing inventory is almost certainly higher.
-  const VACANT_FLOOR = 10637;
+  // Vacancy-gap pulse on the Vacancies tab. Numerator is hardcoded in
+  // index.html (10,637 = 4,889 CU teaching + 5,748 AIIMS, the most
+  // recent partial CFHEI disclosures). Denominator is currently-tracked
+  // CFHEI ads — private-university listings are excluded so the ratio
+  // doesn't understate the regression. The same gap is broken out on
+  // The Gap tab (charts.js renderVacancies) with full math + sources.
   const adsEl = document.getElementById("vgb-ads");
-  const ratioEl = document.getElementById("vgb-ratio");
-  if (adsEl) adsEl.textContent = total.toLocaleString("en-IN");
-  if (ratioEl) {
-    const ratio = total > 0 ? Math.round(VACANT_FLOOR / total) : "—";
-    ratioEl.textContent = `${ratio}× gap.`;
+  if (adsEl) {
+    const cfheiAds = state.ADS.filter(a => {
+      const inst = state.INSTITUTIONS[a.institution_id];
+      return inst && inst.type !== "PrivateUniversity";
+    }).length;
+    adsEl.textContent = cfheiAds || "—";
   }
 }
 
