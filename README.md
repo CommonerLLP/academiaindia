@@ -211,6 +211,27 @@ This section is append-only. The body of the README above is preserved
 as the original description; each dated entry below records what
 changed in the project between then and the entry date.
 
+### 2026-05-06 — `sansad-semantic-crawler` bumped to v0.2.0
+
+`requirements.txt` now pins the upstream crawler at
+[`v0.2.0`](https://github.com/CommonSenseLLP/sansad-semantic-crawler/releases/tag/v0.2.0)
+(was `v0.1.0`). The new release ships a **pluggable-classifier
+architecture** — regex (default, back-compat), embeddings (Sentence
+Transformers anchor similarity), LLM (OpenAI-compat chat-completions
+JSON tagging), or ensemble (combine modes). Optional pip extras:
+`[embeddings]`, `[llm]`, `[all]`. The package never ships model
+weights; users supply their own runtime (Ollama, vLLM, llama.cpp,
+mlx-lm, transformers, or any OpenAI-compatible hosted service).
+
+This bump is **behaviour-preserving for this project**:
+`notes/topics/cei-vacancies.json` does not declare a `classifier`
+block, so v0.2.0 transparently falls back to the regex classifier
+that drove every Gap chart prior to today. Adopting embeddings or
+LLM modes is a separate, opt-in editorial decision.
+
+`make test` (153 + 9 skipped) and `npm test` (126 across 11 files)
+unaffected. The bump touches one line in `requirements.txt`.
+
 ### 2026-05-06 — Parliamentary-corpus crawler extracted and externalised
 
 The three legacy scripts that built *The Gap*'s parliamentary corpus
