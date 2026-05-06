@@ -86,4 +86,12 @@ export function updateMapMarkers(filteredAds) {
       ${hssLine}
       <div style="margin-top:6px">${totalLine}</div>`);
   }
+
+  // Update the map summary bar with counts so the user sees filter feedback.
+  const instWithAds = Object.keys(totalCount).length;
+  const totalAds = filteredAds.length;
+  const instEl = document.getElementById("map-inst-count");
+  const adEl = document.getElementById("map-ad-count");
+  if (instEl) instEl.textContent = instWithAds;
+  if (adEl) adEl.textContent = totalAds;
 }
