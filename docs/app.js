@@ -548,13 +548,27 @@ function wireEvents() {
   // banner ("See the breakdown by category →") and any other anchor with
   // a data-tab-link attribute. Triggers the same path as a tab click so
   // the panel renders correctly.
+  //
+  // Optional `data-scroll-target="<id>"` attribute scrolls to a named
+  // anchor inside the destination tab after activation completes. We
+  // wait one tick + a bit so async render functions (renderVacancies)
+  // have a chance to insert the target element before scrollIntoView.
   document.body.addEventListener("click", (e) => {
     const a = e.target.closest("a[data-tab-link]");
     if (!a) return;
     e.preventDefault();
     const tab = a.dataset.tabLink;
+    const scrollTarget = a.dataset.scrollTarget;
     const ok = activateTab(tab, { writeHash: true });
-    if (!ok) location.href = a.href;
+    if (!ok) { location.href = a.href; return; }
+    if (scrollTarget) {
+      // 250ms covers the renderVacancies async fetch path on first hit;
+      // subsequent hits resolve from the cached VACANCY_DATA and complete
+      // sooner, but the timeout is harmless.
+      setTimeout(() => {
+        document.getElementById(scrollTarget)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 250);
+    }
   });
 }
 
@@ -656,19 +670,19 @@ function renderSummary(filtered, st) {
   el.innerHTML =
     `<span class="emph">${filtered.length}</span> advertisements shown <span style="color:var(--muted-soft)">of ${total} total</span>` +
     (active > 0 ? `<span class="active-mark">· ${active} filter${active!==1?"s":""} active</span>` : "");
-  // Sum of the most recent disclosed standing vacancies we have:
-  //   - Central Universities teaching (AU1206, Jul 2025): 4,889
-  //   - AIIMS network faculty (AS207, Feb 2026): 5,748
-  // = 10,637 minimum. IIT/IIM/NIT/IIIT/IISER vacancies remain undisclosed
-  // post-2023 (last comprehensive all-CHEI figure was 14,606, Feb 2023);
-  // the true current standing inventory is almost certainly higher.
-  const VACANT_FLOOR = 10637;
+  // Vacancy-gap pulse on the Vacancies tab. Numerator is hardcoded in
+  // index.html (10,637 = 4,889 CU teaching + 5,748 AIIMS, the most
+  // recent partial CFHEI disclosures). Denominator is currently-tracked
+  // CFHEI ads — private-university listings are excluded so the ratio
+  // doesn't understate the regression. The same gap is broken out on
+  // The Gap tab (charts.js renderVacancies) with full math + sources.
   const adsEl = document.getElementById("vgb-ads");
-  const ratioEl = document.getElementById("vgb-ratio");
-  if (adsEl) adsEl.textContent = total.toLocaleString("en-IN");
-  if (ratioEl) {
-    const ratio = total > 0 ? Math.round(VACANT_FLOOR / total) : "—";
-    ratioEl.textContent = `${ratio}× gap.`;
+  if (adsEl) {
+    const cfheiAds = state.ADS.filter(a => {
+      const inst = state.INSTITUTIONS[a.institution_id];
+      return inst && inst.type !== "PrivateUniversity";
+    }).length;
+    adsEl.textContent = cfheiAds || "—";
   }
 }
 
@@ -716,7 +730,7 @@ function renderAdList(filtered) {
             Most institutions cite the statutory reservation policy without operationalising it — no per-post category counts, no rosters published with the advertisement. This isn't a filter bug; it's the project's central finding about disclosure.
           </div>
           <div class="empty-state-cta">
-            <a href="#gap" data-tab-link="gap">See The Gap →</a>
+            <a href="#vacancies" data-tab-link="vacancies">See The Gap →</a>
           </div>
         </div>`;
     } else {
