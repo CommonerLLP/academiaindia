@@ -559,12 +559,41 @@ export function renderAd(ad) {
     || (numericFP(publicationDetailsRaw).length > 0 && numericFP(publicationDetailsRaw) === numericFP(evaluationText))
   );
   const publicationDetails = publicationAlreadyVisible ? "" : publicationDetailsRaw;
+  // Canonical-field rows (Track B of the canonical-fields design).
+  // Reads from structured_position.qualifications first; flat fields
+  // are surfaced separately via the existing Eligibility / Description
+  // blocks built above. Each row only renders when populated, so ads
+  // with a sparse structured_position don't grow empty rows.
+  const pushBlock = (label, value) => {
+    if (value == null) return;
+    const text = String(value).trim();
+    if (!text || text.toLowerCase() === "none" || text === "—") return;
+    detailsBlocks.push(`<div class="detail-block"><span class="k">${escapeHTML(label)}</span><div class="v">${escapeHTML(text)}</div></div>`);
+  };
+  const sq = structuredPos?.qualifications || {};
+  // Flat-field fallback: ads without structured_position still expose
+  // ad.unit_eligibility via the parser (APU, etc.). Surface that as a
+  // Requirements row when the cues-extracted Eligibility block hasn't
+  // already shown the same content.
+  if (ad.unit_eligibility && !eligibilityText.includes(String(ad.unit_eligibility).slice(0, 60))) {
+    pushBlock("Requirements", ad.unit_eligibility);
+  }
+  pushBlock("PhD requirement", sq.phd);
+  pushBlock("Teaching experience required", sq.teaching_experience);
+  if (sq.post_phd_experience_years != null && sq.post_phd_experience_years !== "") {
+    pushBlock("Post-PhD experience (years)", String(sq.post_phd_experience_years));
+  }
+  pushBlock("First-class preceding degree", sq.first_class_preceding_degree);
+  pushBlock("Methods preference", structuredPos?.methods_preference);
+  pushBlock("Other qualifications", sq.other);
   if (publicationDetails) {
     detailsBlocks.push(`<div class="detail-block"><span class="k">Publication requirements</span><div class="v">${escapeHTML(publicationDetails)}</div></div>`);
   }
   if (structuredPos?.pay_scale) {
     detailsBlocks.push(`<div class="detail-block"><span class="k">Pay scale</span><div class="v">${escapeHTML(structuredPos.pay_scale)}</div></div>`);
   }
+  pushBlock("General eligibility", structuredPos?.general_eligibility);
+  pushBlock("Specific eligibility", structuredPos?.specific_eligibility);
   if (ad.process_note) {
     detailsBlocks.push(`<div class="detail-block"><span class="k">Process</span><div class="v">${escapeHTML(ad.process_note)}</div></div>`);
   }
