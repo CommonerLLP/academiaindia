@@ -15,7 +15,7 @@ requests==2.33.1
 requests-cache==1.3.1
 pydantic==2.13.3
 beautifulsoup4==4.14.3
-lxml==5.4.0
+lxml==6.1.0
 
 # Parliamentary-record corpus refresh — fetched directly from the public
 # CommonSenseLLP repo at a pinned tag rather than PyPI (no PyPI release yet
