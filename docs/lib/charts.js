@@ -1777,19 +1777,16 @@ export async function renderVacancies() {
     ${chart4_aiims(allSnaps)}
     ${chart7_rdGap()}
 
-    <!-- Free-expand verdict box: viewport-width breakout so the closing
-         editorial signature spans the whole window irrespective of the
-         880px narrative column the rest of the tab uses. The trick
-         (width:100vw + margin-left calc) keeps the element centered in
-         its parent while breaking out of the parent's max-width. -->
-    <div class="gap-verdict" id="architecture-of-failure" style="margin: 56px calc(-50vw + 50%) 32px; padding: 40px max(28px, calc(50vw - 540px)); background: rgba(200,16,46,0.04); border-top: 1px solid color-mix(in srgb, var(--alarm) 35%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--alarm) 35%, transparent); width: 100vw; box-sizing: border-box;">
-      <h2 id="architecture-heading" style="font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--ink); line-height: 1.25; margin: 0 0 16px; letter-spacing: -0.01em;">Not a single failure but an architecture of failure.<a href="#architecture-of-failure" class="heading-anchor" aria-label="Link to this section">#</a></h2>
-      <p style="font-family: var(--serif); font-size: 18px; line-height: 1.6; color: var(--ink); margin: 0 0 14px;">Legislation passed. Data gathered. Questions asked. Answers refused. Courts engaged. And through every instrument the cadre composition stays what the savarna state needs it to be.</p>
-      <p style="font-family: var(--serif); font-size: 21px; line-height: 1.4; color: var(--alarm); font-weight: 700; margin: 14px 0 0; letter-spacing: -0.005em;">The Constitution is not being violated by accident. It is being administered to that effect.</p>
+    <!-- Verdict box stays inside the 880px narrative column, same as
+         every other block on this tab. The earlier viewport-width
+         breakout broke the page's alignment rhythm. -->
+    <div class="gap-verdict" id="architecture-of-failure" style="margin: 56px 0 32px; padding: 32px 40px; background: rgba(200,16,46,0.04); border-top: 1px solid color-mix(in srgb, var(--alarm) 35%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--alarm) 35%, transparent);">
+      <h2 id="architecture-heading" style="font-family: var(--serif); font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.25; margin: 0 0 14px; letter-spacing: -0.01em;">Not a single failure but an architecture of failure.<a href="#architecture-of-failure" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+      <p style="font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--ink); margin: 0;">Legislation passed. Data gathered. Questions asked. Answers refused. Courts engaged. And through every instrument the cadre composition stays what the savarna state needs it to be.</p>
     </div>
 
-    <details class="vacancies-appendix" id="appendix" style="margin-top:48px; padding-top:24px; border-top:2px solid var(--alarm);">
-      <summary style="cursor:pointer; font-family:var(--serif); font-size:18px; font-weight:700; color:var(--ink); padding:12px 0; list-style:none;">Appendix: the rhetorical apparatus and the historical timeline <a href="#appendix" class="heading-anchor" aria-label="Link to this section" onclick="event.stopPropagation();">#</a> <span style="color:var(--accent); font-size:13px; font-weight:500;">(click to expand)</span></summary>
+    <details class="vacancies-appendix" id="appendix">
+      <summary>Appendix: the rhetorical apparatus and the historical timeline <a href="#appendix" class="heading-anchor" aria-label="Link to this section" onclick="event.stopPropagation();">#</a> <span class="bib-summary-hint">(click to expand)</span></summary>
       <div style="padding-top:18px;">
 
       <p class="act-deck" style="font-size:13.5px;">For the reader who wants every receipt: the historical timeline that situates the seven points above, and a prose breakdown of the three rhetorical instruments the Ministry uses to refuse disclosure.</p>
