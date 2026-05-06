@@ -7,9 +7,7 @@ message: >-
   data is derived from.
 type: software
 authors:
-  - family-names: Solanki
-    given-names: Aakash
-    affiliation: CommonSense LLP
+  - name: "CommonSense LLP"
 license: PolyForm-Noncommercial-1.0.0
 repository-code: "https://github.com/CommonSenseLLP/academiaindia"
 url: "https://whoseuniversity.org/"
@@ -24,8 +22,6 @@ preferred-citation:
   type: generic
   title: "Whose University? A public-interest tracker of academic work in India."
   authors:
-    - family-names: Solanki
-      given-names: Aakash
-      affiliation: CommonSense LLP
+    - name: "CommonSense LLP"
   url: "https://whoseuniversity.org/"
   year: 2026
