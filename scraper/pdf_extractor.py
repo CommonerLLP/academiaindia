@@ -125,6 +125,59 @@ def download_pdf(
     return path
 
 
+# Page-pagination noise that pdftotext leaves embedded inline. The IITD
+# rolling-ad PDF, for example, prints "Page 14 of 28" centered as a footer
+# on every page; pdftotext's reading-order output sometimes inserts that
+# string mid-sentence at page boundaries — e.g. "…strong background in
+# Science and Page 14 of 28 Technology Studies or allied disciplines…".
+# These patterns also show up as "Page 14" alone, or " - 14 - " between
+# columns. They carry no editorial value; strip them at extraction time.
+_PAGINATION_PATTERNS = [
+    # Form-feed (\x0c) is pdftotext's page-break marker. It prefixes
+    # the first line of each new page (e.g. "\x0c5   Department of
+    # Civil…"). The rolling-ad splitter's unit-header regex anchors at
+    # line-start with an indent class of [ \t]*, which does NOT match
+    # \f, so a unit whose row starts the page is invisible and its
+    # content gets folded into the previous unit. Strip \f outright;
+    # it carries no semantic content beyond the page-boundary cue,
+    # which the splitter doesn't need.
+    re.compile(r"\f"),
+    # Inline "Page N of M" — surrounded by horizontal whitespace only,
+    # not newlines. Eating newlines would join paragraphs across page
+    # breaks; the rolling-ad splitter requires a unit-header to sit at
+    # line-start, so a collapsed boundary makes the next unit invisible
+    # and its content gets mis-attributed to the previous unit. (This
+    # was the IITD Chemistry-bleeds-into-Civil regression — exactly
+    # what \s* did when it ate the surrounding newlines.)
+    re.compile(r"[ \t]*Page\s+\d+\s+of\s+\d+[ \t]*", re.IGNORECASE),
+    re.compile(r"^[ \t]*Page\s+\d+[ \t]*$", re.IGNORECASE | re.MULTILINE),
+    re.compile(r"^[ \t]*-\s*\d+\s*-[ \t]*$", re.MULTILINE),
+]
+
+
+def _strip_pagination_noise(text: str) -> str:
+    """Remove inline "Page N of M" footers + standalone page numbers.
+
+    pdftotext's reading-order output can interleave a page footer
+    (typically "Page N of M") between sentences when the source document
+    breaks a paragraph across pages. Strip those markers before returning,
+    so downstream excerpt-builders don't surface them as content.
+
+    Substitutes a single space rather than removing the match outright,
+    so words that were split across the footer ("Science and"|"Page 14
+    of 28"|"Technology Studies") rejoin with normal word-spacing rather
+    than concatenating ("…and Technology…" stays readable). Layout-
+    tabular rows (used by the IIT / IIM rolling-ad parsers) are
+    preserved intact — we don't collapse the long runs of spaces those
+    parsers depend on for column alignment.
+    """
+    if not text:
+        return text
+    for pat in _PAGINATION_PATTERNS:
+        text = pat.sub(" ", text)
+    return text
+
+
 def _run_pdftotext(args: list[str], pdf_path: Path) -> Optional[str]:
     """Internal: invoke pdftotext with the given flags. Returns the text or
     None on failure. Errors are logged at WARNING — silent failure was the
@@ -138,7 +191,7 @@ def _run_pdftotext(args: list[str], pdf_path: Path) -> Optional[str]:
         out = subprocess.run(
             cmd, capture_output=True, text=True, check=True, timeout=120,
         )
-        return out.stdout
+        return _strip_pagination_noise(out.stdout)
     except subprocess.TimeoutExpired:
         logger.warning("pdftotext timed out (>120s) on %s", pdf_path.name)
     except subprocess.CalledProcessError as e:

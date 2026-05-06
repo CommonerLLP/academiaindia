@@ -434,8 +434,29 @@ def _apu_position_ad(html: str, url: str, fetched_at: datetime,
     requirements = section_for("Requirements")
     application = section_for("Application Procedure")
 
-    # Build a rich excerpt from all the parts that survived.
-    excerpt_parts = [s for s in [summary, narrative, requirements, application] if s]
+    # Build the excerpt from summary + narrative only.
+    #
+    # Earlier this joined four chunks (summary + narrative + requirements +
+    # application) with em-dashes, which produced three card-level bugs:
+    #
+    # (1) duplication — APU's meta-description summary text is also a
+    #     standalone <p> on the page that the narrative regex matches, so
+    #     the same opening sentence appeared twice, separated by " — ".
+    # (2) requirements rendered twice — once concatenated into the excerpt,
+    #     once as the dedicated "Requirements" block (unit_eligibility).
+    # (3) application instructions polluted the description body. They
+    #     belong on the application-target page (linked via the apply URL),
+    #     not concatenated into the position narrative.
+    #
+    # Fix: requirements is set on unit_eligibility ONLY; application is
+    # not stored in the ad at all (the apply_url + Official listing link
+    # surface it). And summary is dropped if narrative already opens with
+    # it, so the meta-description sentence isn't repeated as the first
+    # narrative paragraph.
+    if summary and narrative.startswith(summary):
+        excerpt_parts = [narrative]
+    else:
+        excerpt_parts = [s for s in [summary, narrative] if s]
     excerpt = " — ".join(excerpt_parts)
 
     # Discipline from the title: "Faculty Positions in <X>" → <X>.
@@ -443,6 +464,32 @@ def _apu_position_ad(html: str, url: str, fetched_at: datetime,
     disc_m = re.match(r"Faculty\s+Positions?\s+(?:for|in)\s+(.+?)$", title, re.I)
     if disc_m:
         discipline = _clean(disc_m.group(1)).rstrip(" ,.;:")
+
+    # Lift "Open Positions: N" out of the requirements prose into the
+    # structured `number_of_posts` field. APU embeds the post-count in
+    # a sentence at the end of the Requirements section ("…education
+    # for public service Open positions: 2"), where it's invisible to
+    # the dashboard's posts-chip + Article-16-tooltip logic. Pull it
+    # into a real integer field and strip it from the eligibility text
+    # so the count doesn't render twice (once as the chip, once as
+    # tail-end prose).
+    posts_count: Optional[int] = None
+    if requirements:
+        posts_m = re.search(r"\bOpen\s+Positions?\s*:?\s*(\d+)\b", requirements, re.IGNORECASE)
+        if posts_m:
+            try:
+                posts_count = int(posts_m.group(1))
+            except ValueError:
+                posts_count = None
+            # Trim the matched phrase out of the requirements text so
+            # the Requirements block on the card stays clean of the now-
+            # structured fact.
+            requirements = re.sub(
+                r"\s*\bOpen\s+Positions?\s*:?\s*\d+\b\s*\.?\s*",
+                " ",
+                requirements,
+                flags=re.IGNORECASE,
+            ).strip()
 
     # Confidence: APU per-position pages have stable structure and we
     # capture title + narrative + requirements + application. 0.85 is
@@ -452,6 +499,8 @@ def _apu_position_ad(html: str, url: str, fetched_at: datetime,
         ad["unit_eligibility"] = requirements[:600]
     if discipline:
         ad["discipline"] = discipline[:120]
+    if posts_count is not None:
+        ad["number_of_posts"] = posts_count
     return ad
 
 
