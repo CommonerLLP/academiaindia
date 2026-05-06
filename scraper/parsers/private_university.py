@@ -367,8 +367,16 @@ _APU_NON_POSITION_RE = re.compile(
 )
 
 
-def _apu_position_ad(html: str, url: str, fetched_at: datetime) -> Optional[dict]:
-    """Parse one APU per-position page into a JobAd dict."""
+def _apu_position_ad(html: str, url: str, fetched_at: datetime,
+                     closing: Optional[str] = None) -> Optional[dict]:
+    """Parse one APU per-position page into a JobAd dict.
+
+    `closing` is passed in by the caller because APU exposes the
+    deadline only in the *index* card's "Add to Calendar" block, not
+    on the per-position detail page. The detail page handles the
+    narrative + requirements + application procedure; the index card
+    handles the deadline + campus.
+    """
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "noscript", "svg"]):
         tag.decompose()
@@ -439,7 +447,7 @@ def _apu_position_ad(html: str, url: str, fetched_at: datetime) -> Optional[dict
     # Confidence: APU per-position pages have stable structure and we
     # capture title + narrative + requirements + application. 0.85 is
     # well above the 0.55 the index-only parser produces.
-    ad = _make_ad(title, url, fetched_at, excerpt, None, url, 0.85, excerpt_cap=2400)
+    ad = _make_ad(title, url, fetched_at, excerpt, closing, url, 0.85, excerpt_cap=2400)
     if requirements:
         ad["unit_eligibility"] = requirements[:600]
     if discipline:
@@ -491,13 +499,22 @@ def _apu_ads(
         if href in seen_urls:
             continue
         seen_urls.add(href)
+        # Extract the deadline from the <article> wrapping this link.
+        # APU's per-position detail page does not show a deadline
+        # anywhere visible; only the index card carries it (in the
+        # iCal "Add to Calendar" block). So pull the date now while
+        # we still have the index DOM.
+        closing = None
+        article = a.find_parent("article")
+        if article:
+            closing = _parse_date(_clean(article.get_text(" ", strip=True)))
         try:
             html = fetch_position(href)
         except Exception:
             continue
         if not html or len(html) < 1000:
             continue
-        ad = _apu_position_ad(html, href, fetched_at)
+        ad = _apu_position_ad(html, href, fetched_at, closing=closing)
         if ad:
             ads.append(ad)
     return ads
