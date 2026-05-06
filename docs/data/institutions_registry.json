@@ -1070,6 +1070,19 @@
     "lon": 73.728
   },
   {
+    "id": "anna-university",
+    "name": "Anna University",
+    "short_name": "Anna University",
+    "type": "StateUniversity",
+    "state": "Tamil Nadu",
+    "city": "Chennai",
+    "career_page_url_guess": "https://www.annauniv.edu/recruitment.php",
+    "ad_format_guess": "Mixed",
+    "parser": "anna_university",
+    "coverage_status": "Unverified",
+    "notes": "Public recruitment page publishes dated faculty and research-project notices as direct PDF links."
+  },
+  {
     "id": "plaksha-university",
     "name": "Plaksha University",
     "short_name": "Plaksha University",
