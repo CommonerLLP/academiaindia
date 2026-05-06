@@ -43,6 +43,7 @@ import pytest
 # and a piece of input that should produce zero ads without triggering
 # network IO. Keep the inputs minimal — they are fixtures, not realism.
 PARSERS = [
+    ("parsers.anna_university",    "html",   "<html><body><p>no jobs</p></body></html>"),
     ("parsers.generic",            "html",   "<html><body><p>no jobs</p></body></html>"),
     ("parsers.iit_delhi",          "html",   "<html><body><div>no positions</div></body></html>"),
     ("parsers.iit_indore",         "html",   "<html><body><table></table></body></html>"),
@@ -96,6 +97,7 @@ def _as_dict(item: Any) -> dict:
 # canonical fields. Parsers without an easy hand-written positive
 # fixture get the `None` fixture and skip the positive assertion.
 POSITIVE_FIXTURES = {
+    "parsers.anna_university": None,
     # IIT Delhi parser looks for "Faculty Recruitment" anchor + table.
     # Skipping positive fixture here — the parser's logic is tightly
     # coupled to live page structure and a contrived fixture would
