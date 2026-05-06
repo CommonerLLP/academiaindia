@@ -16,6 +16,7 @@ beforeAll(async () => {
 describe("typeLabel", () => {
   it("expands registry type codes for display", () => {
     expect(map.typeLabel("CentralUniversity")).toBe("Central University");
+    expect(map.typeLabel("StateUniversity")).toBe("State University");
     expect(map.typeLabel("PrivateUniversity")).toBe("Private University");
     expect(map.typeLabel("IIT")).toBe("IIT");
   });

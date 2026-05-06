@@ -14,6 +14,7 @@ class InstitutionType(str, Enum):
     IISER = "IISER"
     IISc = "IISc"
     CU = "CentralUniversity"
+    StateUniversity = "StateUniversity"
     NIT = "NIT"
     IIIT = "IIIT"
     AIIMS = "AIIMS"
