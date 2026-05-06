@@ -139,16 +139,16 @@
      fold for the actual feed. The strapline still uses the serif italic
      register; just smaller and beside the title rather than below it. */
   header.masthead.masthead-compact {
-    padding: 14px 32px 16px;
+    padding: 18px 32px 20px;
     text-align: center;
   }
   header.masthead.masthead-compact h1 {
-    font-size: 28px;
+    font-size: 34px;
     font-weight: 700;
     color: var(--accent);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.022em;
     line-height: 1.2;
-    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 16px;
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 18px;
     max-width: 1180px; margin: 0 auto;
   }
   header.masthead.masthead-compact .masthead-title {
@@ -157,17 +157,17 @@
   header.masthead.masthead-compact .masthead-strapline {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
     color: var(--ink);
     line-height: 1.4;
   }
   @media (max-width: 720px) {
     header.masthead.masthead-compact h1 {
-      font-size: 22px; gap: 6px; flex-direction: column;
+      font-size: 26px; gap: 6px; flex-direction: column;
       align-items: center;            /* column flex needs cross-axis center */
     }
-    header.masthead.masthead-compact .masthead-strapline { font-size: 12.5px; }
+    header.masthead.masthead-compact .masthead-strapline { font-size: 13.5px; }
   }
 
   /* (Vacancies-tab strip removed; compact vacancy-gap line is now
@@ -1297,7 +1297,13 @@
   .status-no { color: var(--muted); }
 
   /* Vacancy data */
-  #vacancies-tab { max-width: 980px; }
+  /* Single narrative column for the entire Gap tab — centered within
+     the 1080px main. The 880px column matches what the inner blocks
+     (act-header, act-deck, jbm-card, hero-stat-strip, gap-bibliography,
+     vacancies-appendix) cap themselves at, so everything aligns to the
+     same edges. Other tabs keep main's full 1080px so card grids stay
+     wide. */
+  #vacancies-tab { max-width: 880px; margin-left: auto; margin-right: auto; }
   /* H3 section headers on Vacancies tab carry a red left bar — these
      are arguments, not just navigation, and the visual register says so. */
   #vacancies-tab h3 { font-family: var(--serif); font-weight: 700; font-size: 19px; margin: 24px 0 10px; padding: 4px 0 4px 14px; border-left: 4px solid var(--alarm); }
