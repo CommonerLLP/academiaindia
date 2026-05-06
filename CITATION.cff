@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: "Whose University?"
+message: >-
+  If you use this software or its data in academic work, journalism,
+  policy research, or any other public-facing analysis, please cite both
+  the project and the parliamentary or institutional source records the
+  data is derived from.
+type: software
+authors:
+  - name: "CommonSense LLP"
+license: PolyForm-Noncommercial-1.0.0
+repository-code: "https://github.com/CommonSenseLLP/academiaindia"
+url: "https://whoseuniversity.org/"
+keywords:
+  - academic-jobs
+  - india
+  - higher-education
+  - parliamentary-record
+  - reservation
+  - public-interest-research
+preferred-citation:
+  type: generic
+  title: "Whose University? A public-interest tracker of academic work in India."
+  authors:
+    - name: "CommonSense LLP"
+  url: "https://whoseuniversity.org/"
+  year: 2026
