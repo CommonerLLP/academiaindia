@@ -6,10 +6,74 @@ import pytest
 
 from pdf_extractor import (
     _is_safe_url,
+    _strip_pagination_noise,
     find_deadline,
     find_publications,
     split_into_units,
 )
+
+
+# ---- _strip_pagination_noise -------------------------------------------------
+#
+# pdftotext interleaves the source PDF's "Page N of M" footer between
+# sentences when a paragraph crosses a page boundary. The IITD rolling-ad
+# PDF reproduced this on the Technology-in-Society listing — the body
+# text ended up reading "…strong background in Science and Page 14 of 28
+# Technology Studies or allied disciplines…", which then surfaced on the
+# job card. These tests pin the corrected behaviour: the pagination
+# patterns are stripped to a single space at extraction time, so words
+# that were split across the footer rejoin with normal word-spacing.
+
+@pytest.mark.parametrize("dirty,clean", [
+    # Inline mid-sentence: the IITD case the maintainer flagged. The
+    # horizontal whitespace around the pagination marker collapses, so
+    # split words rejoin with a single space.
+    (
+        "candidates with a strong background in Science and Page 14 of 28 Technology Studies or allied disciplines",
+        "candidates with a strong background in Science and Technology Studies or allied disciplines",
+    ),
+    # Standalone "Page N of M" line — newlines on either side MUST be
+    # preserved (otherwise the rolling-ad splitter loses the next
+    # unit-header at line-start, which was the Chemistry-bleeds-into-
+    # Civil regression). The marker becomes a single-space line so the
+    # newline boundaries stay intact for the line-anchored splitter
+    # regex on the next line.
+    (
+        "corresponding author.\n\n           Page 8 of 28\n5   Department of Civil",
+        "corresponding author.\n\n \n5   Department of Civil",
+    ),
+    # Two-line case: the marker is between two paragraphs.
+    ("Body line 1\nPage 7 of 12\nBody line 2", "Body line 1\n \nBody line 2"),
+    # Standalone "Page N" line on its own (the MULTILINE pattern).
+    ("Body\n  Page 3  \nMore body", "Body\n \nMore body"),
+    # Hyphen-flanked centered footer: " - 5 - " between blocks.
+    ("Block A\n - 5 - \nBlock B", "Block A\n \nBlock B"),
+    # Lowercase variant — case-insensitive match.
+    ("Words page 2 of 9 more words", "Words more words"),
+    # Empty input — must not blow up.
+    ("", ""),
+    # No pagination noise — leave content alone.
+    ("Plain body with no footer.", "Plain body with no footer."),
+    # Form-feed (\f) at start of a unit-header line. pdftotext inserts
+    # \f at every page boundary; the splitter's indent class is [ \t]*
+    # which does NOT match \f, so a unit whose row starts the page
+    # becomes invisible. Strip replaces \f with a single space, which
+    # the splitter's [ \t]* indent class does match — so "5" sits at
+    # line-start once again.
+    ("Body line.\n\f5   Department of Civil", "Body line.\n 5   Department of Civil"),
+])
+def test_strip_pagination_noise(dirty, clean):
+    """Pagination footers are removed; surrounding content is preserved."""
+    assert _strip_pagination_noise(dirty) == clean
+
+
+def test_strip_pagination_noise_preserves_layout_runs():
+    """Long runs of spaces (used by the rolling-ad column splitter) must
+    survive — the strip function only removes the pagination patterns,
+    not the layout-tabular spacing IIT/IIM parsers depend on."""
+    # A row from the IITD layout-extracted output.
+    row = "  1  Aerospace Engineering          Aerodynamics; Propulsion        Sr. AP"
+    assert _strip_pagination_noise(row) == row
 
 
 # ---- split_into_units --------------------------------------------------------

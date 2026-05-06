@@ -528,12 +528,14 @@ export function renderAd(ad) {
     const headTokens = _norm(`${discipline} ${instName}`);
     let descBody = cleanedExcerpt;
     // Strip a short leading sentence that mostly echoes the headline.
+    // The leadN >= 4 guard prevents single-character leads (e.g. "a." in
+    // an IITD letter-prefixed list) from getting stripped because the
+    // unit name happens to contain the letter "a". Without the guard,
+    // any one-letter leadN matches any longer headTokens via .includes().
     const leadMatch = descBody.match(/^(.{1,100}?)\.\s+(?=[A-Z(])/);
     if (leadMatch && shellN.length > 6) {
       const leadN = _norm(leadMatch[1]);
-      // The lead is "redundant" if its alphanumeric content is largely
-      // contained in the headline tokens, or vice versa.
-      const overlap = leadN && headTokens && (headTokens.includes(leadN) || leadN.length > 6 && leadN.split(/(?=[a-z])/).slice(0,3).join("") && headTokens.includes(leadN.slice(0, Math.min(20, leadN.length))));
+      const overlap = leadN && leadN.length >= 4 && headTokens && (headTokens.includes(leadN) || leadN.length > 6 && leadN.split(/(?=[a-z])/).slice(0,3).join("") && headTokens.includes(leadN.slice(0, Math.min(20, leadN.length))));
       if (overlap) {
         descBody = descBody.slice(leadMatch[0].length).trim();
       }
@@ -566,7 +568,26 @@ export function renderAd(ad) {
         || (descBody.length < 150 && descTokens.length >= 3 && tokenOverlap >= 0.7)
       );
     if (descBody && !isCircular) {
-      detailsBlocks.push(`<div class="detail-block"><span class="k">Description</span><div class="v">${escapeHTML(descBody)}</div></div>`);
+      // Visual de-interleaving for IITD-style two-column layouts.
+      // pdftotext flattens "Areas (a, b, c…) | Publication Record (•…)"
+      // into a single row-major stream, so the excerpt reads like
+      // "a. Design Publication Record: b. Mechanics • Minimum 4…"
+      // We don't try to un-interleave the columns (that needs PDF-side
+      // bbox parsing); instead we insert paragraph breaks at the
+      // structural markers a human eye is already trained to find:
+      // letter-prefixed list items, bullets, and section headers.
+      // Cards from non-IITD parsers (APU, FLAME, …) don't carry these
+      // markers, so the regex is a no-op for them.
+      const formatted = descBody
+        // Letter-prefix list items: "a. ", "b. ", … "h. " followed by capital.
+        .replace(/\s+(?=\b[a-h]\.\s+[A-Z])/g, "\n")
+        // Standalone bullets.
+        .replace(/\s+(?=[•●∙])/g, "\n")
+        // Common section labels that surface inline in IITD's annexure.
+        .replace(/\s+(?=Publication Record:|Academic [Bb]ackground:|Other:|Additional:)/g, "\n")
+        .trim();
+      const formattedHTML = escapeHTML(formatted).replace(/\n/g, "<br>");
+      detailsBlocks.push(`<div class="detail-block"><span class="k">Description</span><div class="v">${formattedHTML}</div></div>`);
     }
   }
 
