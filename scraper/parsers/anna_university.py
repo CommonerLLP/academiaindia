@@ -118,9 +118,8 @@ def _title_for(a: Tag, context_parts: list[str]) -> str:
 
 def _extract_unit(context_parts: list[str], title: str) -> str | None:
     for part in context_parts:
-        if part == title:
-            continue
-        match = UNIT_RE.search(part)
+        hay = part.replace(title, " ", 1) if title and title in part else part
+        match = UNIT_RE.search(hay)
         if match:
             unit = match.group(1).strip(" -:")
             if unit.lower() != title.lower():

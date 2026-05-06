@@ -25,6 +25,10 @@ def test_parse_extracts_faculty_and_research_listings() -> None:
     assert "Notification for Assistant Professor in Architecture" in titles
     assert all(item["original_url"].startswith("https://www.annauniv.edu/") for item in items)
     assert all(item["publication_date"] in {"2026-04-08", "2026-04-06", "2026-03-20"} for item in items)
+    by_title = {item["title"]: item for item in items}
+    assert by_title["Recruitment Junior Research fellow (JRF)"]["department"] == "CME"
+    assert by_title["Recruitment for Project Assistant in the ANRF funded project"]["department"] == "CCM"
+    assert by_title["Notification for Assistant Professor in Architecture"]["department"] == "Department of Architecture"
 
 
 def test_parse_skips_non_academic_admin_listings() -> None:
