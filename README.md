@@ -70,8 +70,11 @@ make scrape ARGS='--limit 5'
 # wipe the PDF cache before scraping (for ads that were updated upstream)
 make scrape-fresh
 
-# run the test suite (119 tests)
+# run the Python test suite (153 tests + 9 skipped)
 make test
+
+# run the frontend Vitest suite (117 tests across 11 files)
+npm test
 
 # serve docs/ locally for development
 make serve   # → http://localhost:8766/
@@ -95,9 +98,12 @@ whoseuniversity/
 │   ├── index.html       ← markup + theme-flash script
 │   ├── styles.css       ← all stylesheets
 │   ├── app.js           ← all SPA logic
+│   ├── lib/             ← ESM modules; the SPA's logic lives here
 │   ├── favicon.svg      ← oxblood "?" mark
 │   ├── og.svg / og.png  ← social-share card
 │   ├── ARCHITECTURE.md  ← scraper-pipeline architecture
+│   ├── PARSER-ARCHITECTURE.md  ← parser-pipeline design doc
+│   ├── MISTAKES.md      ← append-only log of parser/UI failures
 │   └── data/
 │       ├── current.json              ← live listings (the SPA reads this)
 │       ├── coverage_report.json      ← which parsers worked
@@ -118,8 +124,11 @@ whoseuniversity/
 ├── .github/workflows/   ← weekly-sweep CI
 ├── Makefile             ← entry points
 ├── requirements.txt     ← pinned
-├── TECHDEBT.md          ← what's done; what's deferred and why
+├── package.json         ← Vitest dev-tooling only; the site ships zero npm packages
+├── tests/               ← Vitest suite for `docs/lib/` modules
 ├── CONTRIBUTING.md      ← parser contract + contribution priorities
+├── LICENSE              ← PolyForm Noncommercial 1.0.0
+├── CITATION.cff         ← machine-readable citation metadata
 └── README.md            ← this file
 ```
 
@@ -201,6 +210,33 @@ button.
 This section is append-only. The body of the README above is preserved
 as the original description; each dated entry below records what
 changed in the project between then and the entry date.
+
+### 2026-05-06 — Test counts + repo-layout refresh
+
+The 2026-05-05 entry below describes a frontend test floor of 81 Vitest
+tests across 4 files (`sanitize`, `classify`, `excerpt`, `schema`) and
+notes that 5 lib modules still lacked coverage. Both numbers are
+superseded:
+
+- **Python**: 153 tests + 9 skipped (was 119).
+- **Vitest**: 117 tests across 11 files (was 81 across 4).
+- 11 of 13 `docs/lib/` modules now have at least smoke / contract
+  coverage: `sanitize`, `classify`, `excerpt`, `schema`,
+  `current-validator`, `card-helpers`, `render-card`, `filters`,
+  `map`, `render-tabs`, `search`. The two without dedicated unit
+  tests are `charts.js` (chart data + Resources-tab payload) and
+  `state.js` (a thin shared mutable-state holder); both are exercised
+  indirectly by the higher-level tests but warrant direct contracts
+  next time they're touched.
+
+The Repository-layout block is also updated above to reflect the
+public-tree files added since the original was written:
+`docs/lib/`, `docs/MISTAKES.md`, `docs/PARSER-ARCHITECTURE.md`,
+`LICENSE`, `CITATION.cff`, `package.json`, `tests/`. The orphaned
+`TECHDEBT.md` line is removed: that file is part of the maintainer's
+private working notes (`/notes/` is gitignored), not the public
+tree, so the original layout entry was always pointing at a path
+that GitHub never sees.
 
 ### 2026-05-06 — Project relicensed to non-commercial terms
 
