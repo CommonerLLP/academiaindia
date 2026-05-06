@@ -121,9 +121,59 @@ export function sourceLabel(ad) {
 }
 
 export function sourceLinkLabel(ad) {
-  if (ad._rolling_stub || ad._manual_stub) return "Official source →";
-  if (ad._pdf_parsed || (ad.original_url || "").toLowerCase().includes(".pdf")) return "Original PDF →";
-  return "Official listing →";
+  // ↗ rather than → for external links — academic / Wikipedia
+  // convention. → is reserved for in-page navigation (e.g. "See the
+  // breakdown →" jumping to The Gap tab).
+  if (ad._rolling_stub || ad._manual_stub) return "Official source ↗";
+  if (ad._pdf_parsed || (ad.original_url || "").toLowerCase().includes(".pdf")) return "Original PDF ↗";
+  return "Official listing ↗";
+}
+
+// Registrable-domain heuristic for "is this URL on the institution's
+// own infrastructure or a third-party portal?" comparison. India's
+// compound TLDs (.ac.in / .edu.in / .gov.in / .co.in / .org.in /
+// .res.in / .nic.in) need the last 3 dot-segments; everything else
+// uses the last 2. This is approximate — a proper Public Suffix
+// List would be more accurate but adds a 250 KB dependency for a
+// single feature. The heuristic is correct for the cases we
+// actually have in the registry today (ashoka.edu.in vs
+// apply.interfolio.com is the canonical case).
+const _COMPOUND_TLDS = new Set([
+  "ac.in", "edu.in", "gov.in", "co.in", "org.in", "res.in", "nic.in",
+  "co.uk", "ac.uk", "gov.uk",
+]);
+
+export function registeredDomain(url) {
+  if (!url) return "";
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    const parts = host.split(".");
+    if (parts.length <= 2) return parts.join(".");
+    const last2 = parts.slice(-2).join(".");
+    if (_COMPOUND_TLDS.has(last2)) return parts.slice(-3).join(".");
+    return last2;
+  } catch {
+    return "";
+  }
+}
+
+export function isThirdPartyApplyHost(applyUrl, inst) {
+  // Returns the third-party hostname (e.g. "apply.interfolio.com")
+  // when the apply URL is on a different registered domain from the
+  // institution's own. Returns "" when same-institution (or when we
+  // can't tell). Caller renders the result as a "via X" caption.
+  if (!applyUrl || !inst) return "";
+  const applyDomain = registeredDomain(applyUrl);
+  if (!applyDomain) return "";
+  const instUrl = inst.career_page_url_guess || inst.apply_url || "";
+  const instDomain = registeredDomain(instUrl);
+  if (!instDomain) return "";
+  if (applyDomain === instDomain) return "";
+  try {
+    return new URL(applyUrl).hostname.toLowerCase();
+  } catch {
+    return "";
+  }
 }
 
 // ---------- position-type helpers ----------

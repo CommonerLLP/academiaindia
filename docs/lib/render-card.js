@@ -24,6 +24,7 @@ import {
   sourceLabel, sourceLinkLabel,
   cardDiscipline, cardRankLine,
   extractCardCues, structuredCues,
+  isThirdPartyApplyHost,
 } from "./card-helpers.js";
 
 // Hiring-language traps — phrases in faculty advertisements that quietly
@@ -164,10 +165,10 @@ export function renderAd(ad) {
   const sourceLinks = [];
   sourceLinks.push(`<a href="${escapeAttr(resolveUrl(ad.original_url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(sourceLinkLabel(ad))}</a>`);
   if (ad.annexure_pdf_url) {
-    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.annexure_pdf_url))}" target="_blank" rel="noopener noreferrer">Annexure →</a>`);
+    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.annexure_pdf_url))}" target="_blank" rel="noopener noreferrer">Annexure ↗</a>`);
   }
   if (ad.info_url && ad.info_url !== ad.original_url) {
-    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.info_url))}" target="_blank" rel="noopener noreferrer">Listing page →</a>`);
+    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.info_url))}" target="_blank" rel="noopener noreferrer">Listing page ↗</a>`);
   }
   // Fall back to the institution-level apply URL when the ad doesn't
   // carry one. Some ad PDFs (IIT Indore, etc.) just point at the PDF and
@@ -472,11 +473,22 @@ export function renderAd(ad) {
   // Always-visible apply/source links. In the classified-row design these
   // remain text actions: the card is a public hiring record first, and an
   // application affordance second.
+  // Third-party apply portal disclosure: when the apply URL lives on
+  // a different registered domain from the institution itself (e.g.
+  // Ashoka → apply.interfolio.com), surface the host so the candidate
+  // knows they're being redirected to a third-party application
+  // service rather than the institution's own infrastructure. Same-
+  // domain links (e.g. iimk.ac.in → recruitment.iimk.ac.in) get no
+  // caption — same institution, different subdomain.
+  const thirdPartyHost = applyUrl ? isThirdPartyApplyHost(applyUrl, inst) : "";
+  const thirdPartyCaption = thirdPartyHost
+    ? `<span class="apply-host-via">via ${escapeHTML(thirdPartyHost)}</span>`
+    : "";
   const applyButton = applyUrl
-    ? `<a class="btn-apply" href="${escapeAttr(safeUrl(applyUrl))}" target="_blank" rel="noopener noreferrer">Apply →</a>`
+    ? `<a class="btn-apply" href="${escapeAttr(safeUrl(applyUrl))}" target="_blank" rel="noopener noreferrer">Apply ↗</a>`
     : "";
   const applyLinksHTML = (applyButton || sourceLinks.length)
-    ? `<div class="row-actions-inline">${applyButton}${sourceLinks.length ? `<span class="quiet-links">${sourceLinks.join("")}</span>` : ""}</div>`
+    ? `<div class="row-actions-inline">${applyButton}${thirdPartyCaption}${sourceLinks.length ? `<span class="quiet-links">${sourceLinks.join("")}</span>` : ""}</div>`
     : "";
 
   const detailsBlocks = [];
