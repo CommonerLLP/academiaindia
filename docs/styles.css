@@ -1,18 +1,49 @@
   /* ============================================================
      BAHUJAN POLITICAL PALETTE
      ------------------------------------------------------------
-     --accent      Ambedkarite/BSP cobalt — primary anti-caste color
-                   (Buddhist 'nila'; deeper than the academic blue
-                   the previous palette used)
-     --alarm       Dalit Panther / Maoist red — protest/militancy
-                   signaling. Used for warnings AND for the thin
-                   signature line at the top of the masthead
-     --ink         Near-black, more assertive than the previous warm
-                   #1a1a1a; reads as Panthers/dignity register
-     --bg          Clean off-white. Avoids the academic-cream affect
-                   of the prior design without being harsh white
-     Saffron/orange is deliberately absent — it carries Hindutva-
-     right political associations that would muddy the message.
+     --accent             Ambedkarite cobalt-navy — for tab indicator,
+                          link bottom-rules, card hover borders, and
+                          other secondary chrome. Deeper than the
+                          masthead/CTA blue.
+     --ambedkar-blue      Brighter Ambedkar blue — for the masthead
+                          title and the Apply CTA. Single source of
+                          truth for the primary editorial blue:
+                          #0047AB light / #5b8ad6 dark.
+     --alarm              Dalit Panther / Maoist vermillion — for the
+                          masthead strapline, the "Article 16" pill,
+                          critical-deadline numbers, and protest
+                          signaling. NOT used as a top/bottom strip
+                          on the masthead or footer (those alarm
+                          strips were dropped — they read as
+                          decoration without political weight).
+     --ink                Near-black, broadsheet print register.
+     --bg                 Clean off-white (light) / charcoal (dark).
+                          Tinted color-mix(--alarm × --bg) is
+                          deliberately avoided — it drifts into beige
+                          in light mode against the off-white.
+
+     ============================================================
+     PAGE LAYOUT RULES
+     ------------------------------------------------------------
+     • #listings-tab and #vacancies-tab cap at 880px and centre via
+       margin: 0 auto. Other tabs (#map-tab, #resources-tab) keep
+       main's full 1080px so card grids stay wide.
+     • Section headings on The Gap tab (H2 / Point N / The cost /
+       appendix / bibliography / verdict) all carry an id and a
+       hover-visible "#" anchor link (.heading-anchor). Deep-link
+       URLs like /#point-3 route via the click handler in app.js
+       (data-tab-link + data-scroll-target), and any closed
+       <details> ancestor on the way to the target is auto-opened.
+     • <details> blocks at the end of The Gap tab (appendix and
+       bibliography) share a single summary treatment — same font,
+       size, weight, padding, and ▸/▾ disclosure arrow.
+     • Job cards have no decorative left tier-bar and no
+       scope-private hover override; the urgency hierarchy lives in
+       the deadline column's tier-critical / tier-soon / tier-ok
+       coloring (alarm / alarm / muted).
+     • Masthead is centered, compact (~80 px), title in
+       --ambedkar-blue, strapline italic vermillion. No top
+       alarm strip; footer carries only a thin neutral border.
      ============================================================ */
   :root {
     /* Palette redesign: moved off the generic civic-tech (cobalt + alarm
@@ -1719,44 +1750,6 @@
   @media (max-width: 720px) { #vacancies-tab .hero-stat .hs-num { font-size: 64px; } }
   #vacancies-tab .hero-stat .hs-headline { font-family: var(--serif); font-size: 21px; line-height: 1.4; color: var(--ink); font-weight: 600; max-width: 720px; margin: 18px auto 0; }
   #vacancies-tab .hero-stat .hs-headline em { font-style: italic; color: var(--alarm); }
-  #vacancies-tab .hero-stat .hs-pretitle { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--ink); max-width: 720px; margin: 0 auto 22px; font-weight: 500; }
-
-  /* Four-cell realisation grid: SC / OBC / ST / PwD (latter renders as
-     em-dash since data has not been disclosed since March 2023). */
-  #vacancies-tab .hero-stat .hs-realisation-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    margin: 0 0 24px;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  #vacancies-tab .hero-stat .hsr-cell {
-    padding: 22px 14px;
-    border-right: 1px solid var(--border);
-  }
-  #vacancies-tab .hero-stat .hsr-cell:last-child { border-right: none; }
-  #vacancies-tab .hero-stat .hsr-cat { font-family: var(--sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--alarm); font-weight: 700; margin-bottom: 10px; }
-  #vacancies-tab .hero-stat .hsr-num { font-family: var(--serif); font-weight: 800; font-size: 56px; color: var(--alarm); line-height: 1; letter-spacing: -0.03em; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
-  #vacancies-tab .hero-stat .hsr-num .hsr-pct { font-size: 30px; font-weight: 700; vertical-align: top; line-height: 1; margin-left: 1px; }
-  #vacancies-tab .hero-stat .hsr-pwd .hsr-num { color: var(--muted); }
-  #vacancies-tab .hero-stat .hsr-sub { font-family: var(--sans); font-size: 11.5px; color: var(--muted); line-height: 1.4; }
-
-  @media (max-width: 720px) {
-    #vacancies-tab .hero-stat .hs-realisation-grid { grid-template-columns: repeat(2, 1fr); }
-    #vacancies-tab .hero-stat .hsr-cell {
-      padding: 16px 10px;
-      border-right: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    #vacancies-tab .hero-stat .hsr-cell:nth-child(2n) { border-right: none; }
-    #vacancies-tab .hero-stat .hsr-cell:nth-last-child(-n+2) { border-bottom: none; }
-    #vacancies-tab .hero-stat .hsr-num { font-size: 40px; }
-    #vacancies-tab .hero-stat .hsr-num .hsr-pct { font-size: 22px; }
-  }
-
-  #vacancies-tab .hero-stat .hs-context { font-size: 14px; color: var(--ink); margin: 16px auto 0; max-width: 760px; line-height: 1.6; text-align: left; font-family: var(--serif); }
-  #vacancies-tab .hero-stat .hs-context strong { color: var(--alarm); font-weight: 700; }
 
   /* In-page anchor link inside .act-deck (e.g. "Scope, sources, and
      methodology"). Cobalt with bottom-rule on hover only — the default
@@ -1842,18 +1835,18 @@
   #vacancies-tab .jbm-source,
   #vacancies-tab .hero-stat-strip .hss-source { display: none; }
 
-  /* Bibliography appended by JS at the end of #vacancies-tab. Now a
-     collapsible <details> — same disclosure pattern as the appendix
-     so the Gap tab ends with two click-to-expand sections rather
-     than a long, always-visible reference list. Anchor links to
-     #gap-sources auto-open the <details> via the click handler in
-     app.js. */
-  #vacancies-tab details.gap-bibliography {
-    margin-top: 80px;
+  /* Both end-of-page collapsibles — appendix and bibliography — share
+     a single summary treatment so they read as siblings rather than
+     two unrelated sections. Same font, size, weight, padding, arrow
+     glyph, hint span. */
+  #vacancies-tab details.gap-bibliography,
+  #vacancies-tab details.vacancies-appendix {
+    margin-top: 64px;
     padding-top: 24px;
     border-top: 1px solid var(--border);
   }
-  #vacancies-tab details.gap-bibliography > summary {
+  #vacancies-tab details.gap-bibliography > summary,
+  #vacancies-tab details.vacancies-appendix > summary {
     cursor: pointer;
     font-family: var(--serif);
     font-size: 22px;
@@ -1863,23 +1856,28 @@
     list-style: none;
     letter-spacing: -0.005em;
   }
-  #vacancies-tab details.gap-bibliography > summary::-webkit-details-marker { display: none; }
-  #vacancies-tab details.gap-bibliography > summary::before {
+  #vacancies-tab details.gap-bibliography > summary::-webkit-details-marker,
+  #vacancies-tab details.vacancies-appendix > summary::-webkit-details-marker { display: none; }
+  #vacancies-tab details.gap-bibliography > summary::before,
+  #vacancies-tab details.vacancies-appendix > summary::before {
     content: "▸ ";
     color: var(--accent);
     display: inline-block;
     margin-right: 4px;
     transition: transform 0.15s;
   }
-  #vacancies-tab details.gap-bibliography[open] > summary::before {
+  #vacancies-tab details.gap-bibliography[open] > summary::before,
+  #vacancies-tab details.vacancies-appendix[open] > summary::before {
     content: "▾ ";
   }
-  #vacancies-tab details.gap-bibliography .bib-summary-hint {
+  #vacancies-tab details.gap-bibliography .bib-summary-hint,
+  #vacancies-tab details.vacancies-appendix .bib-summary-hint {
     color: var(--accent);
     font-size: 13px;
     font-weight: 500;
   }
-  #vacancies-tab details.gap-bibliography[open] .bib-summary-hint {
+  #vacancies-tab details.gap-bibliography[open] .bib-summary-hint,
+  #vacancies-tab details.vacancies-appendix[open] .bib-summary-hint {
     display: none;
   }
   #vacancies-tab details.gap-bibliography .bib-body {
