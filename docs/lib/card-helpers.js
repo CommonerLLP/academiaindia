@@ -555,7 +555,7 @@ export function extractCardCues(text, ad = {}) {
   // semicolon, or a "with …" clause that introduces methods.
   const areaPatterns = [
     /(?:in|across)\s+(?:the\s+)?(?:area|areas|fields?|domains?|specializations?|specialisations?|topics?)\s+of\s+([^.]{8,400}?)(?=\s*(?:\.|;|\(with\s|with\s+a\s+|$))/i,
-    /(?:research\s+(?:areas?|interests?))\s*[:\-–]\s*([^.]{8,400}?)(?=\s*(?:\.|;|$))/i,
+    /(?:(?:research|preferred|topical|focus|core|priority|special)\s+(?:areas?|interests?|topics?|themes?))\s*[:\-–]\s*([^.]{8,400}?)(?=\s*(?:\.|;|$))/i,
     /(?:specialization|specialisation|expertise)\s+in\s+([^.]{8,400}?)(?=\s*(?:\.|;|with\s+a\s+|$))/i,
   ];
   for (const re of cues.areas ? [] : areaPatterns) {
