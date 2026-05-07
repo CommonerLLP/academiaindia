@@ -1,0 +1,12 @@
+# India HEI Job Tracker — development-only dependencies.
+#
+# Test runners and other tools that don't need to be installed when the
+# scraper runs in production. The runtime dependency set lives in
+# requirements.txt; install both for development:
+#
+#   .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+#
+# Bumping any of these is a deliberate change — pin and commit a one-line
+# note about why.
+
+pytest==9.0.3

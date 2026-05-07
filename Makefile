@@ -15,7 +15,7 @@ PORT   := 8765
 
 $(PYTHON):
 	python3 -m venv $(VENV)
-	$(PIP) install -q -r requirements.txt
+	$(PIP) install -r requirements.txt -r requirements-dev.txt
 
 .PHONY: serve sweep scrape scrape-fresh refresh-pdfs report test deps prune-archive clean help \
         corpus-crawl corpus-parse corpus-export corpus-consolidate corpus-refresh
@@ -102,7 +102,7 @@ test: $(PYTHON)
 	$(PYTHON) -m pytest scraper/tests/ -v
 
 deps:
-	$(PIP) install -r requirements.txt
+	$(PIP) install -r requirements.txt -r requirements-dev.txt
 
 # Retention: keep daily archives for last 30 days, weekly for last year, then
 # quarterly. Without pruning the archive grows by ~1MB/day indefinitely.
