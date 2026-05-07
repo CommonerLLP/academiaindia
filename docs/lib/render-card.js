@@ -80,6 +80,14 @@ export function extractTraps(ad) {
   return out;
 }
 
+function listingPageLabel(ad) {
+  const infoUrl = String(ad.info_url || "");
+  if (/annauniv\.edu\/events\.php/i.test(infoUrl)) {
+    return "Listing page (open Recruitment tab) ↗";
+  }
+  return "Listing page ↗";
+}
+
 export function renderAd(ad) {
   const inst = state.INSTITUTIONS[ad.institution_id] || { name: ad.institution_id };
   const instType = String(inst.type || "");
@@ -168,7 +176,7 @@ export function renderAd(ad) {
     sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.annexure_pdf_url))}" target="_blank" rel="noopener noreferrer">Annexure ↗</a>`);
   }
   if (ad.info_url && ad.info_url !== ad.original_url) {
-    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.info_url))}" target="_blank" rel="noopener noreferrer">Listing page ↗</a>`);
+    sourceLinks.push(`<a href="${escapeAttr(safeUrl(ad.info_url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(listingPageLabel(ad))}</a>`);
   }
   // Fall back to the institution-level apply URL when the ad doesn't
   // carry one. Some ad PDFs (IIT Indore, etc.) just point at the PDF and

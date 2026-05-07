@@ -80,7 +80,7 @@ import {
   extractCardCues,
   cardRankLine,
 } from "./lib/card-helpers.js";
-const TYPE_ORDER = ["IIT","IIM","PrivateUniversity","IISc","IISER","CentralUniversity","NIT","IIIT"];
+const TYPE_ORDER = ["IIT","IIM","PrivateUniversity","IISc","IISER","CentralUniversity","StateUniversity","NIT","IIIT"];
 // TYPE_COLORS imported from lib/card-helpers.js.
 // SAVED + persistSaved live on state (lib/state.js) — accessed via state.SAVED.
 const SAVED = state.SAVED;

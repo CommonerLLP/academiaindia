@@ -27,6 +27,7 @@ import { TYPE_COLORS } from "./card-helpers.js";
 /** Pretty-print an institution-type code for the legend / chip / tooltip. */
 export const typeLabel = (type) => ({
   CentralUniversity: "Central University",
+  StateUniversity: "State University",
   PrivateUniversity: "Private University",
 }[type] || type);
 
@@ -168,7 +169,7 @@ export function updateMapMarkers(filteredAds) {
     const campusSuffix = key.includes("::") ? ` — ${displayCity} campus` : "";
     marker.bindPopup(`
       <strong>${escapeHTML(inst.name)}${escapeHTML(campusSuffix)}</strong><br/>
-      <span style="color:var(--muted)">${escapeHTML(inst.type)} · ${escapeHTML([displayCity, displayState].filter(Boolean).join(", "))}</span>
+      <span style="color:var(--muted)">${escapeHTML(typeLabel(inst.type))} · ${escapeHTML([displayCity, displayState].filter(Boolean).join(", "))}</span>
       ${hssLine}
       <div style="margin-top:6px">${totalLine}</div>`);
   }

@@ -49,6 +49,8 @@ Thumbs.db
 /notes/
 /internal/
 
+.ai/
+
 # Research data corpus — STAYS LOCAL ONLY.
 # These are the parliamentary PDFs, sansad-crawl outputs, IIT vacancy
 # disclosures, and historical JSON snapshots that drive the analysis.
