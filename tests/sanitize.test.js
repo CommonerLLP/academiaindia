@@ -93,6 +93,7 @@ describe("safeUrl — XSS allowlist", () => {
     expect(got.startsWith(ORIGIN) || got === "ht!tp://broken").toBe(true);
     expect(got.toLowerCase().startsWith("javascript:")).toBe(false);
     expect(got.toLowerCase().startsWith("data:")).toBe(false);
+    expect(got.toLowerCase().startsWith("vbscript:")).toBe(false);
   });
 });
 
