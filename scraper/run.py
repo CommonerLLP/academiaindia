@@ -34,7 +34,7 @@ import logging
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Iterable
 
 from fetch import fetch
 
@@ -238,6 +238,93 @@ def load_previous_ads(out_dir: Path) -> dict[str, list[dict]]:
     return by_inst
 
 
+def load_previous_current_payload(out_dir: Path) -> dict:
+    """Return the previous current.json payload or an empty scaffold.
+
+    Partial institution refreshes merge fresh results into the existing feed
+    rather than clobbering every institution's ads. This helper lets us reuse
+    the same tolerant "missing or malformed current.json means empty" behavior
+    as `load_previous_ads`.
+    """
+    current_path = out_dir / "current.json"
+    if not current_path.exists():
+        return {"generated_at": None, "ad_count": 0, "ads": []}
+    try:
+        payload = json.loads(current_path.read_text())
+    except Exception:
+        logger.warning("load_previous_current_payload: failed to parse %s; treating as empty", current_path)
+        return {"generated_at": None, "ad_count": 0, "ads": []}
+    if not isinstance(payload.get("ads"), list):
+        payload["ads"] = []
+    return payload
+
+
+def load_previous_coverage_payload(out_dir: Path) -> dict:
+    """Return the previous coverage_report.json payload or an empty scaffold."""
+    coverage_path = out_dir / "coverage_report.json"
+    if not coverage_path.exists():
+        return {"generated_at": None, "rows": []}
+    try:
+        payload = json.loads(coverage_path.read_text())
+    except Exception:
+        logger.warning("load_previous_coverage_payload: failed to parse %s; treating as empty", coverage_path)
+        return {"generated_at": None, "rows": []}
+    if not isinstance(payload.get("rows"), list):
+        payload["rows"] = []
+    return payload
+
+
+def _replace_rows_by_institution_id(old_rows: list[dict], new_rows: list[dict], target_ids: set[str]) -> list[dict]:
+    """Replace rows for `target_ids` while preserving the old row order."""
+    new_by_id = {row["institution_id"]: row for row in new_rows}
+    merged: list[dict] = []
+    inserted: set[str] = set()
+    for row in old_rows:
+        iid = row.get("institution_id")
+        if iid in target_ids:
+            replacement = new_by_id.get(iid)
+            if replacement is not None:
+                merged.append(replacement)
+                inserted.add(iid)
+            continue
+        merged.append(row)
+    for row in new_rows:
+        iid = row["institution_id"]
+        if iid not in inserted:
+            merged.append(row)
+    return merged
+
+
+def _replace_ads_by_institution_id(old_ads: list[dict], new_ads: list[dict], target_ids: set[str]) -> list[dict]:
+    """Replace ads for `target_ids` while preserving the old ad order."""
+    new_by_id: dict[str, list[dict]] = {}
+    for ad in new_ads:
+        new_by_id.setdefault(ad.get("institution_id"), []).append(ad)
+
+    merged: list[dict] = []
+    inserted: set[str] = set()
+    for ad in old_ads:
+        iid = ad.get("institution_id")
+        if iid in target_ids:
+            if iid not in inserted:
+                merged.extend(new_by_id.get(iid, []))
+                inserted.add(iid)
+            continue
+        merged.append(ad)
+    for iid in target_ids:
+        if iid not in inserted:
+            merged.extend(new_by_id.get(iid, []))
+    return merged
+
+
+def _summarize_coverage(rows: list[dict]) -> dict:
+    return {
+        "institutions_attempted": len(rows),
+        "institutions_succeeded": sum(1 for r in rows if r.get("fetch_status") in ("ok", "rolling-stub", "stale-archive")),
+        "institutions_with_ads": sum(1 for r in rows if (r.get("ads_found") or 0) > 0),
+    }
+
+
 def record_outcome(
     coverage: list,
     inst: dict,
@@ -306,15 +393,31 @@ def carry_forward_ads(
     return carried
 
 
-def run(registry_path: Path, out_dir: Path, cache_dir: Path, limit: Optional[int] = None) -> dict:
+def run(
+    registry_path: Path,
+    out_dir: Path,
+    cache_dir: Path,
+    limit: Optional[int] = None,
+    institution_ids: Optional[Iterable[str]] = None,
+) -> dict:
     registry = load_registry(registry_path)
+    target_ids = {iid.strip() for iid in (institution_ids or []) if iid and iid.strip()}
+    if target_ids:
+        registry = [inst for inst in registry if inst.get("id") in target_ids]
     if limit:
         registry = registry[:limit]
 
     previous_ads = load_previous_ads(out_dir)
+    previous_current = load_previous_current_payload(out_dir)
+    previous_coverage = load_previous_coverage_payload(out_dir)
     ads: list[dict] = []
     coverage: list[CoverageRow] = []
-    used_ad_ids: set[str] = set()
+    if target_ids:
+        preserved_ads = [ad for ad in previous_current.get("ads", []) if ad.get("institution_id") not in target_ids]
+        used_ad_ids: set[str] = {ad.get("id") for ad in preserved_ads if ad.get("id")}
+    else:
+        preserved_ads = []
+        used_ad_ids = set()
 
     for inst in registry:
         parser_name = inst.get("parser", "generic") or "generic"
@@ -573,20 +676,21 @@ def run(registry_path: Path, out_dir: Path, cache_dir: Path, limit: Optional[int
     # clobbered by every nightly sweep — that's how we lost the Ashoka
     # Sociology & Anthropology Visiting Faculty record on 2026-05-04.
     manual_path = out_dir / "manual_overrides.json"
-    from parsers.manual_override import load_manual_overrides
-    manual_records = load_manual_overrides(manual_path)
-    if manual_records:
-        for rec in manual_records:
-            ensure_unique_ad_id(rec, used_ad_ids)
-            ads.append(rec)
-        coverage.append(CoverageRow(
-            institution_id="_manual_overrides",
-            parser="manual_override",
-            fetch_status="ok",
-            http_status=None,
-            ads_found=len(manual_records),
-            note=f"Merged {len(manual_records)} hand-transcribed entry/entries from manual_overrides.json",
-        ))
+    if not target_ids or not previous_current.get("ads"):
+        from parsers.manual_override import load_manual_overrides
+        manual_records = load_manual_overrides(manual_path)
+        if manual_records:
+            for rec in manual_records:
+                ensure_unique_ad_id(rec, used_ad_ids)
+                ads.append(rec)
+            coverage.append(CoverageRow(
+                institution_id="_manual_overrides",
+                parser="manual_override",
+                fetch_status="ok",
+                http_status=None,
+                ads_found=len(manual_records),
+                note=f"Merged {len(manual_records)} hand-transcribed entry/entries from manual_overrides.json",
+            ))
 
     # Serialize
     now = datetime.now(timezone.utc)
@@ -597,29 +701,35 @@ def run(registry_path: Path, out_dir: Path, cache_dir: Path, limit: Optional[int
     archive_path = out_dir / "archive" / f"{now.date().isoformat()}.json"
     coverage_path = out_dir / "coverage_report.json"
 
+    final_ads = ads
+    final_rows = [asdict(c) for c in coverage]
+    if target_ids and previous_current.get("ads"):
+        final_ads = _replace_ads_by_institution_id(previous_current.get("ads", []), ads, target_ids)
+        final_rows = _replace_rows_by_institution_id(previous_coverage.get("rows", []), final_rows, target_ids)
+    coverage_summary = _summarize_coverage(final_rows)
     payload = {
         "generated_at": now.isoformat(),
-        "ad_count": len(ads),
-        "ads": _default_json_encode(ads),
+        "ad_count": len(final_ads),
+        "ads": _default_json_encode(final_ads),
     }
     current_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, default=str))
     archive_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, default=str))
 
     coverage_payload = {
         "generated_at": now.isoformat(),
-        "institutions_attempted": len(registry),
-        "institutions_succeeded": sum(1 for c in coverage if c.fetch_status in ("ok", "rolling-stub", "stale-archive")),
-        "institutions_with_ads": sum(1 for c in coverage if c.ads_found > 0),
-        "ads_found_total": len(ads),
-        "rows": [asdict(c) for c in coverage],
+        "institutions_attempted": coverage_summary["institutions_attempted"],
+        "institutions_succeeded": coverage_summary["institutions_succeeded"],
+        "institutions_with_ads": coverage_summary["institutions_with_ads"],
+        "ads_found_total": len(final_ads),
+        "rows": final_rows,
     }
     coverage_path.write_text(json.dumps(coverage_payload, indent=2, ensure_ascii=False, default=str))
 
     return {
-        "ads": len(ads),
-        "attempted": len(registry),
-        "succeeded": coverage_payload["institutions_succeeded"],
-        "with_ads": coverage_payload["institutions_with_ads"],
+        "ads": len(final_ads),
+        "attempted": len(registry) if target_ids else coverage_payload["institutions_attempted"],
+        "succeeded": len([r for r in final_rows if r.get("institution_id") in target_ids and r.get("fetch_status") in ("ok", "rolling-stub", "stale-archive")]) if target_ids else coverage_payload["institutions_succeeded"],
+        "with_ads": len([r for r in final_rows if r.get("institution_id") in target_ids and (r.get("ads_found") or 0) > 0]) if target_ids else coverage_payload["institutions_with_ads"],
     }
 
 
@@ -640,10 +750,17 @@ if __name__ == "__main__":
     ap.add_argument("--out", default=str(base / "docs" / "data"))
     ap.add_argument("--cache", default=str(base / ".cache"))
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--institution", action="append", default=None, help="institution_id to refresh in place; may be passed multiple times")
     args = ap.parse_args()
 
     import sys
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-    stats = run(Path(args.registry), Path(args.out), Path(args.cache), limit=args.limit)
+    stats = run(
+        Path(args.registry),
+        Path(args.out),
+        Path(args.cache),
+        limit=args.limit,
+        institution_ids=args.institution,
+    )
     print(json.dumps(stats, indent=2))
