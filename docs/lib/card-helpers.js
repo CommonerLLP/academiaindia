@@ -19,6 +19,7 @@ import { safeUrl, resolveUrl, escapeRegExp } from "./sanitize.js";
 export const TYPE_COLORS = {
   IIT: "#1F4E79", IIM: "#2d6a4f", IISc: "#6b21a8", IISER: "#b45309",
   NIT: "#64748b", IIIT: "#0e7490", CentralUniversity: "#92400e",
+  StateUniversity: "#9a3412",
   PrivateUniversity: "#7c3aed",
 };
 

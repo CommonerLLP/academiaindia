@@ -103,6 +103,21 @@ describe("renderAd", () => {
     expect(renderCard.renderAd(rosterAd)).toContain("OBC-2");
   });
 
+  it("adds an Anna-specific cue for the events listing page", () => {
+    const ad = {
+      id: "anna",
+      institution_id: "iit-delhi",
+      title: "Research Position",
+      discipline: "Chemical Engineering",
+      post_type: "Research",
+      original_url: "https://www.annauniv.edu/pdf/notice.pdf",
+      info_url: "https://www.annauniv.edu/events.php",
+    };
+
+    const html = renderCard.renderAd(ad);
+    expect(html).toContain("Listing page (open Recruitment tab) ↗");
+  });
+
   it("wires save buttons to state and localStorage", () => {
     const ad = {
       id: "save-me",
