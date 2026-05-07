@@ -234,23 +234,295 @@ def _split_subareas(unit: UnitBlock) -> list[tuple[str, str]]:
     return out
 
 
+def _extract_columns(unit: UnitBlock) -> tuple[str, str]:
+    """Split a rolling-ad unit block into its (Areas, Criteria) columns.
+
+    The PDF layout is a 4-column table — S.No | Unit name | Areas |
+    Additional Criteria. pdftotext preserves the column alignment as
+    horizontal-whitespace gaps (≥2 spaces between cells), but its
+    reading order traverses each row of the table left-to-right, so
+    a flat join of the unit-block text mashes Areas + Criteria
+    together row-by-row ("e. Machine Learning in Mechanics minimum
+    of 4 papers…").
+
+    Strategy: read column boundaries off the unit-header line as
+    character positions, then for every line slice
+    `line[col3_start:col4_start]` for the Areas column and
+    `line[col4_start:]` for the Criteria column. Each row of the
+    layout becomes one line in the per-column text, with row order
+    preserved. Continuation lines (cells that wrap inside a single
+    column) survive intact because they're a substring of the same
+    horizontal slice.
+
+    Returns ("", "") when the layout is too sparse to split (e.g.
+    a unit whose header line carries only S.No + Unit name with no
+    Areas/Criteria cells). Caller falls back to the row-major
+    `_short_excerpt` in that case.
+    """
+    lines = unit.text.split("\n")
+
+    # Find the header line — the one containing the unit_num as the
+    # first non-whitespace token. (Could be the very first line of
+    # unit.text, but defensively we scan the first few lines in case
+    # the splitter included a trailing form-feed remainder.)
+    header_idx = -1
+    header_line = ""
+    for idx, line in enumerate(lines[:3]):
+        m = re.match(r"^\s*(\d+)\b", line)
+        if m and int(m.group(1)) == unit.unit_num:
+            header_idx = idx
+            header_line = line
+            break
+    if header_idx < 0:
+        return "", ""
+
+    # Find each cell's start position on the header line by walking
+    # the run-of-2-or-more-whitespace separators.
+    cells: list[tuple[int, str]] = []
+    pos = 0
+    for piece in re.split(r"(\s{2,})", header_line):
+        if not piece:
+            pos += 0
+            continue
+        if piece.strip():
+            cells.append((pos, piece))
+        pos += len(piece)
+
+    # Cells 0/1 are S.No / Unit name. The Criteria column starts at the
+    # LAST cell on the header line (it carries the section-label like
+    # "Publication Record:" / "Publications:" / "Academic Background:").
+    # Everything between Unit-name and the last cell belongs to the Areas
+    # column. The naive "Areas = cell 2" heuristic fails when Areas is
+    # itself split into a letter-prefix sub-column ("a.") and an area-name
+    # sub-column ("Design and Optimization") — both belong to logical
+    # Col-3 and slicing them apart breaks the layout reconstruction.
+    if len(cells) < 3:
+        return "", ""
+
+    # Special case: the header line collapses col-2 (unit name) and col-3
+    # (first area) into one cell because pdftotext didn't put a 2+ space
+    # gap between them. That happens to IITD's Electrical (where col-3's
+    # first sub-area-header "Communication Engineering:" is one space
+    # away from col-2's "Department Of Electrical") and to Yardi's row.
+    # Detect: cells[1] is much longer than expected (>40 chars) and
+    # contains a section-style ":" mid-cell — split cells[1] there.
+    name_cell_pos, name_cell_text = cells[1]
+    if len(name_cell_text) > 40:
+        # Look for "<words>:<space>" or "<words>:<end>" inside the name
+        # cell — likely a sub-area header smushed in.
+        m = re.search(r":\s+(?=[A-Z])|:$", name_cell_text)
+        if m:
+            split_at = m.end()
+            unit_part = name_cell_text[:split_at].rstrip()
+            areas_part = name_cell_text[split_at:].lstrip()
+            new_pos = name_cell_pos + len(unit_part) + (
+                len(name_cell_text) - len(name_cell_text.rstrip())
+            )
+            # Replace cells[1] with two cells: unit-name + collapsed-area.
+            cells = (
+                [cells[0], (name_cell_pos, unit_part)]
+                + ([(new_pos, areas_part)] if areas_part else [])
+                + cells[2:]
+            )
+
+    col3_start = cells[2][0]
+    col4_start = cells[-1][0] if len(cells) >= 4 else None
+    # Sanity: Criteria must sit reasonably far from where Areas starts.
+    # Otherwise treat the whole right side as one column (Areas-only).
+    if col4_start is not None and col4_start - col3_start < 10:
+        col4_start = None
+
+    areas_lines: list[str] = []
+    criteria_lines: list[str] = []
+    for line in lines:
+        if not line.strip():
+            areas_lines.append("")
+            criteria_lines.append("")
+            continue
+        a, c = _classify_line(line, col3_start, col4_start)
+        if a:
+            areas_lines.append(a)
+        if c:
+            criteria_lines.append(c)
+
+    areas_text = "\n".join(areas_lines).strip()
+    criteria_text = "\n".join(criteria_lines).strip()
+
+    # Sanity check — when pdftotext collapses col-2 (unit name) and col-3
+    # (first sub-area header) into one cell because the gap between them
+    # is < 2 spaces (IITD's Electrical Engineering and Yardi-AI rows do
+    # this), the column anchors are wrong and the extracted Areas ends up
+    # carrying Criteria-section content. Detect: if Areas begins with a
+    # criteria-section header keyword and Criteria is empty, the
+    # extraction has misclassified — return ("", "") so the caller falls
+    # back to the row-major path.
+    if areas_text and not criteria_text:
+        first = areas_text.lstrip()[:60].lower()
+        criteria_starters = (
+            "academic background", "publication record", "publications:",
+            "publications and ph", "other:", "other additional",
+        )
+        if any(first.startswith(s) for s in criteria_starters):
+            return "", ""
+
+    return areas_text, criteria_text
+
+
+def _classify_line(line: str, col3_start: int, col4_start: int | None,
+                   tolerance: int = 15) -> tuple[str, str]:
+    """Split a single line of layout-extracted text into (Areas, Criteria).
+
+    pdftotext approximates pixel positions with character spaces, but the
+    alignment shifts row-to-row by ±1–5 chars depending on cell content.
+    A fixed character anchor taken from the header line is too brittle.
+    This function detects each line's column boundaries from the line
+    itself, by classifying every whitespace gap (run of ≥3 spaces) as
+    either the col-2/col-3 boundary or the col-3/col-4 boundary based
+    on which header anchor it's nearer to.
+
+    A line can have:
+    - No gaps: single-cell line. Assign by content start position.
+    - Only a col-2/col-3 gap: name-continuation on the left, Areas on
+      the right (no Criteria content this row).
+    - Only a col-3/col-4 gap: Areas on the left, Criteria on the right.
+    - Both: name-continuation, Areas, Criteria — three slices.
+    """
+    if not line.strip():
+        return "", ""
+
+    gaps = list(re.finditer(r"\s{3,}", line))
+
+    # Classify each gap.
+    col3_gap: re.Match | None = None
+    col4_gap: re.Match | None = None
+    for g in gaps:
+        # The gap's right edge is where the next column begins.
+        edge = g.end()
+        d3 = abs(edge - col3_start)
+        d4 = abs(edge - col4_start) if col4_start is not None else 1e9
+        # A gap is the col-3/col-4 boundary if it's closer to col4_start
+        # than to col3_start (and within tolerance of col4_start).
+        if d4 <= tolerance and d4 < d3:
+            if col4_gap is None or d4 < abs(col4_gap.end() - col4_start):
+                col4_gap = g
+        elif d3 <= tolerance:
+            if col3_gap is None or d3 < abs(col3_gap.end() - col3_start):
+                col3_gap = g
+
+    # Slice based on which boundaries are present.
+    if col3_gap is not None and col4_gap is not None:
+        areas = line[col3_gap.end():col4_gap.start()].strip()
+        criteria = line[col4_gap.end():].strip()
+        return areas, criteria
+    if col3_gap is not None:
+        # Name-continuation on the left; Areas extends to end of line.
+        areas = line[col3_gap.end():].strip()
+        return areas, ""
+    if col4_gap is not None:
+        # No name-continuation. Areas starts at line content start;
+        # Criteria starts after the gap.
+        areas = line[:col4_gap.start()].strip()
+        criteria = line[col4_gap.end():].strip()
+        # If areas content begins before col-3 anchor, the line is
+        # actually a Criteria-only line whose left-side content sits in
+        # col-2 (impossible in IITD layouts but defensive). Drop areas.
+        line_content_start = len(line) - len(line.lstrip())
+        if line_content_start < col3_start - tolerance:
+            areas = ""
+        return areas, criteria
+
+    # No classified gaps — single-cell line. Assign by content start.
+    content_start = len(line) - len(line.lstrip())
+    text_only = line.lstrip().rstrip()
+    if col4_start is not None and content_start >= col4_start - tolerance:
+        return "", text_only
+    if content_start >= col3_start - tolerance:
+        return text_only, ""
+    return "", ""
+
+
 def _short_excerpt(unit: UnitBlock, max_chars: int = 3500) -> str:
     """Return a clean excerpt of the unit's areas + eligibility text.
 
-    Strips the first line (the unit-header itself, e.g. `"10  Department of
-    Humanities & Social Sciences   Economics: ..."`), then collapses
-    whitespace so the dashboard renders a single readable paragraph rather
-    than reflowing the PDF's column gutters.
+    First tries `_extract_columns` to slice the layout's Col-3 (Areas)
+    and Col-4 (Criteria) by character position, then formats the joined
+    Areas-then-Criteria stream with a blank-line separator between the
+    two columns and one line per row. This is what stops the row-by-row
+    mashing where pdftotext's reading-order produces strings like
+    "e. Machine Learning in Mechanics minimum of 4 papers…" — Areas and
+    Criteria become two stacked paragraphs instead of one interleaved
+    line.
 
-    The 3500-char default is large enough that IIT Delhi's HSS unit (which
-    bundles Sociology / STS / Psychology / Lit subareas) keeps all
-    keywords visible to the dashboard's HSS classifier without truncation.
+    Falls back to row-major cell-stripping when the layout is too sparse
+    for column-extraction (e.g. units with only S.No + Unit name on the
+    header line and content beginning on line 1).
+
+    The 3500-char default is large enough that IIT Delhi's HSS unit
+    (which bundles Sociology / STS / Psychology / Lit subareas) keeps
+    all keywords visible to the dashboard's HSS classifier without
+    truncation.
     """
-    text = unit.text
-    # Drop the unit-name + leading column whitespace so the excerpt starts on
-    # the actual content, not the "10  Department of  Economics:" header.
-    lines = text.splitlines()[1:]
-    joined = re.sub(r"\s+", " ", " ".join(lines)).strip()
+    # Column-aware path. _extract_columns() classifies each whitespace
+    # gap on each line as either the col-2/col-3 boundary or the
+    # col-3/col-4 boundary, slicing accordingly. When it succeeds (most
+    # IITD units), Areas and Criteria render as two separate paragraphs
+    # rather than the row-by-row interleave pdftotext produces. When it
+    # detects collapsed-header units (where the column anchors are
+    # unreliable), it returns ("", "") and we fall back to row-major
+    # cell-stripping below. See docs/PARSER-ARCHITECTURE.md §3.4.
+    areas, criteria = _extract_columns(unit)
+    if areas and criteria:
+        joined = areas + "\n\n" + criteria
+        if len(joined) > max_chars:
+            joined = joined[:max_chars].rsplit(" ", 1)[0] + "…"
+        return joined
+    if areas and not criteria:
+        if len(areas) > max_chars:
+            areas = areas[:max_chars].rsplit(" ", 1)[0] + "…"
+        return areas
+
+    # Row-major fallback for units where column extraction couldn't
+    # find clean boundaries (Yardi-AI's collapsed header, Electrical's
+    # ":"-mashed unit-name). Same logic as before; no regression.
+    name_words = set(unit.unit_name.split())
+    out: list[str] = []
+    first_line = True
+    for line in unit.text.splitlines():
+        cells = [c for c in re.split(r"\s{2,}", line) if c]
+        if not cells:
+            continue
+        if first_line:
+            # Drop the S.No cell (matches unit_num) and the unit-name
+            # cell (cell whose words are all part of the unit_name).
+            kept: list[str] = []
+            dropped_num = False
+            dropped_name = False
+            for c in cells:
+                if not dropped_num and c.strip() == str(unit.unit_num):
+                    dropped_num = True
+                    continue
+                if not dropped_name and c.split() and all(w in name_words for w in c.split()):
+                    dropped_name = True
+                    continue
+                kept.append(c)
+            out.append(" ".join(kept))
+            first_line = False
+        else:
+            # Subsequent lines may begin with unit-name continuation
+            # cells (e.g. "Chemistry" on the second line of a wrapped
+            # "Department Of Chemistry"). Drop leading cells that are
+            # purely unit-name words; once a real content cell appears,
+            # stop dropping for the rest of the line.
+            kept = []
+            dropping = True
+            for c in cells:
+                if dropping and c.split() and all(w in name_words for w in c.split()):
+                    continue
+                dropping = False
+                kept.append(c)
+            out.append(" ".join(kept))
+
+    joined = re.sub(r"\s+", " ", " ".join(out)).strip()
     if len(joined) > max_chars:
         joined = joined[:max_chars].rsplit(" ", 1)[0] + "…"
     return joined

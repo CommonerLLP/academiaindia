@@ -165,7 +165,7 @@ export function renderResources() {
   const renderBlock = (b) => `
     <details class="res-accordion res-block">
       <summary>
-        <span class="acc-title">I am exploring ${escapeHTML(b.title.toLowerCase().replace("if you're tracking ", "").replace("networks ", "networks ").replace("networks and associations", "networks and associations"))}</span>
+        <span class="acc-title">I am exploring ${escapeHTML(b.title.toLowerCase().replace("if you're tracking ", ""))}</span>
         <span class="acc-icon">▾</span>
       </summary>
       <div class="acc-content">
