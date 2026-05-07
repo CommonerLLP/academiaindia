@@ -90,7 +90,14 @@ describe("safeUrl — XSS allowlist", () => {
     // it as a relative path. The exact string returned matters less than
     // that no executable scheme leaks through.
     const got = safeUrl("ht!tp://broken", ORIGIN);
-    expect(got.startsWith(ORIGIN) || got === "ht!tp://broken").toBe(true);
+    const isSameOrigin = (() => {
+      try {
+        return new URL(got).origin === ORIGIN;
+      } catch {
+        return false;
+      }
+    })();
+    expect(isSameOrigin || got === "ht!tp://broken").toBe(true);
     expect(got.toLowerCase().startsWith("javascript:")).toBe(false);
     expect(got.toLowerCase().startsWith("data:")).toBe(false);
   });
