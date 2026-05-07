@@ -14,7 +14,7 @@ def _fixture() -> str:
 def test_parse_extracts_faculty_and_research_listings() -> None:
     items = parse(
         _fixture(),
-        "https://www.annauniv.edu/recruitment.php",
+        "https://www.annauniv.edu/events.php",
         datetime(2026, 5, 6, tzinfo=timezone.utc),
     )
 
@@ -24,7 +24,7 @@ def test_parse_extracts_faculty_and_research_listings() -> None:
     assert "Recruitment for Project Assistant in the ANRF funded project" in titles
     assert "Notification for Assistant Professor in Architecture" in titles
     assert all(item["original_url"].startswith("https://www.annauniv.edu/") for item in items)
-    assert all(item["publication_date"] in {"2026-04-08", "2026-04-06", "2026-03-20"} for item in items)
+    assert all(item["closing_date"] in {"2026-04-08", "2026-04-06", "2026-03-20"} for item in items)
     by_title = {item["title"]: item for item in items}
     assert by_title["Recruitment Junior Research fellow (JRF)"]["department"] == "CME"
     assert by_title["Recruitment for Project Assistant in the ANRF funded project"]["department"] == "CCM"
@@ -34,7 +34,7 @@ def test_parse_extracts_faculty_and_research_listings() -> None:
 def test_parse_skips_non_academic_admin_listings() -> None:
     items = parse(
         _fixture(),
-        "https://www.annauniv.edu/recruitment.php",
+        "https://www.annauniv.edu/events.php",
         datetime(2026, 5, 6, tzinfo=timezone.utc),
     )
 
@@ -45,5 +45,5 @@ def test_parse_skips_non_academic_admin_listings() -> None:
 def test_parse_handles_empty_or_garbage_input() -> None:
     fetched_at = datetime(2026, 5, 6, tzinfo=timezone.utc)
 
-    assert parse("", "https://www.annauniv.edu/recruitment.php", fetched_at) == []
-    assert isinstance(parse("<html><body></body></html>", "https://www.annauniv.edu/recruitment.php", fetched_at), list)
+    assert parse("", "https://www.annauniv.edu/events.php", fetched_at) == []
+    assert isinstance(parse("<html><body></body></html>", "https://www.annauniv.edu/events.php", fetched_at), list)
