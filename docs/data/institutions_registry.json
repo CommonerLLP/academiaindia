@@ -1076,11 +1076,11 @@
     "type": "StateUniversity",
     "state": "Tamil Nadu",
     "city": "Chennai",
-    "career_page_url_guess": "https://www.annauniv.edu/recruitment.php",
+    "career_page_url_guess": "https://www.annauniv.edu/events.php",
     "ad_format_guess": "Mixed",
     "parser": "anna_university",
     "coverage_status": "Unverified",
-    "notes": "Public recruitment page publishes dated faculty and research-project notices as direct PDF links."
+    "notes": "Recruitment notices currently surface in the Recruitment tab of events.php as a structured table with department and last-date columns."
   },
   {
     "id": "plaksha-university",

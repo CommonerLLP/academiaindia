@@ -1,7 +1,7 @@
 """Anna University recruitment parser.
 
-Targets `https://www.annauniv.edu/recruitment.php`, which publishes a dated
-listing of recruitment notices that typically link directly to PDFs.
+Targets `https://www.annauniv.edu/events.php`, whose Recruitment tab publishes
+a structured table of notices with department and last-date columns.
 
 v1 scope:
 - emit faculty + research listings from the public recruitment page
@@ -27,6 +27,7 @@ DATE_RE = re.compile(
     r"[a-z]*\s+(?P<year>20\d{2})\b",
     re.I,
 )
+DOT_DATE_RE = re.compile(r"\b(?P<day>\d{1,2})\.(?P<month>\d{1,2})\.(?P<year>20\d{2})\b")
 MONTHS = {
     "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
     "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
@@ -95,6 +96,16 @@ def _extract_date(parts: Iterable[str]) -> str | None:
     return None
 
 
+def _extract_dot_date(text: str) -> str | None:
+    match = DOT_DATE_RE.search(text or "")
+    if not match:
+        return None
+    day = int(match.group("day"))
+    month = int(match.group("month"))
+    year = int(match.group("year"))
+    return f"{year:04d}-{month:02d}-{day:02d}"
+
+
 def _classify_scope(text: str) -> str | None:
     has_faculty = bool(FACULTY_RE.search(text))
     has_research = bool(RESEARCH_RE.search(text))
@@ -127,8 +138,64 @@ def _extract_unit(context_parts: list[str], title: str) -> str | None:
     return None
 
 
+def _parse_table_rows(soup: BeautifulSoup, url: str, fetched_at: datetime) -> list[dict]:
+    ads: list[dict] = []
+    seen_urls: set[str] = set()
+
+    for tr in soup.find_all("tr"):
+        cells = tr.find_all("td")
+        if len(cells) < 4:
+            continue
+        title_link = cells[1].find("a", href=True)
+        if not title_link:
+            continue
+
+        title = _text_of(cells[1]).strip(" -|")
+        if len(title) < 5:
+            continue
+
+        department = _text_of(cells[2]).strip(" -:") or None
+        row_text = " ".join(_text_of(cell) for cell in cells)
+        post_type = _classify_scope(f"{title} {department or ''} {row_text}")
+        if post_type is None:
+            continue
+
+        href = (title_link.get("href") or "").strip()
+        if not href or href.startswith("#") or href.lower().startswith("javascript:"):
+            continue
+        abs_url = urljoin(url, href)
+        if abs_url in seen_urls:
+            continue
+        seen_urls.add(abs_url)
+
+        closing_date = _extract_dot_date(_text_of(cells[3]))
+        contract_status = "Contractual" if CONTRACT_RE.search(row_text) else "Unknown"
+        parse_confidence = 0.93 if closing_date and department else 0.88
+
+        ads.append(make_ad(
+            id=stable_id("anna-university", abs_url, title, closing_date or ""),
+            title=title[:250],
+            original_url=abs_url,
+            snapshot_fetched_at=fetched_at,
+            department=department,
+            discipline=department if department and len(department) > 4 else None,
+            post_type=post_type,
+            contract_status=contract_status,
+            closing_date=closing_date,
+            parse_confidence=parse_confidence,
+            raw_text_excerpt=row_text[:500],
+            info_url=url,
+        ))
+
+    return ads
+
+
 def parse(html: str, url: str, fetched_at: datetime) -> list[dict]:
     soup = BeautifulSoup(html or "", "html.parser")
+    table_ads = _parse_table_rows(soup, url, fetched_at)
+    if table_ads:
+        return table_ads
+
     ads: list[dict] = []
     seen_urls: set[str] = set()
 
