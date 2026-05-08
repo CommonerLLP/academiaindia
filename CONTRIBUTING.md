@@ -209,7 +209,7 @@ scripts/sansad_download_pdfs.py   # PDF download pass (125 lines)
 
 These are retired. The same functionality now lives in a separately-
 released public package, **`sansad-semantic-crawler`** at
-[github.com/CommonSenseLLP/sansad-semantic-crawler](https://github.com/CommonSenseLLP/sansad-semantic-crawler)
+[github.com/CommonerLLP/sansad-semantic-crawler](https://github.com/CommonerLLP/sansad-semantic-crawler)
 (PolyForm Noncommercial 1.0.0), pinned at `v0.1.0` in
 `requirements.txt`. The host project supplies the topic profile —
 `notes/topics/cei-vacancies.json`, gitignored — that encodes the
