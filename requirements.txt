@@ -24,4 +24,4 @@ lxml==6.1.0
 # it via the extra; `pdfminer.six` is the fallback PDF text-extractor used
 # when `pdftotext` (system binary) isn't available. Bump the @v tag when a
 # new release lands at github.com/CommonerLLP/sansad-semantic-crawler.
-sansad-semantic-crawler[http,pdf] @ git+https://github.com/CommonerLLP/sansad-semantic-crawler.git@v0.3.0
+sansad-semantic-crawler[http,pdf] @ git+https://github.com/CommonerLLP/sansad-semantic-crawler.git@v0.4.0
