@@ -345,7 +345,6 @@ export function renderAd(ad) {
   if (contractStr === "Permanent") contractStr = "";
   // A small flag-row for non-blocking but worth-knowing signals.
   const flags = [];
-  flags.push(`<span class="card-flag scope ${institutionScope}">${isPrivateInstitution ? "Private" : "Public"}</span>`);
   if (effectivePostCount) {
     flags.push(`<span class="card-flag">${effectivePostCount} ${effectivePostCount === 1 ? "post" : "posts"}</span>`);
   }
@@ -463,6 +462,7 @@ export function renderAd(ad) {
       </div>
     </details>
   `;
+  flags.push(art16PillHTML);
 
   const reservPillsHTML = breakdown ? `
     <div class="row-reserv">
@@ -674,7 +674,7 @@ export function renderAd(ad) {
       <div class="tier-bar"></div>
       <div class="card-body">
         <div class="card-headline">
-          <h3 class="card-institution">${escapeHTML(instName)}${cityPart} ${art16PillHTML}</h3>
+          <h3 class="card-institution">${escapeHTML(instName)}${cityPart}</h3>
           <p class="card-subhead">
             <span class="card-rank">${escapeHTML(rankLine)}, </span>
             <span class="card-discipline">${escapeHTML(discipline)}</span>
