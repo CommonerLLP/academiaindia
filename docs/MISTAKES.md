@@ -5,6 +5,26 @@ codebase. Newest entry on top. Each entry exists because the alternative
 is repeating the same mistake — and because the worst thing an LLM can
 do is leave no trace of its incompetence behind.
 
+## 2026-05-08 — The Popover Bleed (Viewport Overflow)
+
+I implemented a redesign of the job listing cards, moving the Article 16 reservation pill into a `bottom-right` flag cluster in the card footer.
+
+**What I broke.**
+
+I defined the `.reserv-info-pop` with `position: absolute; left: 0;`. This worked fine in previous iterations where the Article 16 pill was left-aligned in the card body. However, once I moved it into a right-aligned flex container (`justify-content: flex-end`), the `left: 0` anchor caused the 320px-wide popover to extend 320px to the *right* of the button. Since the button was already at the right edge of the card, the popover bled off-screen, making it inaccessible on mid-width viewports (768–1024px) where horizontal space was constrained but the mobile layout hadn't yet triggered.
+
+**The failure.**
+
+I tested the mobile layout (720px) and the standard wide-desktop layout, but I failed to test the "narrow desktop" range or verify the anchoring logic after changing the container's alignment. I assumed `left: 0` was a safe default for a popover, forgetting that absolute positioning is relative to the `position: relative` parent (`.art16-details`), which itself was now floating at the right edge of the card.
+
+**The fix.**
+
+Changed the desktop anchor to `right: 0` so the popover expands into the card body rather than away from it. Added a media-query override for mobile (`max-width: 720px`) to switch back to `left: 0`, as the flags are left-aligned on small screens.
+
+**What to prevent recurrence.**
+
+Always verify popover positioning whenever a parent container's horizontal alignment or flex justification changes. Test the "seams" between responsive breakpoints (the 768–1024px range).
+
 ---
 
 ## 2026-05-06 — A regex ate the page break

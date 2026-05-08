@@ -48,7 +48,7 @@ Three constraints drive the architecture:
 - `id` — slug, e.g. `iit-delhi`, `jnu`, `aiims-delhi`
 - `name` — canonical long form
 - `short_name`
-- `type` — enum: IIT | IIM | IISER | IISc | CentralUniversity | NIT | IIIT | AIIMS | Other
+- `type` — enum: IIT | IIM | IISER | IISc | CentralUniversity | NIT | IIIT | AIIMS | StateUniversity | Other
 - `state`
 - `city`
 - `established` — year
@@ -123,7 +123,7 @@ Alternative: self-hosted cron → S3 / Cloudflare Pages.
 
 ## What v1 ships
 
-- Registry with 150+ institutions, all flagged `coverage_status: Unverified` except the ~10 that have working parsers.
+- Registry with 185+ institutions. Active coverage includes all major IITs, several Central Universities, and the first wave of State Universities (Anna University).
 - Fetch + orchestration layer: working.
 - Parsers: IIT-Delhi, JNU, two more as proof-of-concept. Placeholder stubs for the rest.
 - Generic parser: working, low-confidence output.
@@ -135,6 +135,6 @@ Alternative: self-hosted cron → S3 / Cloudflare Pages.
 - Email/RSS notifications.
 - User accounts.
 - Samarth scraping (forbidden).
-- State University support.
+- (Ships) State University support (plumbing + first-wave parsers).
 - Historical backfill from Wayback (separate project; see CRITIQUE.md "publication possibility").
 - Aggregate statistics dashboard. Coverage reporting only.
