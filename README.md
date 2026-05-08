@@ -101,9 +101,6 @@ whoseuniversity/
 │   ├── lib/             ← ESM modules; the SPA's logic lives here
 │   ├── favicon.svg      ← oxblood "?" mark
 │   ├── og.svg / og.png  ← social-share card
-│   ├── ARCHITECTURE.md  ← scraper-pipeline architecture
-│   ├── PARSER-ARCHITECTURE.md  ← parser-pipeline design doc
-│   ├── MISTAKES.md      ← append-only log of parser/UI failures
 │   └── data/
 │       ├── current.json              ← live listings (the SPA reads this)
 │       ├── coverage_report.json      ← which parsers worked
