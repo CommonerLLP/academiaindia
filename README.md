@@ -214,7 +214,7 @@ changed in the project between then and the entry date.
 ### 2026-05-06 — `sansad-semantic-crawler` bumped to v0.2.0
 
 `requirements.txt` now pins the upstream crawler at
-[`v0.2.0`](https://github.com/CommonSenseLLP/sansad-semantic-crawler/releases/tag/v0.2.0)
+[`v0.2.0`](https://github.com/CommonerLLP/sansad-semantic-crawler/releases/tag/v0.2.0)
 (was `v0.1.0`). The new release ships a **pluggable-classifier
 architecture** — regex (default, back-compat), embeddings (Sentence
 Transformers anchor similarity), LLM (OpenAI-compat chat-completions
@@ -240,7 +240,7 @@ The three legacy scripts that built *The Gap*'s parliamentary corpus
 **retired**. Their behaviour (LS DSpace API + RS rsdoc.nic.in API +
 PDF discovery + dedup-on-resume) now lives in a separately-released
 public-good package, **`sansad-semantic-crawler`**, hosted at
-[github.com/CommonSenseLLP/sansad-semantic-crawler](https://github.com/CommonSenseLLP/sansad-semantic-crawler)
+[github.com/CommonerLLP/sansad-semantic-crawler](https://github.com/CommonerLLP/sansad-semantic-crawler)
 and pinned at `v0.1.0` in `requirements.txt`.
 
 The package is config-driven: it expects a topic-profile JSON that
