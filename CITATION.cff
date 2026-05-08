@@ -7,9 +7,9 @@ message: >-
   data is derived from.
 type: software
 authors:
-  - name: "CommonSense LLP"
+  - name: "Commoner LLP"
 license: PolyForm-Noncommercial-1.0.0
-repository-code: "https://github.com/CommonSenseLLP/academiaindia"
+repository-code: "https://github.com/CommonerLLP/academiaindia"
 url: "https://whoseuniversity.org/"
 keywords:
   - academic-jobs
@@ -22,6 +22,6 @@ preferred-citation:
   type: generic
   title: "Whose University? A public-interest tracker of academic work in India."
   authors:
-    - name: "CommonSense LLP"
+    - name: "Commoner LLP"
   url: "https://whoseuniversity.org/"
   year: 2026

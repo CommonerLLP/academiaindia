@@ -18,10 +18,10 @@ beautifulsoup4==4.14.3
 lxml==6.1.0
 
 # Parliamentary-record corpus refresh — fetched directly from the public
-# CommonSenseLLP repo at a pinned tag rather than PyPI (no PyPI release yet
+# CommonerLLP repo at a pinned tag rather than PyPI (no PyPI release yet
 # for this package). Use the `[http,pdf]` extras: the host project already
 # pins `requests`, but the package's clean-install path expects to discover
 # it via the extra; `pdfminer.six` is the fallback PDF text-extractor used
 # when `pdftotext` (system binary) isn't available. Bump the @v tag when a
-# new release lands at github.com/CommonSenseLLP/sansad-semantic-crawler.
-sansad-semantic-crawler[http,pdf] @ git+https://github.com/CommonSenseLLP/sansad-semantic-crawler.git@v0.2.0
+# new release lands at github.com/CommonerLLP/sansad-semantic-crawler.
+sansad-semantic-crawler[http,pdf] @ git+https://github.com/CommonerLLP/sansad-semantic-crawler.git@v0.2.0
