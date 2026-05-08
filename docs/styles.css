@@ -641,7 +641,7 @@
   html[data-theme="dark"] .vacancy-gap-banner.vacancy-gap-banner-compact {
     background: color-mix(in srgb, var(--alarm) 12%, var(--bg));
   }
-  .feed-list { display: flex; flex-direction: column; gap: 18px; }
+  .feed-list { display: flex; flex-direction: column; gap: 22px; }
   /* Load-more button — large, satisfying tap target. Cobalt to align with
      the political register; the chevron suggests progressive expansion. */
   .load-more { display: block; width: 100%; margin: 14px 0 0; padding: 18px 24px; background: var(--panel); border: 2px solid var(--accent); border-radius: 10px; color: var(--accent); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s, color .15s; text-align: center; letter-spacing: 0.01em; }
@@ -667,7 +667,7 @@
    */
   .listing {
     background: var(--panel); border: 1px solid var(--border);
-    border-radius: 0; padding: 18px 22px 16px;
+    border-radius: 8px; padding: 38px 42px 36px;
     transition: border-color 0.15s, background 0.15s;
     position: relative; display: block;
   }
@@ -707,8 +707,8 @@
      disambiguator without competing with the institution name. */
   .listing .card-institution {
     margin: 0;
-    font-family: var(--serif); font-size: 22px; font-weight: 700;
-    line-height: 1.2; color: var(--ink); letter-spacing: -0.014em;
+    font-family: var(--serif); font-size: 28px; font-weight: 700;
+    line-height: 1.08; color: var(--ink); letter-spacing: -0.014em;
     display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
   }
   .listing .card-institution .card-campus {
@@ -721,8 +721,8 @@
      register matches the publication aesthetic without competing with
      the headline. */
   .listing .card-subhead {
-    margin: 7px 0 0;
-    font-family: var(--sans); font-size: 15px; line-height: 1.45;
+    margin: 10px 0 0;
+    font-family: var(--sans); font-size: 15.5px; line-height: 1.45;
     color: var(--muted); font-style: normal;
   }
   .listing .card-subhead .card-rank {
@@ -744,14 +744,15 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-top: 14px;
-    padding-top: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
     gap: 20px;
     border-top: 1px dashed var(--border);
   }
   .listing .card-flags.bottom-right {
     margin: 0;
     justify-content: flex-end;
+    align-items: center;
     text-align: right;
   }
   .listing .card-flag {
@@ -779,12 +780,15 @@
   /* Mobile: collapse the actions column (star moves under flags), drop
      the dedicated padding for a denser scroll. */
   @media (max-width: 720px) {
-    .listing { padding: 14px 16px 14px 18px; }
+    .listing { padding: 26px 22px; }
     .listing .card-body { grid-template-columns: 1fr auto; gap: 12px; }
     .listing .card-actions { display: none; }
-    .listing .card-institution { font-size: 18px; }
-    .listing .card-subhead { font-size: 14px; }
+    .listing .card-institution { font-size: 21px; line-height: 1.15; }
+    .listing .card-subhead { font-size: 15px; }
     .listing .card-deadline { min-width: 72px; }
+    .listing .card-footer { flex-direction: column; align-items: stretch; gap: 14px; }
+    .listing .card-flags.bottom-right { justify-content: flex-start; text-align: left; }
+    .listing .reserv-info-pop { right: auto; left: 0; }
   }
   /* Backwards-compat selectors so existing CSS for deadline / star /
      reservation pills / traps / apply links / details — written against
@@ -843,17 +847,17 @@
   }
   .listing .art16-btn:hover { filter: brightness(0.95); }
   .listing .art16-btn::-webkit-details-marker { display: none; }
-  .listing .art16-btn.art16-red {
-    background: #ffebe9; color: #b91c1c; border-color: #fca5a5;
+  .listing .art16-btn.art16-saffron {
+    background: #fff4e5; color: #c2410c; border-color: #fdba74;
   }
-  html[data-theme="dark"] .listing .art16-btn.art16-red {
-    background: rgba(185, 28, 28, 0.2); color: #fca5a5; border-color: rgba(252, 165, 165, 0.3);
+  html[data-theme="dark"] .listing .art16-btn.art16-saffron {
+    background: rgba(194, 65, 12, 0.2); color: #fdba74; border-color: rgba(253, 186, 116, 0.3);
   }
-  .listing .art16-btn.art16-green {
-    background: #ecfdf5; color: #047857; border-color: #6ee7b7;
+  .listing .art16-btn.art16-blue {
+    background: #eef2ff; color: var(--ambedkar-blue); border-color: #c7d2fe;
   }
-  html[data-theme="dark"] .listing .art16-btn.art16-green {
-    background: rgba(4, 120, 87, 0.2); color: #6ee7b7; border-color: rgba(110, 231, 183, 0.3);
+  html[data-theme="dark"] .listing .art16-btn.art16-blue {
+    background: rgba(91, 138, 214, 0.15); color: var(--accent); border-color: rgba(91, 138, 214, 0.3);
   }
   .listing .art16-btn.art16-grey {
     background: #f3f4f6; color: #4b5563; border-color: #d1d5db;
@@ -878,7 +882,7 @@
     position: absolute;
     z-index: 20;
     top: 28px;
-    left: 0;
+    right: 0;
     width: min(320px, calc(100vw - 48px));
     padding: 10px 12px;
     border: 1px solid var(--border);
@@ -893,8 +897,8 @@
   .listing .reserv-info-pop strong { color: var(--accent); display: block; margin-bottom: 4px; }
   .listing .reserv-breakdown { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
   .listing .reserv-label.warn { color: var(--warn); font-size: 11px; font-weight: 600; text-transform: uppercase; }
-  .listing .reserv-label.good { color: #047857; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-  html[data-theme="dark"] .listing .reserv-label.good { color: #6ee7b7; }
+  .listing .reserv-label.good { color: var(--accent); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  html[data-theme="dark"] .listing .reserv-label.good { color: var(--accent); }
   /* Hiring-language traps */
   .listing .row-traps { grid-column: 2 / span 3; margin: 8px 0 0; background: #fff8e7; border: 1px solid #f0d98e; border-left: 3px solid #d49a2a; border-radius: 6px; padding: 0; }
   .listing .row-traps summary { padding: 8px 12px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: #5c4a1a; list-style: none; display: flex; align-items: center; gap: 8px; }
@@ -1110,13 +1114,13 @@
     .listing .card-cue { flex-direction: column; gap: 4px; }
     .listing .card-cue-label { min-width: 0; padding-top: 0; }
   }
-  .listing .details { font-size: 12.5px; color: var(--ink); margin: 8px 0 0; grid-column: 2 / span 3; }
-  .listing .details > summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 4px 0; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
+  .listing .details { font-size: 14px; color: var(--ink); margin: 8px 0 0; grid-column: 2 / span 3; }
+  .listing .details > summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 4px 0; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
   .listing .details > summary:hover { color: var(--accent); }
   .listing .details[open] > summary { color: var(--accent); }
-  .listing .detail-block { margin-top: 6px; padding: 6px 0; }
-  .listing .detail-block .k { color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px; font-weight: 600; display: block; margin-bottom: 3px; }
-  .listing .detail-block .v { line-height: 1.55; }
+  .listing .detail-block { margin-top: 8px; padding: 8px 0; }
+  .listing .detail-block .k { color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px; font-weight: 650; display: block; margin-bottom: 4px; }
+  .listing .detail-block .v { line-height: 1.62; }
 
   /* Action links live in the details disclosure for compactness; only the
      Original-PDF link is promoted to the always-visible action column. */
@@ -1169,7 +1173,7 @@
   .listing .row-actions { display: flex; flex-direction: column; gap: 4px; align-items: center; }
   /* WCAG 2.5.5 AA: 44x44 minimum tap area (was 36x36 — visual unchanged, the
      padding box just expands to meet the AA target). */
-  .listing .star { background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 16px; color: var(--muted); border-radius: 8px; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .listing .star { background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 22px; color: var(--muted); border-radius: 8px; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
   .listing .star:hover { background: var(--chip-bg); color: var(--accent); }
   .listing .star.on { color: var(--warn); }
 
@@ -1230,7 +1234,7 @@
 
     /* Listing card — collapse to 3 columns (tier-bar | content | deadline),
        drop the actions column entirely. The row-meta pills wrap naturally. */
-    .listing { grid-template-columns: 4px 1fr auto; gap: 12px; padding: 12px 14px; }
+    .listing { grid-template-columns: 4px 1fr auto; gap: 12px; padding: 26px 22px; }
     .listing .row-actions { display: none; }
     .listing .row-title { font-size: 14.5px; }
     .listing .row-meta { font-size: 11.5px; gap: 4px 5px; }
@@ -1253,10 +1257,18 @@
      Collapse the deadline column as a final fallback so the title isn't
      squeezed into a 60 px ribbon. */
   @media (max-width: 420px) {
-    .listing { grid-template-columns: 4px 1fr; }
-    .listing .row-deadline { grid-column: 2; text-align: left; min-width: 0; margin-top: 6px; }
-    .listing .row-deadline .deadline-num { font-size: 14px; display: inline; margin-right: 6px; font-weight: 700; color: var(--alarm); }
-    .listing .row-deadline .deadline-pill { font-size: 11px; }
+    .listing { padding: 22px 18px; }
+    .listing .card-body { grid-template-columns: 1fr; gap: 10px; }
+    .listing .card-deadline {
+      min-width: 0;
+      text-align: left;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .listing .deadline-num { font-size: 20px; }
+    .listing .deadline-meta { margin-top: 0; }
+    .listing .row-actions-inline { gap: 12px; }
     header.masthead h1 { font-size: 24px; }
     nav.tabs button { padding: 11px 9px; font-size: 13px; }
   }
@@ -1308,8 +1320,8 @@
     /* Ambedkar blue — same token the masthead title uses, so the
        primary CTA and the editorial nameplate sit in the same blue. */
     background: var(--ambedkar-blue); color: #fff;
-    padding: 6px 14px; border-radius: 6px;
-    font-size: 13px; font-weight: 600; text-decoration: none;
+    padding: 8px 16px; border-radius: 6px;
+    font-size: 14px; font-weight: 650; text-decoration: none;
     border: 1px solid var(--ambedkar-blue);
     transition: background 0.15s ease, opacity 0.15s ease;
     flex-shrink: 0;
@@ -1352,7 +1364,7 @@
     font-variant-numeric: normal;
   }
   .listing .deadline-meta {
-    font-size: 11.5px; color: var(--muted); font-family: var(--mono);
+    font-size: 13px; color: var(--muted); font-family: var(--mono);
     margin-top: 3px; line-height: 1.3;
   }
   .listing .deadline-future {
@@ -1444,7 +1456,7 @@
      centered within main, matching The Gap tab's column. The filter
      strip, vacancy-gap line, summary row, heuristic banner, and the
      listing cards all sit inside this 880px frame. */
-  #listings-tab { max-width: 880px; margin-left: auto; margin-right: auto; }
+  #listings-tab { max-width: 740px; margin-left: auto; margin-right: auto; }
   /* H3 section headers on Vacancies tab carry a red left bar — these
      are arguments, not just navigation, and the visual register says so. */
   #vacancies-tab h3 { font-family: var(--serif); font-weight: 700; font-size: 19px; margin: 24px 0 10px; padding: 4px 0 4px 14px; border-left: 4px solid var(--alarm); }
