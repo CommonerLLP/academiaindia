@@ -431,14 +431,14 @@ export function renderAd(ad) {
   let breakdown = "";
 
   if (isPrivate && !catBits.length) {
-    art16Color = "red";
+    art16Color = "saffron";
     art16Tip = "Private Universities are not known to implement affirmative action provisions unless compelled to by the state.";
   } else if (catBits.length) {
-    art16Color = "green";
+    art16Color = "blue";
     art16Tip = "Institution has published post-wise reservation breakdown.";
     breakdown = catBits.map(([k, v]) => `<span class="reserv-pill r-${escapeAttr(k)}">${escapeHTML(k)}-${v}</span>`).join("");
   } else if (isSRD) {
-    art16Color = "green";
+    art16Color = "blue";
     art16Tip = "This ad is part of a Special Recruitment Drive for reserved-category candidates — typically SC/ST/OBC/PwBD posts being filled to reduce roster backlog.";
     breakdown = `<span class="reserv-label good">✓ Special Recruitment Drive</span>`;
   } else if (isCompositeAd) {
@@ -454,7 +454,7 @@ export function renderAd(ad) {
 
   const art16PillHTML = `
     <details class="reserv-info art16-details">
-      <summary class="art16-btn art16-${art16Color} ${art16Color === 'red' ? 'art16-strike' : ''}" aria-label="Explain Article 16 status">
+      <summary class="art16-btn art16-${art16Color} ${art16Color === 'saffron' ? 'art16-strike' : ''}" aria-label="Explain Article 16 status">
         Article 16 <span aria-hidden="true">▾</span>
       </summary>
       <div class="reserv-info-pop">
