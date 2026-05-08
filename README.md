@@ -211,6 +211,26 @@ This section is append-only. The body of the README above is preserved
 as the original description; each dated entry below records what
 changed in the project between then and the entry date.
 
+### 2026-05-08 — `sansad-semantic-crawler` bumped to v0.4.0
+
+`requirements.txt` now pins the upstream crawler at
+[`v0.4.0`](https://github.com/CommonerLLP/sansad-semantic-crawler/releases/tag/v0.4.0).
+This release automates the **politician enrichment layer**:
+
+- **Automated Party/State Lookup**: Question records now include an `asker_details`
+  block (party, party_name, state, house) pulled from the latest official
+  member lists. No more manual party-mapping in `consolidate_corpus.py`.
+- **Committee Composition Rosters**: The crawler can now fetch the full
+  roster of parliamentary standing committees using a hybrid API and
+  PDF/LLM strategy. This enables tracking how committee membership
+  (and the political balance within) changes from one report to the next.
+- **Refactored Base Architecture**: Improved provenance tracking and
+  PDF sanity checks.
+
+This bump is **behaviour-preserving**: the single-schema assumption for
+questions remains intact, but manifests will now contain richer metadata
+by default.
+
 ### 2026-05-06 — `sansad-semantic-crawler` bumped to v0.2.0
 
 `requirements.txt` now pins the upstream crawler at
@@ -248,7 +268,7 @@ encodes search groups, ministry filters, and tag rules. The faculty-
 vacancy / reservation / Mission-Mode lens that drove the legacy
 scripts is now `notes/topics/cei-vacancies.json` — gitignored, since
 the analytical lens is project-specific and the public package ships
-only a `libraries.json` example for `freelibraries4all`.
+only a `libraries.json` example for `theright2read`.
 
 What the host project picks up in exchange:
 
