@@ -268,7 +268,7 @@ encodes search groups, ministry filters, and tag rules. The faculty-
 vacancy / reservation / Mission-Mode lens that drove the legacy
 scripts is now `notes/topics/cei-vacancies.json` — gitignored, since
 the analytical lens is project-specific and the public package ships
-only a `libraries.json` example for `freelibraries4all`.
+only a `libraries.json` example for `theright2read`.
 
 What the host project picks up in exchange:
 
