@@ -686,19 +686,19 @@
     border-radius: 8px; padding: 38px 42px 36px;
     transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
     position: relative; display: block;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   }
   .listing:hover {
     border-color: var(--accent);
     background: color-mix(in srgb, var(--panel) 96%, var(--accent) 4%);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   }
   html[data-theme="dark"] .listing {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   }
   html[data-theme="dark"] .listing:hover {
     background: color-mix(in srgb, var(--panel) 92%, var(--accent) 8%);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   }
   /* All listing cards (public + private) share the same neutral
      surface and the same cobalt hover. The earlier scope-private
@@ -769,7 +769,7 @@
   .listing .card-footer {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     margin-top: 24px;
     padding-top: 16px;
     gap: 20px;
@@ -858,10 +858,10 @@
   .listing .row-reserv { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 10px 0 0; grid-column: 2 / span 3; }
   .listing .reserv-info { position: relative; }
   .listing .art16-btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 4px 10px 4px 8px;
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 8px 16px 8px 12px;
     border-radius: 999px;
-    font-size: 10.5px;
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -871,7 +871,8 @@
     border: 1px solid var(--border);
     list-style: none;
     user-select: none;
-    transition: background 0.2s, border-color 0.2s;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    line-height: 1;
   }
   .listing .art16-btn::before {
     content: "";

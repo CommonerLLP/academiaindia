@@ -50,6 +50,9 @@ Thumbs.db
 # docs/ARCHITECTURE.md (the existing operational scraper-architecture
 # doc, which is fine to publish).
 /ARCHITECTURE.md
+/GITHUB-ACTIONS-SETUP.md
+/MISTAKES.md
+/PARSER-ARCHITECTURE.md
 /STYLEGUIDE.md
 /RISKS.md
 /RUNBOOK.md
