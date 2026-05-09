@@ -11,7 +11,7 @@
 VENV   := .venv
 PYTHON := $(VENV)/bin/python
 PIP    := $(VENV)/bin/pip
-PORT   := 8765
+PORT   := 8000
 
 $(PYTHON):
 	python3 -m venv $(VENV)
@@ -70,8 +70,8 @@ corpus-refresh: corpus-crawl corpus-parse corpus-consolidate
 # ---- core operations -------------------------------------------------------
 
 serve:
-	@echo "Dashboard → http://localhost:$(PORT)/dashboard/"
-	@python3 -m http.server $(PORT)
+	@echo "Site → http://localhost:$(PORT)/"
+	@python3 -m http.server $(PORT) --directory docs
 
 # Run the orchestrator and write data/current.json + coverage_report.json.
 # `make sweep ARGS='--limit 5'` to smoke-test against just 5 institutions.
@@ -117,7 +117,7 @@ clean:
 
 help:
 	@echo "Core (vacancy scraper):"
-	@echo "  make serve         — serve dashboard at http://localhost:$(PORT)/dashboard/"
+	@echo "  make serve         — serve site at http://localhost:$(PORT)/"
 	@echo "  make sweep         — run scraper (alias: make scrape)"
 	@echo "  make scrape-fresh  — busts PDF cache before scraping"
 	@echo "  make refresh-pdfs  — drop .cache/pdfs/ to force re-download next sweep"
