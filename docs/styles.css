@@ -1,11 +1,11 @@
 /* ============================================================
-     BAHUJAN POLITICAL PALETTE
+     PRIMARY EDITORIAL PALETTE
      ------------------------------------------------------------
-     --accent             Ambedkarite cobalt-navy — for tab indicator,
+     --accent             Primary cobalt-navy — for tab indicator,
                           link bottom-rules, card hover borders, and
                           other secondary chrome. Deeper than the
                           masthead/CTA blue.
-     --ambedkar-blue      Brighter Ambedkar blue — for the masthead
+     --ambedkar-blue      Primary blue — for the masthead
                           title and the Apply CTA. Single source of
                           truth for the primary editorial blue:
                           #0047AB light / #5b8ad6 dark.
@@ -49,44 +49,44 @@
     /* Palette redesign: moved off the generic civic-tech (cobalt + alarm
        red on white) palette into a warmer, broadsheet-publication
        register. Ivory background instead of pure-white, oxblood instead
-       of generic alarm red (more specifically the Dalit Panther
+       of generic alarm red (more specifically the Saturated Red
        saturated red the page already cites in comments), warmer-ink
        text instead of cool charcoal. The cobalt stays — it's the
-       Ambedkarite anti-caste color of the project — but goes deeper
+       Primary primary color of the project — but goes deeper
        and less bureaucratic-bright. */
-    --bg: #fbfaf7;             /* austere off-white, not khaki */
+    --bg: #f2f0e6;             /* warm ivory, distinct from white panel */
     --panel: #ffffff;          /* record surfaces */
     --ink: #171512;            /* near-black, print register */
     --muted: #5f5f5a;          /* neutral secondary text */
     --muted-soft: #888883;     /* neutral non-urgent signal */
-    --accent: #123f73;         /* Ambedkar cobalt/navy for actions */
+    --accent: #123f73;         /* Primary cobalt/navy for actions */
     --accent-deep: #0b2d55;    /* hover / pressed */
-    --ambedkar-blue: #0047AB;        /* Ambedkar blue — masthead title + Apply CTA */
-    --ambedkar-blue-deep: #003380;   /* Ambedkar blue hover/pressed */
+    --ambedkar-blue: #0047AB;        /* Primary blue — masthead title + Apply CTA */
+    --ambedkar-blue-deep: #003380;   /* Primary blue hover/pressed */
     --warn: #8a5a18;           /* amber for disclosure absence */
     --alarm: #7a1620;          /* oxblood — Saturated Red saturated red */
     --good: #1b5e20;
-    --border: #d8d6cf;         /* neutral rule */
+    --border: #dad8ce;         /* neutral rule */
     --chip-bg: #efeee9;        /* quiet neutral chip background */
     --serif: "Newsreader", "Source Serif 4", Georgia, serif;
     --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
     color-scheme: light;
   }
   html[data-theme="dark"] {
-    --bg: #101113;             /* charcoal paper */
-    --panel: #17191c;          /* record surfaces */
+    --bg: #0c0d0e;             /* deep charcoal paper */
+    --panel: #1c1e20;          /* elevated record surfaces */
     --ink: #ede9df;            /* soft paper text */
     --muted: #aaa69d;
     --muted-soft: #6f716f;
     --accent: #7ea7df;         /* luminous cobalt */
     --accent-deep: #a4c3ee;
-    --ambedkar-blue: #5b8ad6;        /* Ambedkar blue, lifted for dark-mode contrast */
-    --ambedkar-blue-deep: #82a6e0;   /* Ambedkar blue hover/pressed in dark mode */
+    --ambedkar-blue: #5b8ad6;        /* Primary blue, lifted for dark-mode contrast */
+    --ambedkar-blue-deep: #82a6e0;   /* Primary blue hover/pressed in dark mode */
     --warn: #d0a05e;           /* amber */
     --alarm: #e05b63;          /* oxblood in dark mode */
     --good: #63ad78;
-    --border: #30343a;
-    --chip-bg: #22262b;
+    --border: #32363b;         /* slightly lighter for contrast */
+    --chip-bg: #262a2f;
     color-scheme: dark;
   }
   /* Adjust signal-color tints for dark backgrounds */
@@ -142,8 +142,8 @@
      beneath it, then the lede paragraph — all max-width 720 px and centred.
      Portrait moved to a small centred figure below the lede so the page
      still has a face but doesn't compete with the headline. */
-  /* The 6px red strip is the Bahujan radical-tradition signature
-     (Dalit Panthers / protest red). Politically explicit, not subtle. */
+  /* The 6px red strip is the Editorial radical-tradition signature
+     (Saturated Reds / protest red). Politically explicit, not subtle. */
   /* Masthead — broadsheet wordmark register. Was: 38px h1 + small italic
      subtitle on white, no anchoring. Now: an issue/date eyebrow, a
      larger Newsreader wordmark, a serif italic standfirst, with
@@ -195,7 +195,7 @@
   header.masthead.masthead-compact h1 {
     font-size: 40px;
     font-weight: 700;
-    /* Ambedkar blue token — same colour the Apply CTA fills with, in
+    /* Primary blue token — same colour the Apply CTA fills with, in
        both modes. Light: #0047AB. Dark: #5b8ad6 (lifted for text
        contrast against charcoal — Apply button shifts up too so they
        still match exactly). */
@@ -217,7 +217,7 @@
     font-style: italic;
     font-size: 18px;
     font-weight: 400;
-    color: var(--alarm);                /* Dalit Panther vermillion */
+    color: var(--alarm);                /* Saturated Red vermillion */
     line-height: 1.4;
   }
   /* No column-mode breakpoint here — the h1 keeps `flex-wrap: wrap` on,
@@ -490,7 +490,7 @@
   .filter-strip .quick-chip { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 7px 12px; min-height: 40px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, border-color .15s, color .15s; font-weight: 650; }
   .filter-strip .quick-chip:hover { background: var(--chip-bg); }
   .filter-strip .quick-chip .quick-chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .15s; }
-  /* Reserved-posts chip pressed state uses Ambedkarite cobalt — affirmative
+  /* Reserved-posts chip pressed state uses Primary cobalt — affirmative
      action gets its actual political color, not a generic 'go' green. */
   .filter-strip .quick-chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
   .filter-strip .quick-chip[aria-pressed="true"] .quick-chip-dot { background: #fff; }
@@ -684,11 +684,21 @@
   .listing {
     background: var(--panel); border: 1px solid var(--border);
     border-radius: 8px; padding: 38px 42px 36px;
-    transition: border-color 0.15s, background 0.15s;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
     position: relative; display: block;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .listing:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--panel) 96%, var(--accent) 4%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  html[data-theme="dark"] .listing {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   }
   html[data-theme="dark"] .listing:hover {
     background: color-mix(in srgb, var(--panel) 92%, var(--accent) 8%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
   /* All listing cards (public + private) share the same neutral
      surface and the same cobalt hover. The earlier scope-private
@@ -701,7 +711,7 @@
     background: var(--panel);
     border-color: var(--border);
   }
-  .listing:hover { border-color: var(--accent); background: color-mix(in srgb, var(--panel) 96%, var(--accent) 4%); }
+
   /* Tier bar removed entirely — the 4px strip on the left of every
      listing read as a vestigial decorative accent. Urgency is now
      conveyed by the deadline column's red intensity alone. */
@@ -1325,15 +1335,15 @@
   }
   .empty-state-reserved .empty-state-cta a:hover { opacity: 0.8; }
 
-  /* Apply CTA — filled button in Ambedkar blue (#0047AB). Hardcoded
+  /* Apply CTA — filled button in Primary blue (#0047AB). Hardcoded
      here rather than driven by --accent so the broader palette stays
-     untouched until the full Ambedkar/Left aesthetic redesign lands.
+     untouched until the full Primary aesthetic redesign lands.
      The earlier classified-row treatment (text-only, var(--accent))
      is preserved in git history; restoring filled-button styling per
      2026-05-05 maintainer call. */
   .listing .row-actions-inline a.btn-apply {
     display: inline-flex; align-items: center; gap: 4px;
-    /* Ambedkar blue — same token the masthead title uses, so the
+    /* Primary blue — same token the masthead title uses, so the
        primary CTA and the editorial nameplate sit in the same blue. */
     background: var(--ambedkar-blue); color: #fff;
     padding: 8px 16px; border-radius: 6px;
@@ -1737,7 +1747,7 @@
   /* JBM color discipline:
        --jbm-emph    : ONE accent for what the chart is making you look at
        --jbm-context : muted grey for everything else
-       --jbm-promise : Ambedkar cobalt for what was promised by statute
+       --jbm-promise : Primary cobalt for what was promised by statute
        --jbm-grid    : barely-there gridline grey
    */
   #vacancies-tab .jbm-card { --jbm-emph: var(--alarm); --jbm-context: #b3b1a6; --jbm-promise: var(--accent); --jbm-grid: rgba(0,0,0,0.08); }
@@ -1844,7 +1854,7 @@
   #vacancies-tab .anno-callout.cobalt { background: rgba(31,58,138,0.92); }
   #vacancies-tab .anno-callout.muted { background: rgba(95,93,87,0.92); }
 
-  /* Hero stat — Ambedkarite grammar: an opening pretitle that sets the
+  /* Hero stat — Primary grammar: an opening pretitle that sets the
      denominator, a four-cell grid of per-category withholdings, and a
      closing political claim. The hero block sits centered as a column;
      the pretitle and grid are center-aligned, the closing context

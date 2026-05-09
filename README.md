@@ -171,10 +171,10 @@ testing setup, and a priority queue.
 ## Editorial line
 
 The site reads as journalism, not as a service. The political register
-— anti-caste, evidence-grounded, naming institutions by name — is
+— evidence-grounded, naming institutions by name — is
 deliberate. Pull requests that soften analysis, generalise to
 "stakeholders" or "marginalised communities" instead of naming SC, ST,
-   OBC, EWS, PwBD, and Bahujan candidates specifically, or that try to
+   OBC, EWS, and PwBD candidates specifically, or that try to
    balance The Gap's claims by adding institutional-perspective
    disclaimers that aren't sourced — will be declined.
 
@@ -211,12 +211,12 @@ This section is append-only. The body of the README above is preserved
 as the original description; each dated entry below records what
 changed in the project between then and the entry date.
 
-### 2026-05-08 — UI Redesign & Article 16 Political Palette
+### 2026-05-08 — UI Redesign & Article 16 Palette
 
 The listing card UI has been redesigned to improve scannability and accessibility. 
 - **Typography & Hierarchy**: Increased institution font size to 28px and adjusted line-heights to establish a clearer visual order. The listings column is now capped at 740px to improve line length for readability.
-- **Article 16 Palette**: Shifted the reservation status pill to a high-contrast political color register:
-    - **Ambedkar Blue**: Confirmed roster disclosure or Special Recruitment Drive (SRD).
+- **Article 16 Palette**: Shifted the reservation status pill to a high-contrast color register:
+    - **Blue**: Confirmed roster disclosure or Special Recruitment Drive (SRD).
     - **Saffron**: Institutional exclusion / No reservation (Private Universities).
     - **Grey**: Unclear or undisclosed status.
 - **Accessibility**: Increased tap areas for the star/save buttons (WCAG 2.5.5 AA) and re-anchored footer popovers to prevent viewport overflow.
