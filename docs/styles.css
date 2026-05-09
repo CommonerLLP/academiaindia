@@ -1,4 +1,4 @@
-  /* ============================================================
+/* ============================================================
      BAHUJAN POLITICAL PALETTE
      ------------------------------------------------------------
      --accent             Ambedkarite cobalt-navy — for tab indicator,
@@ -9,13 +9,13 @@
                           title and the Apply CTA. Single source of
                           truth for the primary editorial blue:
                           #0047AB light / #5b8ad6 dark.
-     --alarm              Dalit Panther / Maoist vermillion — for the
+     --alarm              Saturated vermillion — for the
                           masthead strapline, the "Article 16" pill,
-                          critical-deadline numbers, and protest
-                          signaling. NOT used as a top/bottom strip
+                          critical-deadline numbers, and signaling.
+                          NOT used as a top/bottom strip
                           on the masthead or footer (those alarm
                           strips were dropped — they read as
-                          decoration without political weight).
+                          decoration without weight).
      --ink                Near-black, broadsheet print register.
      --bg                 Clean off-white (light) / charcoal (dark).
                           Tinted color-mix(--alarm × --bg) is
@@ -64,7 +64,7 @@
     --ambedkar-blue: #0047AB;        /* Ambedkar blue — masthead title + Apply CTA */
     --ambedkar-blue-deep: #003380;   /* Ambedkar blue hover/pressed */
     --warn: #8a5a18;           /* amber for disclosure absence */
-    --alarm: #7a1620;          /* oxblood — Dalit Panther saturated red */
+    --alarm: #7a1620;          /* oxblood — Saturated Red saturated red */
     --good: #1b5e20;
     --border: #d8d6cf;         /* neutral rule */
     --chip-bg: #efeee9;        /* quiet neutral chip background */
@@ -132,7 +132,7 @@
      subtitle on white, no anchoring. Now: an issue/date eyebrow, a
      larger Newsreader wordmark, a serif italic standfirst, with
      vertical rules above and below to feel like a publication
-     nameplate. The 6px Dalit Panther red strip stays. */
+     nameplate. The 6px Saturated Red red strip stays. */
   header.masthead {
     background: var(--bg);
     border-bottom: 1px solid var(--border);
@@ -223,7 +223,7 @@
   /* "Public-interest service" tag in the footer disclaimer. Cobalt
      to align with the political register; everything else in the
      footer keeps its muted-gray paragraph style. */
-  /* The "Public-interest service" tag uses Dalit Panther red — the
+  /* The "Public-interest service" tag uses Saturated Red red — the
      framing is an editorial claim, not a constitutional reference, so
      it earns the protest register rather than cobalt. */
   /* Compact colophon — appears at the foot of every tab. The full project
@@ -832,38 +832,38 @@
   .listing .row-reserv { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 10px 0 0; grid-column: 2 / span 3; }
   .listing .reserv-info { position: relative; }
   .listing .art16-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 4px 10px;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 4px 10px 4px 8px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     cursor: pointer;
-    border: 1px solid transparent;
+    background: var(--chip-bg);
+    color: var(--ink);
+    border: 1px solid var(--border);
     list-style: none;
     user-select: none;
-    transition: filter 0.2s;
+    transition: background 0.2s, border-color 0.2s;
   }
-  .listing .art16-btn:hover { filter: brightness(0.95); }
+  .listing .art16-btn::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .listing .art16-btn:hover { background: var(--border); }
   .listing .art16-btn::-webkit-details-marker { display: none; }
-  .listing .art16-btn.art16-saffron {
-    background: #fff4e5; color: #c2410c; border-color: #fdba74;
+  .listing .art16-btn.art16-saffron::before {
+    background: #FF9933;
   }
-  html[data-theme="dark"] .listing .art16-btn.art16-saffron {
-    background: rgba(194, 65, 12, 0.2); color: #fdba74; border-color: rgba(253, 186, 116, 0.3);
+  .listing .art16-btn.art16-blue::before {
+    background: var(--ambedkar-blue);
   }
-  .listing .art16-btn.art16-blue {
-    background: #eef2ff; color: var(--ambedkar-blue); border-color: #c7d2fe;
-  }
-  html[data-theme="dark"] .listing .art16-btn.art16-blue {
-    background: rgba(91, 138, 214, 0.15); color: var(--accent); border-color: rgba(91, 138, 214, 0.3);
-  }
-  .listing .art16-btn.art16-grey {
-    background: #f3f4f6; color: #4b5563; border-color: #d1d5db;
-  }
-  html[data-theme="dark"] .listing .art16-btn.art16-grey {
-    background: rgba(75, 85, 99, 0.2); color: #9ca3af; border-color: rgba(156, 163, 175, 0.3);
+  .listing .art16-btn.art16-grey::before {
+    background: #9ca3af;
   }
   .listing .art16-btn.art16-strike {
     position: relative;

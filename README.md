@@ -174,9 +174,9 @@ The site reads as journalism, not as a service. The political register
 — anti-caste, evidence-grounded, naming institutions by name — is
 deliberate. Pull requests that soften analysis, generalise to
 "stakeholders" or "marginalised communities" instead of naming SC, ST,
-OBC, EWS, PwBD, and Bahujan candidates specifically, or that try to
-balance The Gap's claims by adding institutional-perspective
-disclaimers that aren't sourced — will be declined.
+   OBC, EWS, PwBD, and Bahujan candidates specifically, or that try to
+   balance The Gap's claims by adding institutional-perspective
+   disclaimers that aren't sourced — will be declined.
 
 ## Licence
 
@@ -215,7 +215,7 @@ changed in the project between then and the entry date.
 
 The listing card UI has been redesigned to improve scannability and accessibility. 
 - **Typography & Hierarchy**: Increased institution font size to 28px and adjusted line-heights to establish a clearer visual order. The listings column is now capped at 740px to improve line length for readability.
-- **Article 16 Palette**: Shifted the reservation status pill to a Bahujan-political color register:
+- **Article 16 Palette**: Shifted the reservation status pill to a high-contrast political color register:
     - **Ambedkar Blue**: Confirmed roster disclosure or Special Recruitment Drive (SRD).
     - **Saffron**: Institutional exclusion / No reservation (Private Universities).
     - **Grey**: Unclear or undisclosed status.
