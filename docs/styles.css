@@ -115,6 +115,22 @@
   .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--panel); padding: 10px 14px; font-weight: 600; text-decoration: none; border-radius: 0 0 6px 0; z-index: 1000; }
   .skip-link:focus { left: 0; }
 
+  .beta-banner {
+    background: var(--chip-bg);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    padding: 6px 20px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .beta-banner strong {
+    color: var(--alarm);
+    font-weight: 700;
+  }
+
   /* Visually-hidden, screen-reader-accessible (WCAG 1.3.1). Used for section
      H2s that name each tab panel without visually duplicating the tab label. */
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
@@ -1024,7 +1040,7 @@
   #resources-tab .rti-card .rti-scenario { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 0 16px; font-style: italic; }
   #resources-tab .rti-card .rti-target { font-size: 13.5px; color: var(--ink); margin-bottom: 12px; }
   #resources-tab .rti-card .rti-text { width: 100%; min-height: 240px; padding: 16px; font-family: var(--mono); font-size: 13px; line-height: 1.6; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; resize: vertical; box-sizing: border-box; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-  #resources-tab .rti-card .rti-actions { display: flex; gap: 14px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+   #resources-tab .rti-card .rti-actions { display: flex; gap: 14px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
   #resources-tab .rti-card .rti-copy { padding: 10px 20px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s ease, transform 0.1s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   #resources-tab .rti-card .rti-copy:hover { background: var(--accent-deep); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
   #resources-tab .rti-card .rti-copy:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
