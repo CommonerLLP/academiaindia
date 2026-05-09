@@ -98,9 +98,11 @@ describe("safeUrl — XSS allowlist", () => {
       }
     })();
     expect(isSameOrigin || got === "ht!tp://broken").toBe(true);
-    expect(got.toLowerCase().startsWith("javascript:")).toBe(false);
-    expect(got.toLowerCase().startsWith("data:")).toBe(false);
-    expect(got.toLowerCase().startsWith("vbscript:")).toBe(false);
+    const lowered = got.toLowerCase();
+    const hasBlockedScheme = ["javascript:", "data:", "vbscript:"].some((s) =>
+      lowered.startsWith(s)
+    );
+    expect(hasBlockedScheme).toBe(false);
   });
 });
 
