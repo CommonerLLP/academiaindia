@@ -89,6 +89,42 @@ export function markerKeyForAd(ad) {
 let MAP = null;
 const MARKERS = {};
 
+// ---------- Icons ----------
+
+const PIN_PATH = "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z";
+const SYMBOLS = {
+  cap: "M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17.18 5 13.18z",
+  building: "M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-8h8v8zm-2-6h-4v4h4v-4z",
+  chart: "M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z",
+};
+
+const getSymbolPath = (type) => {
+  if (type.includes("University")) return SYMBOLS.cap;
+  if (["IIT", "NIT", "IIIT", "IISc", "IISER"].includes(type)) return SYMBOLS.building;
+  if (type === "IIM") return SYMBOLS.chart;
+  return "";
+};
+
+const createMarkerIcon = (type, color, isActive = false) => {
+  const symbol = getSymbolPath(type);
+  const size = isActive ? 36 : 28;
+  const strokeColor = isActive ? "var(--warn)" : "rgba(255,255,255,0.8)";
+  const strokeWidth = isActive ? 2.5 : 1;
+
+  return L.divIcon({
+    className: "custom-marker",
+    html: `
+      <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));">
+        <path d="${PIN_PATH}" fill="${color}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />
+        <path d="${symbol}" fill="white" transform="scale(0.5) translate(12, 6)" />
+      </svg>
+    `,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size],
+  });
+};
+
 export function initMap() {
   if (MAP) { MAP.invalidateSize(); return; }
   MAP = L.map("map-container").setView([22.5, 82], 5);
@@ -101,8 +137,8 @@ export function initMap() {
   for (const inst of Object.values(state.INSTITUTIONS)) {
     if (!inst.lat || !inst.lon) continue;
     const color = TYPE_COLORS[inst.type] || "#888";
-    const marker = L.circleMarker([inst.lat, inst.lon], {
-      radius: 7, color, fillColor: color, fillOpacity: 0.85, weight: 1,
+    const marker = L.marker([inst.lat, inst.lon], {
+      icon: createMarkerIcon(inst.type, color),
       interactive: true,
     });
     marker.on("add", () => {
@@ -130,8 +166,8 @@ export function initMap() {
     if (campuses) {
       for (const c of campuses) {
         const key = `${inst.id}::${c.city}`;
-        const cm = L.circleMarker([c.lat, c.lon], {
-          radius: 7, color, fillColor: color, fillOpacity: 0.85, weight: 1,
+        const cm = L.marker([c.lat, c.lon], {
+          icon: createMarkerIcon(inst.type, color),
           interactive: true,
         });
         cm.on("add", () => {
@@ -179,16 +215,16 @@ export function updateMapMarkers(filteredAds) {
     const fieldMatched = fieldCount[key] || 0;
     const total = totalCount[key] || 0;
     const color = TYPE_COLORS[inst.type] || "#888";
+    
+    // Update marker icon to reflect activity
     if (total === 0) {
-      marker.setStyle({ radius: 5, color: "#ccc", fillColor: "#ccc", fillOpacity: 0.3, weight: 1 });
+      marker.setIcon(createMarkerIcon(inst.type, "#ccc", false));
+      marker.setOpacity(0.4);
     } else {
-      marker.setStyle({
-        radius: fieldMatched > 0 ? 10 : 7,
-        color: fieldMatched > 0 ? "#b45309" : color,
-        fillColor: color, fillOpacity: 0.85,
-        weight: fieldMatched > 0 ? 2.5 : 1,
-      });
+      marker.setIcon(createMarkerIcon(inst.type, color, fieldMatched > 0));
+      marker.setOpacity(1.0);
     }
+
     const coverageUrl = inst.career_page_url_guess || "#";
     const hssLine = fieldMatched > 0 ? `<div class="popup-hss">▲ ${fieldMatched} field-matched ad${fieldMatched > 1 ? "s" : ""}</div>` : "";
     const totalLine = total > 0
