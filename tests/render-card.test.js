@@ -8,15 +8,6 @@ let renderCard;
 let state;
 
 beforeAll(async () => {
-  const win = new Window();
-  globalThis.window = win;
-  globalThis.document = win.document;
-  globalThis.localStorage = {
-    store: {},
-    getItem(key) { return this.store[key] ?? null; },
-    setItem(key, value) { this.store[key] = String(value); },
-    clear() { this.store = {}; },
-  };
   ({ state } = await import("../docs/lib/state.js"));
   renderCard = await import("../docs/lib/render-card.js");
 });
@@ -139,6 +130,6 @@ describe("renderAd", () => {
     expect(button.textContent).toBe("★");
     expect(button.getAttribute("aria-pressed")).toBe("true");
     expect(document.getElementById("count-saved").textContent).toBe("1");
-    expect(localStorage.store["hei-tracker-saved"]).toBe('["save-me"]');
+    expect(localStorage.getItem("hei-tracker-saved")).toBe('["save-me"]');
   });
 });

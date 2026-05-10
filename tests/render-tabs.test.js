@@ -8,19 +8,10 @@ let tabs;
 let state;
 
 beforeAll(async () => {
-  const win = new Window();
-  globalThis.window = win;
-  globalThis.document = win.document;
   Object.defineProperty(globalThis, "navigator", {
     configurable: true,
     value: { clipboard: { writeText: async () => {} } },
   });
-  globalThis.localStorage = {
-    store: {},
-    getItem(key) { return this.store[key] ?? null; },
-    setItem(key, value) { this.store[key] = String(value); },
-    clear() { this.store = {}; },
-  };
   ({ state } = await import("../docs/lib/state.js"));
   tabs = await import("../docs/lib/render-tabs.js");
 });
