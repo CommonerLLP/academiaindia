@@ -36,11 +36,14 @@ Thumbs.db
 .claude/
 
 # Agent operating rules + per-repo memory.
-# Hard rule: NEVER commit CLAUDE.md / AGENTS.md / memory/ on any repo.
-# These files carry operating discipline, mistakes log, and the
-# verified-fact audit trail. They stay local to the working tree.
+# Hard rule: NEVER commit these on any repo.
+# They carry operating discipline, mistakes log, and the verified-fact
+# audit trail. They stay local to the working tree, synced via iCloud.
 /CLAUDE.md
 /AGENTS.md
+/CONTEXT.md
+/GEMINI.md
+/WORKING.md
 /memory/
 
 # Internal strategy / architecture / design notes — NEVER commit.
