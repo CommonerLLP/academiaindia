@@ -4,12 +4,12 @@ This file is append-only. Entries record public project changes that are
 too detailed for the README but useful for maintainers, reviewers, and
 future contributors.
 
-## 2026-05-08 — UI Redesign & Article 16 Palette
+## 2026-05-08 — UI Redesign & Article 16 Political Palette
 
 The listing card UI has been redesigned to improve scannability and accessibility. 
 - **Typography & Hierarchy**: Increased institution font size to 28px and adjusted line-heights to establish a clearer visual order. The listings column is now capped at 740px to improve line length for readability.
-- **Article 16 Palette**: Shifted the reservation status pill to a high-contrast color register:
-    - **Blue**: Confirmed roster disclosure or Special Recruitment Drive (SRD).
+- **Article 16 Palette**: Shifted the reservation status pill to a Bahujan-political color register:
+    - **Ambedkar Blue**: Confirmed roster disclosure or Special Recruitment Drive (SRD).
     - **Saffron**: Institutional exclusion / No reservation (Private Universities).
     - **Grey**: Unclear or undisclosed status.
 - **Accessibility**: Increased tap areas for the star/save buttons (WCAG 2.5.5 AA) and re-anchored footer popovers to prevent viewport overflow.
