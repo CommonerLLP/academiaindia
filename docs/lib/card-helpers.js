@@ -17,10 +17,10 @@ import { safeUrl, resolveUrl, escapeRegExp } from "./sanitize.js";
 
 /** Type-to-colour map used by the card type chip and the map markers. */
 export const TYPE_COLORS = {
-  IIT: "#58a6ff", IIM: "#F47C20", IISc: "#58a6ff", IISER: "#58a6ff",
+  IIT: "#1F4E79", IIM: "#2d6a4f", IISc: "#6b21a8", IISER: "#b45309",
   NIT: "#64748b", IIIT: "#0e7490", CentralUniversity: "#92400e",
   StateUniversity: "#9a3412",
-  PrivateUniversity: "#F47C20",
+  PrivateUniversity: "#7c3aed",
 };
 
 export function detectAdCampus(ad) {
