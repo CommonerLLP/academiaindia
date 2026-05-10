@@ -149,7 +149,7 @@ describe("relevanceTag — HSS / non-HSS / other bucket", () => {
   });
   it("buckets an IIM management-only ad as 'non-hss'", () => {
     // IIM Bodh Gaya tagged Management/Business — treated as non-HSS for
-    // this dashboard's primary user (Bahujan PhD scholar, HSS-leaning).
+    // the target research persona (HSS-leaning).
     expect(relevanceTag(iimBodhgaya)).toBe("non-hss");
   });
   it("listingStatus is an alias for relevanceTag", () => {

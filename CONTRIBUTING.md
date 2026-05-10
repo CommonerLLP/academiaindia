@@ -154,27 +154,17 @@ These are non-negotiable. PRs that violate them will be declined.
   upstream servers and the project's ability to keep running.
 - **Do not commit advertisement PDFs to the repo.** We index; we do
   not rehost. Source PDFs stay on the institution's own servers.
-- **Do not soften analysis.** PRs that generalise from "SC, ST, OBC,
-  EWS, PwBD candidates" to "marginalised communities" or
-  "stakeholders" — or that add institutional-perspective hedges to
-  The Gap's specific claims without primary-source evidence — will
-  be declined.
-
-## Editorial register (for content contributions to *The Gap*)
-
-The Gap reads as journalism in the parliamentary-record tradition,
-not as op-ed. Three constraints:
-
-1. **Every claim is sourced** to a parliamentary question, court order,
-   or official Ministry of Education communication, and the source is
-   listed in the page-end bibliography.
-2. **Institutions and individuals are named when the record names
-   them.** "The Ministry of Education", "the IIT directors",
-   "Mallikarjun Kharge", "Sukanta Majumdar" — not "the relevant
-   authorities".
-3. **Reservation categories are named specifically.** SC, ST, OBC,
-   EWS, PwBD, Bahujan as a collective political identity — not
-   "marginalised", "underrepresented", "communities".
+- **Do not soften analysis.** PRs should maintain technical specificity 
+  when referring to constitutional categories (SC, ST, OBC, EWS, and 
+  PwBD). Avoid generic terms that obscure the data's relationship to 
+  the statutory reservation regime. 
+- **Maintain empirical rigor.** Contributions to *The Gap* must ground 
+  all claims in primary sources (parliamentary records, court orders, 
+  official communications).
+- **Use specific nomenclature.** Refer to institutions, individuals, and 
+  categories by their official or recorded names. Use "Bahujan" as a 
+  collective term only when it serves as a precise analytical category 
+  for the group of statutory reservation beneficiaries.
 
 ## Bug-fix priority
 

@@ -5,7 +5,7 @@
                           link bottom-rules, card hover borders, and
                           other secondary chrome. Deeper than the
                           masthead/CTA blue.
-     --ambedkar-blue      Primary blue — for the masthead
+     --accent-blue      Primary blue — for the masthead
                           title and the Apply CTA. Single source of
                           truth for the primary editorial blue:
                           #0047AB light / #5b8ad6 dark.
@@ -42,7 +42,7 @@
        the deadline column's tier-critical / tier-soon / tier-ok
        coloring (alarm / alarm / muted).
      • Masthead is centered, compact (~80 px), title in
-       --ambedkar-blue, strapline italic vermillion. No top
+       --accent-blue, strapline italic vermillion. No top
        alarm strip; footer carries only a thin neutral border.
      ============================================================ */
   :root {
@@ -61,8 +61,8 @@
     --muted-soft: #888883;     /* neutral non-urgent signal */
     --accent: #123f73;         /* Primary cobalt/navy for actions */
     --accent-deep: #0b2d55;    /* hover / pressed */
-    --ambedkar-blue: #0047AB;        /* Primary blue — masthead title + Apply CTA */
-    --ambedkar-blue-deep: #003380;   /* Primary blue hover/pressed */
+    --accent-blue: #0047AB;        /* Primary blue — masthead title + Apply CTA */
+    --accent-blue-deep: #003380;   /* Primary blue hover/pressed */
     --warn: #8a5a18;           /* amber for disclosure absence */
     --alarm: #7a1620;          /* oxblood — Saturated Red saturated red */
     --good: #1b5e20;
@@ -80,8 +80,8 @@
     --muted-soft: #6f716f;
     --accent: #7ea7df;         /* luminous cobalt */
     --accent-deep: #a4c3ee;
-    --ambedkar-blue: #5b8ad6;        /* Primary blue, lifted for dark-mode contrast */
-    --ambedkar-blue-deep: #82a6e0;   /* Primary blue hover/pressed in dark mode */
+    --accent-blue: #5b8ad6;        /* Primary blue, lifted for dark-mode contrast */
+    --accent-blue-deep: #82a6e0;   /* Primary blue hover/pressed in dark mode */
     --warn: #d0a05e;           /* amber */
     --alarm: #e05b63;          /* oxblood in dark mode */
     --good: #63ad78;
@@ -199,7 +199,7 @@
        both modes. Light: #0047AB. Dark: #5b8ad6 (lifted for text
        contrast against charcoal — Apply button shifts up too so they
        still match exactly). */
-    color: var(--ambedkar-blue);
+    color: var(--accent-blue);
     letter-spacing: -0.024em;
     line-height: 1.2;
     display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 22px;
@@ -207,7 +207,7 @@
   }
   header.masthead.masthead-compact .masthead-title {
     font-family: var(--serif);
-    /* Inherits color: var(--ambedkar-blue) from the parent h1 — same
+    /* Inherits color: var(--accent-blue) from the parent h1 — same
        blue the Apply CTA fills with, so the masthead title sits in the
        same family as the site's primary action. Strapline below stays
        vermillion. */
@@ -887,7 +887,7 @@
     background: #FF9933;
   }
   .listing .art16-btn.art16-blue::before {
-    background: var(--ambedkar-blue);
+    background: var(--accent-blue);
   }
   .listing .art16-btn.art16-grey::before {
     background: #9ca3af;
@@ -1346,15 +1346,15 @@
     display: inline-flex; align-items: center; gap: 4px;
     /* Primary blue — same token the masthead title uses, so the
        primary CTA and the editorial nameplate sit in the same blue. */
-    background: var(--ambedkar-blue); color: #fff;
+    background: var(--accent-blue); color: #fff;
     padding: 8px 16px; border-radius: 6px;
     font-size: 14px; font-weight: 650; text-decoration: none;
-    border: 1px solid var(--ambedkar-blue);
+    border: 1px solid var(--accent-blue);
     transition: background 0.15s ease, opacity 0.15s ease;
     flex-shrink: 0;
   }
   .listing .row-actions-inline a.btn-apply:hover {
-    background: var(--ambedkar-blue-deep); border-color: var(--ambedkar-blue-deep);
+    background: var(--accent-blue-deep); border-color: var(--accent-blue-deep);
     color: #fff; opacity: 1; text-decoration: none;
   }
   /* Third-party apply portal disclosure: shown next to the Apply

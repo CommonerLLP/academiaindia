@@ -103,7 +103,23 @@ export function initMap() {
     const color = TYPE_COLORS[inst.type] || "#888";
     const marker = L.circleMarker([inst.lat, inst.lon], {
       radius: 7, color, fillColor: color, fillOpacity: 0.85, weight: 1,
-    }).addTo(MAP);
+      interactive: true,
+    });
+    marker.on("add", () => {
+      const el = marker.getElement();
+      if (el) {
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", `${inst.name} (${typeLabel(inst.type)})`);
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            marker.openPopup();
+          }
+        });
+      }
+    });
+    marker.addTo(MAP);
     marker._instId = inst.id;
     marker._campusCity = inst.city;
     MARKERS[inst.id] = marker;
@@ -116,7 +132,23 @@ export function initMap() {
         const key = `${inst.id}::${c.city}`;
         const cm = L.circleMarker([c.lat, c.lon], {
           radius: 7, color, fillColor: color, fillOpacity: 0.85, weight: 1,
-        }).addTo(MAP);
+          interactive: true,
+        });
+        cm.on("add", () => {
+          const el = cm.getElement();
+          if (el) {
+            el.setAttribute("tabindex", "0");
+            el.setAttribute("role", "button");
+            el.setAttribute("aria-label", `${inst.name} — ${c.city} campus (${typeLabel(inst.type)})`);
+            el.addEventListener("keydown", (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                cm.openPopup();
+              }
+            });
+          }
+        });
+        cm.addTo(MAP);
         cm._instId = inst.id;
         cm._campusCity = c.city;
         cm._campusState = c.state;
