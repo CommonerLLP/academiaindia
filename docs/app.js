@@ -680,6 +680,7 @@ function renderSummary(filtered, st) {
   el.innerHTML =
     `<span class="emph">${filtered.length}</span> advertisements shown <span style="color:var(--muted-soft)">of ${total} total</span>` +
     (active > 0 ? `<span class="active-mark">· ${active} filter${active!==1?"s":""} active</span>` : "");
+  document.getElementById("sr-announcer").textContent = `${filtered.length} advertisements shown`;
   // Vacancy-gap pulse on the Vacancies tab. Numerator is hardcoded in
   // index.html (10,637 = 4,889 CU teaching + 5,748 AIIMS, the most
   // recent partial CFHEI disclosures). Denominator is currently-tracked
