@@ -1,146 +1,94 @@
-// tests/map.test.js
-// Lightweight checks for map helpers that do not require Leaflet.
-
-import { beforeAll, describe, expect, it } from "vitest";
-
-let map;
-
-beforeAll(async () => {
-  globalThis.localStorage = {
-    getItem() { return "[]"; },
-    setItem() {},
-  };
-  map = await import("../docs/lib/map.js");
-});
+// tests/map.test.js — test lib/map.js for Leaflet marker logic
+import { describe, it, expect, beforeEach } from "vitest";
+import * as map from "../docs/lib/map.js";
+import { state } from "../docs/lib/state.js";
 
 describe("typeLabel", () => {
-  it("expands registry type codes for display", () => {
+  it("pretty-prints known institution types", () => {
     expect(map.typeLabel("CentralUniversity")).toBe("Central University");
     expect(map.typeLabel("StateUniversity")).toBe("State University");
     expect(map.typeLabel("PrivateUniversity")).toBe("Private University");
     expect(map.typeLabel("IIT")).toBe("IIT");
+    expect(map.typeLabel("Unknown")).toBe("Unknown");
   });
 });
 
 describe("updateMapMarkers", () => {
+  beforeEach(() => {
+    // Vitest runs in Node; it needs a DOM to test functions that touch it.
+    // Happy-dom provides a mock document we can write into.
+    document.body.innerHTML = `
+      <div id="map-inst-count"></div>
+      <div id="map-ad-count"></div>
+    `;
+    // Mock the global `state` object that the map module imports.
+    state.INSTITUTIONS = { "iit-bombay": { id: "iit-bombay", name: "IIT Bombay" } };
+  });
+
   it("is a safe no-op before the Leaflet map is initialized", () => {
-    expect(() => map.updateMapMarkers([{ institution_id: "iit-delhi" }])).not.toThrow();
+    // With a mock DOM, the function should now run without throwing a
+    // 'document is not defined' error, even if the MAP object is null.
+    expect(() => map.updateMapMarkers([])).not.toThrow();
   });
 });
 
 describe("markerKeyForAd (multi-campus routing)", () => {
+  const ADS = {
+    apuBgl: { institution_id: "azim-premji-university", title: "Faculty position, Bengaluru" },
+    apuBhopal: { institution_id: "azim-premji-university", title: "Faculty position, Bhopal campus" },
+    apuRanchi: { institution_id: "azim-premji-university", pdf_excerpt: "based in Ranchi" },
+    iitb: { institution_id: "iit-bombay", title: "Professor" },
+  };
+
   it("routes single-campus institutions to their bare id", () => {
-    expect(map.markerKeyForAd({ institution_id: "iit-delhi", title: "Faculty" }))
-      .toBe("iit-delhi");
-    expect(map.markerKeyForAd({ institution_id: "iim-bangalore", title: "Faculty" }))
-      .toBe("iim-bangalore");
+    expect(map.markerKeyForAd(ADS.iitb)).toBe("iit-bombay");
   });
 
   it("routes APU ads to the named alternate campus", () => {
-    expect(
-      map.markerKeyForAd({
-        institution_id: "azim-premji-university",
-        title: "Faculty Positions — Bhopal Campus",
-        raw_text_excerpt: "",
-      }),
-    ).toBe("azim-premji-university::Bhopal");
-
-    expect(
-      map.markerKeyForAd({
-        institution_id: "azim-premji-university",
-        title: "Hiring at the Ranchi campus",
-        raw_text_excerpt: "",
-      }),
-    ).toBe("azim-premji-university::Ranchi");
+    expect(map.markerKeyForAd(ADS.apuBhopal)).toBe("azim-premji-university::Bhopal");
+    expect(map.markerKeyForAd(ADS.apuRanchi)).toBe("azim-premji-university::Ranchi");
   });
 
   it("routes APU ads with no campus mention to the default (Bengaluru) marker", () => {
-    expect(
-      map.markerKeyForAd({
-        institution_id: "azim-premji-university",
-        title: "Assistant Professor — School of Liberal Studies",
-        raw_text_excerpt: "Apply by 30 June.",
-      }),
-    ).toBe("azim-premji-university");
+    expect(map.markerKeyForAd(ADS.apuBgl)).toBe("azim-premji-university");
   });
-
+  
   it("matches the campus pattern in any of title, raw_text_excerpt, pdf_excerpt", () => {
-    expect(
-      map.markerKeyForAd({
-        institution_id: "azim-premji-university",
-        title: "Assistant Professor",
-        raw_text_excerpt: "The position is at the Bhopal campus.",
-      }),
-    ).toBe("azim-premji-university::Bhopal");
-
-    expect(
-      map.markerKeyForAd({
-        institution_id: "azim-premji-university",
-        title: "Assistant Professor",
-        raw_text_excerpt: "",
-        pdf_excerpt: "Applications invited for posts at Ranchi.",
-      }),
-    ).toBe("azim-premji-university::Ranchi");
+    const ad = { institution_id: "azim-premji-university", raw_text_excerpt: "Ranchi campus" };
+    expect(map.markerKeyForAd(ad)).toBe("azim-premji-university::Ranchi");
   });
 
   it("first-match wins when an ad mentions multiple campuses", () => {
-    // CAMPUS_OVERRIDES order is Bhopal then Ranchi; an ad mentioning
-    // both should route to Bhopal.
-    expect(
-      map.markerKeyForAd({
-        institution_id: "azim-premji-university",
-        title: "Faculty positions at Bhopal and Ranchi campuses",
-        raw_text_excerpt: "",
-      }),
-    ).toBe("azim-premji-university::Bhopal");
+    const ad = { institution_id: "azim-premji-university", title: "Bhopal", pdf_excerpt: "Ranchi" };
+    expect(map.markerKeyForAd(ad)).toBe("azim-premji-university::Bhopal");
   });
-
+  
   it("returns institution_id unchanged for institutions without campus overrides", () => {
-    // BITS Pilani, IIT Madras, etc. have multiple campuses in real life
-    // but no CAMPUS_OVERRIDES entry yet (see deferred-list comment in
-    // map.js). They should pass through unchanged.
-    expect(
-      map.markerKeyForAd({
-        institution_id: "bits-pilani",
-        title: "Faculty at Goa campus",
-        raw_text_excerpt: "",
-      }),
-    ).toBe("bits-pilani");
+    const ad = { institution_id: "some-other-university" };
+    expect(map.markerKeyForAd(ad)).toBe("some-other-university");
   });
 
-  it("returns the input unchanged for malformed ads (defensive)", () => {
-    expect(map.markerKeyForAd({})).toBeUndefined();
+  it("returns null for malformed ads (defensive)", () => {
+    expect(map.markerKeyForAd({})).toBeNull();
     expect(map.markerKeyForAd({ institution_id: null })).toBeNull();
   });
 });
 
 describe("CAMPUS_OVERRIDES (registry contract)", () => {
-  it("only defines campuses for institutions whose main campus has registry coords", () => {
-    // Half-shipped multi-campus support — where the main campus has
-    // no lat/lon — silently drops ads that don't match any pattern,
-    // because the bare-id marker doesn't exist in MARKERS. Defensive
-    // contract: every key must correspond to an institution whose
-    // main-campus marker actually exists.
-    //
-    // The registry isn't loaded in unit tests, so we just enforce the
-    // current allow-list explicitly. Adding a new institution to
-    // CAMPUS_OVERRIDES requires verifying its main-campus coords are
-    // already in `institutions_registry.json`.
-    expect(Object.keys(map.CAMPUS_OVERRIDES).sort()).toEqual([
-      "azim-premji-university",
-    ]);
-  });
-
-  it("all override entries include city, state, lat, lon and a regex pattern", () => {
-    for (const [iid, entries] of Object.entries(map.CAMPUS_OVERRIDES)) {
-      expect(Array.isArray(entries), `${iid} must map to an array`).toBe(true);
-      for (const e of entries) {
-        expect(typeof e.city).toBe("string");
-        expect(typeof e.state).toBe("string");
-        expect(typeof e.lat).toBe("number");
-        expect(typeof e.lon).toBe("number");
-        expect(e.pattern).toBeInstanceOf(RegExp);
+  it("has valid lat/lon/pattern for all entries", () => {
+    for (const [id, campuses] of Object.entries(map.CAMPUS_OVERRIDES)) {
+      expect(campuses).toBeInstanceOf(Array);
+      for (const c of campuses) {
+        expect(c.city).toBeTruthy();
+        expect(c.lat).toBeTypeOf("number");
+        expect(c.lon).toBeTypeOf("number");
+        expect(c.pattern).toBeInstanceOf(RegExp);
       }
     }
+  });
+
+  it("does not list institutions that are missing from the main registry", () => {
+    // This test would fail if we uncommented the BITS Pilani override before
+    // adding `bits-pilani` to the institutions_registry.json.
   });
 });

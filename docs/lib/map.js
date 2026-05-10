@@ -1,28 +1,9 @@
 // docs/lib/map.js — Leaflet map initialisation + marker updates.
-//
-// initMap creates the map once (idempotent: a second call just invalidates
-// size in case the tab became visible). updateMapMarkers re-paints the
-// existing markers based on whatever filter slice the listings tab is
-// currently showing — so the map and the listings stay in sync.
-//
-// Leaflet itself is loaded as a global from CDN — referenced as L. The
-// map div #map-container and the legend div #map-legend live in index.html.
-//
-// MAP and MARKERS are module-local mutable state; nobody outside this
-// module needs to read them, hence no exports.
 
 import { state } from "./state.js";
 import { fieldTags } from "./classify.js";
 import { escapeHTML, escapeAttr, safeUrl } from "./sanitize.js";
 import { TYPE_COLORS } from "./card-helpers.js";
-// NB: card-helpers.js exports a heuristic `detectAdCampus(ad)` that
-// scans free-text for "<City> Campus" / "Campus: <City>" / "based in
-// <City>". We deliberately do NOT use it here — the map needs a
-// strict whitelist (per-institution, per-campus, with known coords)
-// rather than open-ended capture, so we ship CAMPUS_OVERRIDES below.
-// `detectAdCampus` is still the right tool for the card label, where
-// false-positives are cosmetic; here a false-positive would put the
-// marker in the wrong place.
 
 /** Pretty-print an institution-type code for the legend / chip / tooltip. */
 export const typeLabel = (type) => ({
@@ -32,36 +13,6 @@ export const typeLabel = (type) => ({
 }[type] || type);
 
 // ---------- Multi-campus support ----------
-// A small number of institutions in the registry have one entry but
-// run multiple geographic campuses. The registry's lat/lon is the
-// "main" campus; ads that explicitly name an alternate campus in
-// their text get plotted at that campus's coords instead. Ads that
-// don't name a campus stay on the default (main-campus) marker.
-//
-// Schema: CAMPUS_OVERRIDES[institution_id] = [
-//   { city, state, lat, lon, pattern: /\\bCityName\\b/i },
-//   ...
-// ]
-// `pattern` is tested against the ad's title + excerpt + pdf-excerpt.
-// First match wins, so order entries by specificity if cities overlap.
-//
-// Coverage today (deliberately minimal; expand only when both the
-// registry has the main campus AND the alternates' lat/lon are
-// publicly verifiable):
-//
-// - Azim Premji University (registry: Bengaluru). Bhopal opened
-//   2023, Ranchi opened 2025.
-//
-// Deferred:
-//
-// - BITS Pilani (Pilani / Goa / Hyderabad / Dubai). The registry
-//   entry `bits-pilani` has no lat/lon, so the main-campus marker
-//   isn't created in `initMap()` at all — adding only Goa /
-//   Hyderabad here would mean ads not naming either silently
-//   disappear from the map. Wire this up after the main-campus
-//   coords land in `institutions_registry.json`.
-// - IIT Madras (Chennai + Zanzibar) — Zanzibar is too far off the
-//   India bounding-box to plot meaningfully on the current map.
 export const CAMPUS_OVERRIDES = {
   "azim-premji-university": [
     { city: "Bhopal", state: "Madhya Pradesh", lat: 23.233, lon: 77.434, pattern: /\bBhopal\b/i },
@@ -69,17 +20,12 @@ export const CAMPUS_OVERRIDES = {
   ],
 };
 
-/** Pure helper: given an ad, return the marker key it should be
- *  counted under. Returns the composite key `"instId::City"` for an
- *  alternate campus, or the bare `institution_id` for the default
- *  (main-campus) marker. Exported so tests can pin the routing.
- */
 export function markerKeyForAd(ad) {
   const iid = ad?.institution_id;
-  if (!iid) return iid;
+  if (!iid) return null;
   const campuses = CAMPUS_OVERRIDES[iid];
   if (!campuses) return iid;
-  const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.pdf_excerpt || ""}`;
+  const text = `${ad.title || ""} ${ad.raw_text_excerpt || ""} ${ad.pdf_excerpt || ""}`.toLowerCase();
   for (const c of campuses) {
     if (c.pattern.test(text)) return `${iid}::${c.city}`;
   }
@@ -87,101 +33,203 @@ export function markerKeyForAd(ad) {
 }
 
 let MAP = null;
+let CLUSTER_GROUP = null;
 const MARKERS = {};
+
+// ---------- Icons ----------
+const SYMBOLS = {
+  cap: "M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17.18 5 13.18z",
+  building: "M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-8h8v8zm-2-6h-4v4h4v-4z",
+  chart: "M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z",
+};
+
+const getSymbolPath = (type) => {
+  const t = type || "";
+  if (t.includes("University")) return SYMBOLS.cap;
+  if (["IIT", "NIT", "IIIT", "IISc", "IISER"].includes(t)) return SYMBOLS.building;
+  if (t === "IIM") return SYMBOLS.chart;
+  return SYMBOLS.cap;
+};
+
+const createMarkerIcon = (type, color, count = 0, isActive = false) => {
+  const symbol = getSymbolPath(type);
+  const showCount = count > 0;
+  const width = showCount ? (count > 9 ? 48 : 42) : 16;
+  const height = 24;
+  const safeColor = color || "#888";
+
+  let html = "";
+  if (showCount) {
+    const activeClass = isActive ? "custom-marker-active has-field-match" : "custom-marker-active";
+    html = `
+      <div class="${activeClass}" style="--marker-bg: ${safeColor}; width: ${width}px; height: ${height}px;">
+        <svg width="12" height="12" viewBox="0 0 24 24"><path d="${symbol}" fill="white" /></svg>
+        <span>${count}</span>
+      </div>
+    `;
+  } else {
+    html = `
+      <div class="custom-marker-inactive">
+        <svg width="8" height="8" viewBox="0 0 24 24"><path d="${symbol}" fill="#999" /></svg>
+      </div>
+    `;
+  }
+
+  return L.divIcon({
+    className: "map-pill-wrap",
+    html: html,
+    iconSize: [width, height + 6],
+    iconAnchor: [width / 2, height + 6],
+    popupAnchor: [0, -(height + 6)],
+  });
+};
+
+const createClusterIcon = (cluster) => {
+  const markers = cluster.getAllChildMarkers();
+  let totalJobs = 0;
+  const instsInCluster = new Set();
+  
+  markers.forEach(m => {
+    totalJobs += (m._currentTotalCount || 0);
+    instsInCluster.add(m._instId);
+  });
+
+  const count = totalJobs;
+  const instCount = instsInCluster.size;
+  const width = count > 99 ? 64 : 54;
+  const height = 28;
+  const clusterColor = "#123f73";
+
+  return L.divIcon({
+    className: "map-cluster-pill-wrap",
+    html: `
+      <div class="custom-marker-active cluster-pill" style="--marker-bg: ${clusterColor}; width: ${width}px; height: ${height}px; border-width: 3px; font-size: 11px; gap: 2px;">
+        <span style="font-weight: 400; opacity: 0.9;">${instCount}🏛️</span>
+        <span style="border-left: 1px solid rgba(255,255,255,0.3); padding-left: 4px;">${count}</span>
+      </div>
+    `,
+    iconSize: [width, height],
+    iconAnchor: [width / 2, height / 2],
+  });
+};
 
 export function initMap() {
   if (MAP) { MAP.invalidateSize(); return; }
-  MAP = L.map("map-container").setView([22.5, 82], 5);
+  const container = document.getElementById("map-container");
+  if (!container) return;
+  
+  MAP = L.map(container).setView([22.5, 82], 5);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 18,
   }).addTo(MAP);
 
-  const typeSeen = new Set();
+  // Initialize Cluster Group with Airbnb-style tuning
+  CLUSTER_GROUP = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 70, // Bunches markers within 70px
+    disableClusteringAtZoom: 10, // At zoom 10, always show individual institutions
+    spiderfyOnMaxZoom: true,
+    iconCreateFunction: createClusterIcon
+  });
+  MAP.addLayer(CLUSTER_GROUP);
+
   for (const inst of Object.values(state.INSTITUTIONS)) {
     if (!inst.lat || !inst.lon) continue;
     const color = TYPE_COLORS[inst.type] || "#888";
-    const marker = L.circleMarker([inst.lat, inst.lon], {
-      radius: 7, color, fillColor: color, fillOpacity: 0.85, weight: 1,
-    }).addTo(MAP);
+    
+    const marker = L.marker([inst.lat, inst.lon], {
+      icon: createMarkerIcon(inst.type, color),
+      interactive: true,
+      keyboard: true,
+      title: inst.name
+    });
+    
     marker._instId = inst.id;
     marker._campusCity = inst.city;
+    marker._currentTotalCount = 0; // Track for cluster aggregation
     MARKERS[inst.id] = marker;
-    typeSeen.add(inst.type);
+    CLUSTER_GROUP.addLayer(marker);
 
-    // Create additional markers for alternate campuses.
+    // Alternate campuses
     const campuses = CAMPUS_OVERRIDES[inst.id];
     if (campuses) {
       for (const c of campuses) {
         const key = `${inst.id}::${c.city}`;
-        const cm = L.circleMarker([c.lat, c.lon], {
-          radius: 7, color, fillColor: color, fillOpacity: 0.85, weight: 1,
-        }).addTo(MAP);
+        const cm = L.marker([c.lat, c.lon], {
+          icon: createMarkerIcon(inst.type, color),
+          interactive: true,
+          keyboard: true,
+          title: `${inst.name} (${c.city})`
+        });
         cm._instId = inst.id;
         cm._campusCity = c.city;
         cm._campusState = c.state;
+        cm._currentTotalCount = 0;
         MARKERS[key] = cm;
+        CLUSTER_GROUP.addLayer(cm);
       }
     }
   }
 
   const legend = document.getElementById("map-legend");
-  legend.innerHTML = [...typeSeen].filter(Boolean).sort().map(t =>
-    `<div class="map-legend-item"><div class="map-legend-dot" style="background:${TYPE_COLORS[t] || '#888'}"></div>${typeLabel(t)}</div>`
-  ).join("") +
-  `<div class="map-legend-item"><div class="map-legend-dot" style="background:#1F4E79; outline:2px solid var(--warn); outline-offset:1px;"></div>Field-matched ads open</div>`;
+  if (legend) {
+    legend.innerHTML = [
+      `<div class="map-legend-item"><div class="map-legend-dot" style="background:#000080" aria-label="Blue"></div>Central University</div>`,
+      `<div class="map-legend-item"><div class="map-legend-dot" style="background:#58a6ff" aria-label="Light Blue"></div>Technical (IIT/IISc)</div>`,
+      `<div class="map-legend-item"><div class="map-legend-dot" style="background:#F47C20" aria-label="Saffron"></div>IIM / Private</div>`,
+      `<div class="map-legend-item"><div class="map-legend-dot" style="background:#123f73; border-radius: 4px;" aria-label="Navy"></div>Regional Cluster</div>`
+    ].join("");
+  }
 }
 
 export function updateMapMarkers(filteredAds) {
-  if (!MAP) return;
-  const fieldCount = {}, totalCount = {};
+  const instEl = document.getElementById("map-inst-count");
+  const adEl = document.getElementById("map-ad-count");
+  
+  const fieldCount = {}, totalCount = {}, instsSeen = new Set();
   for (const ad of filteredAds) {
     const key = markerKeyForAd(ad);
+    if (!key) continue;
     totalCount[key] = (totalCount[key] || 0) + 1;
     if (!fieldTags(ad).includes("Other")) fieldCount[key] = (fieldCount[key] || 0) + 1;
+    instsSeen.add(key.includes("::") ? key.split("::")[0] : key);
   }
+
+  if (instEl) instEl.textContent = instsSeen.size;
+  if (adEl) adEl.textContent = filteredAds.length;
+
+  if (!MAP || !CLUSTER_GROUP) return;
+
   for (const [key, marker] of Object.entries(MARKERS)) {
-    // For alternate campus markers, look up the parent institution.
     const instId = marker._instId;
     const inst = state.INSTITUTIONS[instId] || {};
     const fieldMatched = fieldCount[key] || 0;
     const total = totalCount[key] || 0;
     const color = TYPE_COLORS[inst.type] || "#888";
-    if (total === 0) {
-      marker.setStyle({ radius: 5, color: "#ccc", fillColor: "#ccc", fillOpacity: 0.3, weight: 1 });
-    } else {
-      marker.setStyle({
-        radius: fieldMatched > 0 ? 10 : 7,
-        color: fieldMatched > 0 ? "#b45309" : color,
-        fillColor: color, fillOpacity: 0.85,
-        weight: fieldMatched > 0 ? 2.5 : 1,
-      });
-    }
+    
+    // Store live count on marker for cluster calculation
+    marker._currentTotalCount = total;
+    
+    marker.setIcon(createMarkerIcon(inst.type, color, total, fieldMatched > 0));
+    marker.setOpacity(total === 0 ? 0.4 : 1.0);
+    
     const coverageUrl = inst.career_page_url_guess || "#";
     const hssLine = fieldMatched > 0 ? `<div class="popup-hss">▲ ${fieldMatched} field-matched ad${fieldMatched > 1 ? "s" : ""}</div>` : "";
-    const totalLine = total > 0
-      ? `${total} ad${total !== 1 ? "s" : ""} match filters &nbsp;·&nbsp; <a class="popup-link" href="${escapeAttr(safeUrl(coverageUrl))}" target="_blank" rel="noopener noreferrer">career page →</a>`
-      : `no ads match current filters &nbsp;·&nbsp; <a class="popup-link" href="${escapeAttr(safeUrl(coverageUrl))}" target="_blank" rel="noopener noreferrer">career page →</a>`;
+    const totalLine = total > 0 ? `${total} ad${total !== 1 ? "s" : ""} match filters` : `no ads match filters`;
 
-    // Display campus-specific name for alternate campuses.
     const displayCity = marker._campusCity || inst.city;
     const displayState = marker._campusState || inst.state;
     const campusSuffix = key.includes("::") ? ` — ${displayCity} campus` : "";
+    
     marker.bindPopup(`
       <strong>${escapeHTML(inst.name)}${escapeHTML(campusSuffix)}</strong><br/>
       <span style="color:var(--muted)">${escapeHTML(typeLabel(inst.type))} · ${escapeHTML([displayCity, displayState].filter(Boolean).join(", "))}</span>
       ${hssLine}
-      <div style="margin-top:6px">${totalLine}</div>`);
+      <div style="margin-top:6px">${totalLine}</div>
+      <div style="margin-top:4px"><a class="popup-link" href="${escapeAttr(safeUrl(coverageUrl))}" target="_blank" rel="noopener noreferrer">career page →</a></div>`);
   }
 
-  // Update the map summary bar with counts so the user sees filter feedback.
-  // Count unique institutions (collapse campus variants to parent id).
-  const instsSeen = new Set();
-  for (const key of Object.keys(totalCount)) {
-    instsSeen.add(key.includes("::") ? key.split("::")[0] : key);
-  }
-  const instEl = document.getElementById("map-inst-count");
-  const adEl = document.getElementById("map-ad-count");
-  if (instEl) instEl.textContent = instsSeen.size;
-  if (adEl) adEl.textContent = filteredAds.length;
+  // Force cluster refresh to pick up new internal marker counts
+  CLUSTER_GROUP.refreshClusters();
 }

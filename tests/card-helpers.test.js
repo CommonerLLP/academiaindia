@@ -7,12 +7,6 @@ let helpers;
 let state;
 
 beforeAll(async () => {
-  globalThis.localStorage = {
-    store: {},
-    getItem(key) { return this.store[key] ?? null; },
-    setItem(key, value) { this.store[key] = String(value); },
-    clear() { this.store = {}; },
-  };
   ({ state } = await import("../docs/lib/state.js"));
   helpers = await import("../docs/lib/card-helpers.js");
 });
