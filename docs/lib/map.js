@@ -105,23 +105,66 @@ const getSymbolPath = (type) => {
   return "";
 };
 
-const createMarkerIcon = (type, color, isActive = false) => {
+const createMarkerIcon = (type, color, count = 0, isActive = false) => {
   const symbol = getSymbolPath(type);
-  const size = isActive ? 36 : 28;
-  const strokeColor = isActive ? "var(--warn)" : "rgba(255,255,255,0.8)";
-  const strokeWidth = isActive ? 2.5 : 1;
+  const showCount = count > 0;
+  
+  // Sizing and styling
+  const width = showCount ? (count > 9 ? 48 : 42) : 24;
+  const height = 24;
+  const borderRadius = 12;
+  const strokeColor = isActive ? "var(--warn)" : "white";
+  const strokeWidth = isActive ? 2 : 1;
+  const fillColor = showCount ? color : "#ccc";
+
+  let html = "";
+  if (showCount) {
+    // Accessible Data Pill: [ Symbol | Count ]
+    html = `
+      <div style="
+        display: flex; align-items: center; justify-content: center;
+        width: ${width}px; height: ${height}px;
+        background: ${fillColor}; color: white;
+        border-radius: ${borderRadius}px; border: ${strokeWidth}px solid ${strokeColor};
+        font-family: var(--sans); font-size: 13px; font-weight: 700;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        position: relative;
+        gap: 4px; padding: 0 4px;
+      ">
+        <svg width="12" height="12" viewBox="0 0 24 24">
+          <path d="${symbol}" fill="white" />
+        </svg>
+        <span>${count}</span>
+        <div style="
+          position: absolute; bottom: -6px; left: 50%;
+          width: 0; height: 0; margin-left: -6px;
+          border-left: 6px solid transparent; border-right: 6px solid transparent;
+          border-top: 6px solid ${fillColor};
+        "></div>
+      </div>
+    `;
+  } else {
+    // Small minimalist dot for inactive institutions
+    html = `
+      <div style="
+        width: 14px; height: 14px;
+        background: #eee; border-radius: 50%;
+        border: 1px solid #ccc; opacity: ${opacity};
+        display: flex; align-items: center; justify-content: center;
+      ">
+        <svg width="8" height="8" viewBox="0 0 24 24">
+          <path d="${symbol}" fill="#999" />
+        </svg>
+      </div>
+    `;
+  }
 
   return L.divIcon({
     className: "custom-marker",
-    html: `
-      <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));">
-        <path d="${PIN_PATH}" fill="${color}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />
-        <path d="${symbol}" fill="white" transform="scale(0.5) translate(12, 6)" />
-      </svg>
-    `,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size],
-    popupAnchor: [0, -size],
+    html: html,
+    iconSize: [width, height + 6],
+    iconAnchor: [width / 2, height + 6],
+    popupAnchor: [0, -(height + 6)],
   });
 };
 
@@ -216,12 +259,12 @@ export function updateMapMarkers(filteredAds) {
     const total = totalCount[key] || 0;
     const color = TYPE_COLORS[inst.type] || "#888";
     
-    // Update marker icon to reflect activity
+    // Update marker icon to reflect activity with Airbnb-style count pills
+    marker.setIcon(createMarkerIcon(inst.type, color, total, fieldMatched > 0));
+    
     if (total === 0) {
-      marker.setIcon(createMarkerIcon(inst.type, "#ccc", false));
       marker.setOpacity(0.4);
     } else {
-      marker.setIcon(createMarkerIcon(inst.type, color, fieldMatched > 0));
       marker.setOpacity(1.0);
     }
 
