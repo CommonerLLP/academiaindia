@@ -369,14 +369,11 @@ function wireEvents() {
   // One open at a time so popovers don't overlap.
   // Each open/close also flips `aria-expanded` on the trigger so AT users
   // know the popover state matches what sighted users see.
-  const closeAllDropdowns = ({ returnFocus = false } = {}) => {
+  const closeAllDropdowns = () => {
     document.querySelectorAll(".filter-dd.open").forEach(d => {
       d.classList.remove("open");
       const trigger = d.querySelector(".filter-trigger");
-      if (trigger) {
-        trigger.setAttribute("aria-expanded", "false");
-        if (returnFocus) trigger.focus();
-      }
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
     });
   };
   document.querySelectorAll(".filter-dd .filter-trigger").forEach(btn => {
@@ -388,12 +385,6 @@ function wireEvents() {
       if (!wasOpen) {
         dd.classList.add("open");
         btn.setAttribute("aria-expanded", "true");
-        // Accessibility: move focus to the first interactive element in the popover
-        const firstFocusable = dd.querySelector('input, button:not([disabled])');
-        if (firstFocusable) {
-          // Delay focus slightly to ensure the browser has rendered the open popover
-          setTimeout(() => firstFocusable.focus(), 50);
-        }
       }
     });
   });
@@ -401,7 +392,7 @@ function wireEvents() {
     if (!e.target.closest(".filter-dd")) closeAllDropdowns();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAllDropdowns({ returnFocus: true });
+    if (e.key === "Escape") closeAllDropdowns();
   });
   // Per-popover "Clear" buttons (data-clear="filter-<id>") uncheck every
   // input inside the matching filter-group.

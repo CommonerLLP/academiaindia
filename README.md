@@ -166,13 +166,15 @@ Two contribution areas are especially urgent:
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the parser contract,
 testing setup, and a priority queue.
 
-## Technical standards
+## Editorial line
 
-The site prioritizes technical rigor and specificity in its analysis. 
-Data is processed according to the official categories defined by the 
-Constitution of India and subsequent statutes (SC, ST, OBC, EWS, and 
-PwBD). Contributions should maintain this level of granularity and 
-ground all claims in the primary parliamentary and institutional records.
+The site reads as journalism, not as a service. The political register
+— evidence-grounded, naming institutions by name — is
+deliberate. Pull requests that soften analysis, generalise to
+"stakeholders" or "marginalised communities" instead of naming SC, ST,
+   OBC, EWS, and PwBD candidates specifically, or that try to
+   balance The Gap's claims by adding institutional-perspective
+   disclaimers that aren't sourced — will be declined.
 
 ## Licence
 

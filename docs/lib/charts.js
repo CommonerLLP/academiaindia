@@ -1613,9 +1613,9 @@ export function mpsAskingPanel() {
   const max = Math.max(...stateRanked.map(s => s.count));
 
   const stateRows = stateRanked.map(s => {
-    // Identifying regional variation in data extraction. States with 
-    // higher frequency of parliamentary inquiry into faculty recruitment
-    // are highlighted to show geographic concentration.
+    // Mark non-southern, non-eastern states as "muted" to make the geographic
+    // concentration visually obvious. The political claim: anti-caste,
+    // Dravidian, and left-leaning states do this parliamentary work.
     const muted = !["Tamil Nadu","Kerala","West Bengal","Uttar Pradesh","Andhra Pradesh","Odisha","Karnataka","Bihar","Maharashtra"].includes(s.state);
     return `<div class="mp-state-row${muted ? ' muted' : ''}">
       <span class="mp-state-name">${escapeHTML(s.state)}</span>
@@ -1807,7 +1807,7 @@ export async function renderVacancies() {
       </div>
 
       <div class="jbm-card">
-        <h3 class="jbm-title">Three rhetorical instruments the Ministry uses to refuse disclosure</h3>
+        <h4 class="jbm-title">Three rhetorical instruments the Ministry uses to refuse disclosure</h4>
         <p class="jbm-deck">Reading the parliamentary record across five years, three patterns repeat — each one a specific evasion technique deployed against specific kinds of question.</p>
         <div class="jbm-chart">
           <div style="display:grid; gap:14px; font-family:var(--sans, 'Inter'); font-size:13.5px; line-height:1.55;">
