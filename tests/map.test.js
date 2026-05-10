@@ -76,7 +76,7 @@ describe("markerKeyForAd (multi-campus routing)", () => {
 
 describe("CAMPUS_OVERRIDES (registry contract)", () => {
   it("has valid lat/lon/pattern for all entries", () => {
-    for (const [id, campuses] of Object.entries(map.CAMPUS_OVERRIDES)) {
+    for (const [, campuses] of Object.entries(map.CAMPUS_OVERRIDES)) {
       expect(campuses).toBeInstanceOf(Array);
       for (const c of campuses) {
         expect(c.city).toBeTruthy();
